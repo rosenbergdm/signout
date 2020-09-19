@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="/static/signout.css">
+{% endblock %}
+{% block title %}Night Float call list for {{ type }} calls{% endblock %}
+{% block body %}
+<center><h1>Call list for {{ type }} signouts</h1></center></br>
+<div class="flex-container">
+  <div class="waitinglist" style="flex: 0 0 400px">
+    <ul>
+      {% for intern in waiting_interns %}
+      <li>{{ intern.intern_name }} - ({{ intern.name }})
+        <form id="{{ intern.id }}" name="{{ intern.id }}" action="" method="POST">
+          <input type="hidden" name="signout.id" value="{{ intern.id }}">
+          <button name="submit" type="submit" id="submit">Remove</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="completelist" style="flex: 0 0 400px">
+    <ul>
+      {% for intern in completed_interns %}
+      <li>{{ intern.intern_name }} - ({{ intern.name }})
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}
+
+<!-- vim: ft=htmldjango 
+-->

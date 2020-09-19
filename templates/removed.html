@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<meta http-equiv="refresh" content="2; url=/nightfloat?list={{ type }}" />
+{% endblock %}
+{% block title %}Entry successfully removed{% endblock %}
+{% block body %}
+<h1>Callback successfully removed from the call list.</h1>
+{% endblock %}
