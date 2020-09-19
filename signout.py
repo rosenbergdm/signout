@@ -36,25 +36,33 @@ def get_db():
 def index():
     return redirect(url_for("submission"))
 
+
 @app.route("/nightfloat", methods=["GET", "POST"])
 def nightfloat():
-    if request.args.get('list') is None:
+    if request.args.get("list") is None:
         listtype = "Solid"
     else:
-        listtype = request.args.get('list')
+        listtype = request.args.get("list")
     conn = get_db()
     if request.method == "GET":
         cur = conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
                     SELECT signout.id, intern_name, name, intern_callback 
                     FROM signout LEFT JOIN service 
                         ON signout.service = service.id 
                     WHERE active is TRUE 
                         AND type = '%s' 
                     ORDER BY addtime ASC
-                    """ % listtype.upper())
-        waiting_interns = [{"id": x[0], "intern_name": x[1], "name": x[2], "intern_callback": x[3]} for x in cur.fetchall()]
-        cur.execute("""
+                    """
+            % listtype.upper()
+        )
+        waiting_interns = [
+            {"id": x[0], "intern_name": x[1], "name": x[2], "intern_callback": x[3]}
+            for x in cur.fetchall()
+        ]
+        cur.execute(
+            """
                     SELECT intern_name, name 
                     FROM signout LEFT JOIN service 
                         ON signout.service = service.id 
@@ -64,20 +72,32 @@ def nightfloat():
                         and date_part('month', addtime) = date_part('month', current_timestamp) 
                         and date_part('year', addtime) = date_part('year', current_timestamp)
                     ORDER BY completetime ASC
-                    """ % listtype.upper())
-        completed_interns = [{"intern_name": x[0], "name": x[1]} for x in cur.fetchall()]
+                    """
+            % listtype.upper()
+        )
+        completed_interns = [
+            {"intern_name": x[0], "name": x[1]} for x in cur.fetchall()
+        ]
         cur.close()
         conn.close()
-        return render_template("nightfloat.html", waiting_interns = waiting_interns, completed_interns = completed_interns, type = listtype, querystring = "?list=" + listtype)
+        return render_template(
+            "nightfloat.html",
+            waiting_interns=waiting_interns,
+            completed_interns=completed_interns,
+            type=listtype,
+            querystring="?list=" + listtype,
+        )
     else:
         cur = conn.cursor()
-        cur.execute("UPDATE signout SET active = FALSE, completetime = current_timestamp WHERE id = %s" % request.form['signout.id'])
+        cur.execute(
+            "UPDATE signout SET active = FALSE, completetime = current_timestamp WHERE id = %s"
+            % request.form["signout.id"]
+        )
         conn.commit()
         cur.close()
         conn.close()
         return render_template("removed.html", type=listtype)
         return str(request.form)
-
 
 
 @app.route("/submission", methods=["GET", "POST"])
