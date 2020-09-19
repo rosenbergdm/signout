@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="/static/signout.css">
+{% endblock %}
+{% block title %}Intern Ready-To-Signout Submission{% endblock %}
+{% block body %}
+  <!-- NON-CALL SOLID TUMOR -->
+  <center><h1>Non-Call Solid Tumor</h1></center><br>
+    <div class="flex-container">
+    <div class="submissionform">
+      <form id="signoutready" action="" method="POST">
+        <h3>Intern Ready-To-Signout</h3>
+        <h4>Do not complete until you are ready to signout</h4>
+        <fieldset>
+          <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
+        </fieldset>
+        <fieldset>
+          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" required>
+        </fieldset>
+        <fieldset>
+          <select id="service" name="service">
+            {% for service in solid_services %}
+            <option value="{{ service.id }}">{{ service.name }}</option>
+            {% endfor %}
+          </select>
+        </fieldset>
+        <input type="hidden" id="oncall" name="oncall" value="FALSE">
+        <fieldset>
+          <button name="submit" type="submit" id="submit">Submit</button>
+        </fieldset>
+      </form>
+    </div>
+    <div class="currentlist" style="flex: 0 0 600px">
+      </h3>Interns signed up</h3>
+      <ol>
+        {% for intern in noncall_solid_interns %}
+        <li>{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+
+  <!-- NON-CALL LIQUID TUMOR / Gen Med -->
+  <center><h1>Non-Call Liquid Tumor</h1></center><br>
+  <div class="flex-container">
+    <div class="submissionform">
+      <form id="signoutready" action="" method="POST">
+        <h3>Intern Ready-To-Signout</h3>
+        <h4>Do not complete until you are ready to signout</h4>
+        <fieldset>
+          <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
+        </fieldset>
+        <fieldset>
+          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" required>
+        </fieldset>
+        <fieldset>
+          <select id="service" name="service">
+            {% for service in liquid_services %}
+            <option value="{{ service.id }}">{{ service.name }}</option>
+            {% endfor %}
+          </select>
+        </fieldset>
+        <input type="hidden" id="oncall" name="oncall" value="FALSE">
+        <fieldset>
+          <button name="submit" type="submit" id="submit">Submit</button>
+        </fieldset>
+      </form>
+    </div>
+    <div class="currentlist" style="flex: 0 0 600px">
+      </h3>Interns signed up</h3>
+      <ol>
+        {% for intern in noncall_liquid_interns %}
+        <li>{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+
+
+  <!-- CALL SOLID TUMOR -->
+  <center><h1>On-Call Solid Tumor</h1></center><br>
+  <div class="flex-container">
+    <div class="submissionform">
+      <form id="signoutready" action="" method="POST">
+        <h3>Intern Ready-To-Signout</h3>
+        <h4>Do not complete until you are ready to signout</h4>
+        <fieldset>
+          <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
+        </fieldset>
+        <fieldset>
+          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" required>
+        </fieldset>
+        <fieldset>
+          <select id="service" name="service">
+            {% for service in solid_services %}
+            <option value="{{ service.id }}">{{ service.name }}</option>
+            {% endfor %}
+          </select>
+        </fieldset>
+        <input type="hidden" id="oncall" name="oncall" value="TRUE">
+        <fieldset>
+          <button name="submit" type="submit" id="submit">Submit</button>
+        </fieldset>
+      </form>
+    </div>
+    <div class="currentlist" style="flex: 0 0 600px">
+      </h3>Interns signed up</h3>
+      <ol>
+        {% for intern in call_solid_interns %}
+        <li>{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+
+  <!-- CALL LIQUID TUMOR / Gen Med -->
+
+  <h1 align="center">On-Call Liquid Tumor</h1><br>
+  <div class="flex-container">
+    <div class="submissionform">
+      <form id="signoutready" action="" method="POST">
+        <h3>Intern Ready-To-Signout</h3>
+        <h4>Do not complete until you are ready to signout</h4>
+        <fieldset>
+          <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
+        </fieldset>
+        <fieldset>
+          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" required>
+        </fieldset>
+        <fieldset>
+          <select id="service" name="service">
+            {% for service in liquid_services %}
+            <option value="{{ service.id }}">{{ service.name }}</option>
+            {% endfor %}
+          </select>
+        </fieldset>
+        <input type="hidden" id="oncall" name="oncall" value="TRUE">
+        <fieldset>
+          <button name="submit" type="submit" id="submit">Submit</button>
+        </fieldset>
+      </form>
+    </div>
+    <div class="currentlist" style="flex: 0 0 600px">
+      </h3>Interns signed up</h3>
+      <ol>
+        {% for intern in call_liquid_interns %}
+        <li>{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+{% endblock %}
+
+<!-- vim: ft=htmldjango 
+-->
