@@ -1,6 +1,5 @@
-*.pyc
 {
 	"dbname": "signout",
 	"username": "signout",
-	"password": "lwAXvfd9emIyBpYQk8"
+	"password": "YOUR-PASSWORD-HERE"
 }

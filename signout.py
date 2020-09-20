@@ -22,13 +22,32 @@ from flask import (
     app,
     request,
 )
+import json
+import os
 import psycopg2
 
 app = Flask(__name__)
 
+dbname = ""
+dbuser = ""
+dbpassword = ""
+
+
+def load_db_settings():
+    global dbname
+    global dbuser
+    global dbpassword
+    scriptdir = os.path.dirname(os.path.realpath(__file__))
+    fp = open(os.path.join(scriptdir, "dbsettings.json"))
+    dbsettings = json.load(fp)
+    fp.close()
+    dbname = dbsettings["dbname"]
+    dbuser = dbsettings["username"]
+    dbpassword = dbsettings["password"]
+
 
 def get_db():
-    conn = psycopg2.connect(database="signout", user="davidrosenberg")
+    conn = psycopg2.connect(database=dbname, user=dbuser, password=dbpassword)
     return conn
 
 
@@ -110,25 +129,53 @@ def submission():
         cur.execute("SELECT id, name FROM service where type='LIQUID'")
         liquid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
         cur.execute(
-            "SELECT intern_name, name, addtime FROM signout LEFT JOIN service ON signout.service = service.id WHERE active is TRUE AND oncall is FALSE and type = 'SOLID' ORDER BY addtime ASC"
+            """
+            SELECT intern_name, name, addtime 
+            FROM signout LEFT JOIN service 
+                ON signout.service = service.id 
+            WHERE active is TRUE 
+                AND oncall is FALSE 
+                and type = 'SOLID' 
+            ORDER BY addtime ASC"""
         )
         noncall_solid_interns = [
             {"intern_name": x[0], "name": x[1], "addtime": x[2]} for x in cur.fetchall()
         ]
         cur.execute(
-            "SELECT intern_name, name, addtime FROM signout LEFT JOIN service ON signout.service = service.id WHERE active is TRUE AND oncall is TRUE and type = 'SOLID' ORDER BY addtime ASC"
+            """
+            SELECT intern_name, name, addtime 
+            FROM signout LEFT JOIN service 
+                ON signout.service = service.id 
+            WHERE active is TRUE 
+                AND oncall is TRUE 
+                and type = 'SOLID' 
+            ORDER BY addtime ASC"""
         )
         call_solid_interns = [
             {"intern_name": x[0], "name": x[1], "addtime": x[2]} for x in cur.fetchall()
         ]
         cur.execute(
-            "SELECT intern_name, name, addtime FROM signout LEFT JOIN service ON signout.service = service.id WHERE active is TRUE AND oncall is FALSE and type = 'LIQUID' ORDER BY addtime ASC"
+            """
+            SELECT intern_name, name, addtime 
+            FROM signout LEFT JOIN service 
+                ON signout.service = service.id 
+            WHERE active is TRUE 
+                AND oncall is FALSE 
+                and type = 'LIQUID' 
+            ORDER BY addtime ASC"""
         )
         noncall_liquid_interns = [
             {"intern_name": x[0], "name": x[1], "addtime": x[2]} for x in cur.fetchall()
         ]
         cur.execute(
-            "SELECT intern_name, name, addtime FROM signout LEFT JOIN service ON signout.service = service.id WHERE active is TRUE AND oncall is TRUE and type = 'LIQUID' ORDER BY addtime ASC"
+            """
+            SELECT intern_name, name, addtime 
+            FROM signout LEFT JOIN service 
+                ON signout.service = service.id 
+            WHERE active is TRUE 
+                AND oncall is TRUE 
+                and type = 'LIQUID' 
+            ORDER BY addtime ASC"""
         )
         call_liquid_interns = [
             {"intern_name": x[0], "name": x[1], "addtime": x[2]} for x in cur.fetchall()
@@ -147,7 +194,8 @@ def submission():
     else:
         cur = conn.cursor()
         cur.execute(
-            "INSERT INTO signout (intern_name, intern_callback, service, oncall) VALUES ('%s', '%s', %s, '%s')"
+            "INSERT INTO signout (intern_name, intern_callback, service, oncall) \
+                    VALUES ('%s', '%s', %s, '%s')"
             % (
                 request.form["intern_name"],
                 request.form["intern_callback"],
@@ -162,5 +210,6 @@ def submission():
 
 
 if __name__ == "__main__":
+    load_db_settings()
     get_db()
     app.run(host="0.0.0.0")
