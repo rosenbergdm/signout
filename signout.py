@@ -80,6 +80,7 @@ def nightfloat():
             {"id": x[0], "intern_name": x[1], "name": x[2], "intern_callback": x[3]}
             for x in cur.fetchall()
         ]
+        print(waiting_interns)
         cur.execute(
             """
                     SELECT intern_name, name 
