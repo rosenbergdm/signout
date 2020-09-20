@@ -11,7 +11,7 @@
     <ul>
       {% for intern in waiting_interns %}
       <li>{{ intern.intern_name }} - ({{ intern.name }})
-        <form id="{{ intern.id }}" name="{{ intern.id }}" action="" method="POST">
+	      <form id="{{ intern.id }}" name="{{ intern.id }}" action="" {%- if not(loop.first) -%} onSubmit="return confirm('This is not the first person on the list.  Do you really want to do this?')" {% endif %} method="POST">
           <input type="hidden" name="signout.id" value="{{ intern.id }}">
           <button name="submit" type="submit" id="submit">Remove</button>
         </form>

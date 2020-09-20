@@ -1,9 +1,12 @@
+#!/usr/bin/env python
 import sys
-sys.path.insert(0, '/usr/local/src/signout')
+import logging
+logging.basicConfig(stream=sys.stderr)
+sys.path.insert(0, '/usr/local/src/signout/')
 
 from signout import app as application
-from signout import create_app, load_db_settings, dbuser, dbpassword, dbname, get_db
+from signout import load_db_settings
 load_db_settings()
-application = create_app()
+# application = create_app()
 
 # vim: ft=python:
