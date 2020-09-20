@@ -72,6 +72,9 @@ def nightfloat():
                         ON signout.service = service.id 
                     WHERE active is TRUE 
                         AND type = '%s' 
+                        AND date_part('day', addtime) = date_part('day', current_timestamp) 
+                        and date_part('month', addtime) = date_part('month', current_timestamp) 
+                        and date_part('year', addtime) = date_part('year', current_timestamp)
                     ORDER BY addtime ASC
                     """
             % listtype.upper()
