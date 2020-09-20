@@ -8,6 +8,7 @@
 <center><h1>Call list for {{ type }} signouts</h1></center></br>
 <div class="flex-container">
   <div class="waitinglist" style="flex: 0 0 400px">
+	  <h4>Waiting to sign out</h4>
     <ul>
       {% for intern in waiting_interns %}
       <li>{{ intern.intern_name }} - ({{ intern.name }})
@@ -20,6 +21,7 @@
     </ul>
   </div>
   <div class="completelist" style="flex: 0 0 400px">
+	  <h4>Sign out already complete</h4>
     <ul>
       {% for intern in completed_interns %}
       <li>{{ intern.intern_name }} - ({{ intern.name }})
