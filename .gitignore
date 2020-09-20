@@ -1,2 +1,3 @@
 *.pyc
 dbsettings.json
+__pycache__
