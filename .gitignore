@@ -1,6 +1,2 @@
 *.pyc
-{
-	"dbname": "signout",
-	"username": "signout",
-	"password": "lwAXvfd9emIyBpYQk8"
-}
+dbsettings.json

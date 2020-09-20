@@ -119,6 +119,13 @@ def nightfloat():
         return str(request.form)
 
 
+def get_foreground_color(activestate):
+    if activestate:
+        return "#000000"
+    else:
+        return "#999999"
+
+
 @app.route("/submission", methods=["GET", "POST"])
 def submission():
     conn = get_db()
@@ -130,55 +137,91 @@ def submission():
         liquid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
         cur.execute(
             """
-            SELECT intern_name, name, addtime 
+            SELECT intern_name, name, addtime, active 
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
-            WHERE active is TRUE 
+            WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
+                and date_part('month', addtime) = date_part('month', current_timestamp) 
+                and date_part('year', addtime) = date_part('year', current_timestamp)
                 AND oncall is FALSE 
                 and type = 'SOLID' 
             ORDER BY addtime ASC"""
         )
         noncall_solid_interns = [
-            {"intern_name": x[0], "name": x[1], "addtime": x[2]} for x in cur.fetchall()
+            {
+                "intern_name": x[0],
+                "name": x[1],
+                "addtime": x[2],
+                "active": x[3],
+                "fgcolor": get_foreground_color(x[3]),
+            }
+            for x in cur.fetchall()
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime 
+            SELECT intern_name, name, addtime, active
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
-            WHERE active is TRUE 
+            WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
+                and date_part('month', addtime) = date_part('month', current_timestamp) 
+                and date_part('year', addtime) = date_part('year', current_timestamp)
                 AND oncall is TRUE 
                 and type = 'SOLID' 
             ORDER BY addtime ASC"""
         )
         call_solid_interns = [
-            {"intern_name": x[0], "name": x[1], "addtime": x[2]} for x in cur.fetchall()
+            {
+                "intern_name": x[0],
+                "name": x[1],
+                "addtime": x[2],
+                "active": x[3],
+                "fgcolor": get_foreground_color(x[3]),
+            }
+            for x in cur.fetchall()
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime 
+            SELECT intern_name, name, addtime, active
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
-            WHERE active is TRUE 
+            WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
+                and date_part('month', addtime) = date_part('month', current_timestamp) 
+                and date_part('year', addtime) = date_part('year', current_timestamp)
                 AND oncall is FALSE 
                 and type = 'LIQUID' 
             ORDER BY addtime ASC"""
         )
         noncall_liquid_interns = [
-            {"intern_name": x[0], "name": x[1], "addtime": x[2]} for x in cur.fetchall()
+            {
+                "intern_name": x[0],
+                "name": x[1],
+                "addtime": x[2],
+                "active": x[3],
+                "fgcolor": get_foreground_color(x[3]),
+            }
+            for x in cur.fetchall()
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime 
+            SELECT intern_name, name, addtime, active
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
-            WHERE active is TRUE 
+            WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
+                and date_part('month', addtime) = date_part('month', current_timestamp) 
+                and date_part('year', addtime) = date_part('year', current_timestamp)
                 AND oncall is TRUE 
                 and type = 'LIQUID' 
             ORDER BY addtime ASC"""
         )
         call_liquid_interns = [
-            {"intern_name": x[0], "name": x[1], "addtime": x[2]} for x in cur.fetchall()
+            {
+                "intern_name": x[0],
+                "name": x[1],
+                "addtime": x[2],
+                "active": x[3],
+                "fgcolor": get_foreground_color(x[3]),
+            }
+            for x in cur.fetchall()
         ]
         cur.close()
         conn.close()

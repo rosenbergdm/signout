@@ -35,7 +35,7 @@
       </h3>Interns signed up</h3>
       <ol>
         {% for intern in noncall_solid_interns %}
-        <li>{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
+        <li style="color:{{ intern.fgcolor }}">{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
         {% endfor %}
       </ol>
     </div>
@@ -71,7 +71,7 @@
       </h3>Interns signed up</h3>
       <ol>
         {% for intern in noncall_liquid_interns %}
-        <li>{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
+        <li style="color:{{ intern.fgcolor }}">{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
         {% endfor %}
       </ol>
     </div>
@@ -108,7 +108,7 @@
       </h3>Interns signed up</h3>
       <ol>
         {% for intern in call_solid_interns %}
-        <li>{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
+        <li style="color:{{ intern.fgcolor }}">{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
         {% endfor %}
       </ol>
     </div>
@@ -145,7 +145,7 @@
       </h3>Interns signed up</h3>
       <ol>
         {% for intern in call_liquid_interns %}
-        <li>{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
+        <li style="color:{{ intern.fgcolor }}">{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
         {% endfor %}
       </ol>
     </div>
