@@ -3,20 +3,25 @@
 {{ super() }}
 <link rel="stylesheet" href="/static/signout.css">
 {% endblock %}
-{% block title %}Intern Ready-To-Signout Submission{% endblock %}
+{% block title %}Primary Teams Ready-To-Signout Submission{% endblock %}
 {% block body %}
+<center>
+  <button onClick="location.href='/nightfloat?list=Solid'">Solid tumor night float page</button>
+  <button onClick="location.href='/nightfloat?list=Liquid'">Liquid tumor night float page</button>
+</center>
+
   <!-- NON-CALL SOLID TUMOR -->
   <center><h1>Non-Call Solid Tumor</h1></center><br>
     <div class="flex-container">
     <div class="submissionform">
       <form id="signoutready" action="" method="POST">
-        <h3>Intern Ready-To-Signout</h3>
+        <h3>Primary Team Ready-To-Signout</h3>
         <h4>Do not complete until you are ready to signout</h4>
         <fieldset>
           <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
         </fieldset>
         <fieldset>
-          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" required>
+          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" pattern=".*[0-9]{4}.*" maxlength=15 required>
         </fieldset>
         <fieldset>
           <select id="service" name="service">
@@ -32,7 +37,7 @@
       </form>
     </div>
     <div class="currentlist" style="flex: 0 0 600px">
-      </h3>Interns signed up</h3>
+      </h3>Primary teams signed up</h3>
       <ol>
         {% for intern in noncall_solid_interns %}
         <li style="color:{{ intern.fgcolor }}">{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
@@ -46,13 +51,13 @@
   <div class="flex-container">
     <div class="submissionform">
       <form id="signoutready" action="" method="POST">
-        <h3>Intern Ready-To-Signout</h3>
+        <h3>Primary Team Ready-To-Signout</h3>
         <h4>Do not complete until you are ready to signout</h4>
         <fieldset>
           <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
         </fieldset>
         <fieldset>
-          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" required>
+          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" pattern=".*[0-9]{4}.*" maxlength=15 required>
         </fieldset>
         <fieldset>
           <select id="service" name="service">
@@ -68,7 +73,7 @@
       </form>
     </div>
     <div class="currentlist" style="flex: 0 0 600px">
-      </h3>Interns signed up</h3>
+      </h3>Primary teams signed up</h3>
       <ol>
         {% for intern in noncall_liquid_interns %}
         <li style="color:{{ intern.fgcolor }}">{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
@@ -83,13 +88,13 @@
   <div class="flex-container">
     <div class="submissionform">
       <form id="signoutready" action="" method="POST">
-        <h3>Intern Ready-To-Signout</h3>
+        <h3>Primary Team Ready-To-Signout</h3>
         <h4>Do not complete until you are ready to signout</h4>
         <fieldset>
           <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
         </fieldset>
         <fieldset>
-          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" required>
+          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" pattern=".*[0-9]{4}.*" maxlength=15 required>
         </fieldset>
         <fieldset>
           <select id="service" name="service">
@@ -105,7 +110,7 @@
       </form>
     </div>
     <div class="currentlist" style="flex: 0 0 600px">
-      </h3>Interns signed up</h3>
+      </h3>Primary teams signed up</h3>
       <ol>
         {% for intern in call_solid_interns %}
         <li style="color:{{ intern.fgcolor }}">{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
@@ -120,13 +125,13 @@
   <div class="flex-container">
     <div class="submissionform">
       <form id="signoutready" action="" method="POST">
-        <h3>Intern Ready-To-Signout</h3>
+        <h3>Primary Team Ready-To-Signout</h3>
         <h4>Do not complete until you are ready to signout</h4>
         <fieldset>
           <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
         </fieldset>
         <fieldset>
-          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" required>
+          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" pattern=".*[0-9]{4}.*" maxlength=15 required>
         </fieldset>
         <fieldset>
           <select id="service" name="service">
@@ -142,7 +147,7 @@
       </form>
     </div>
     <div class="currentlist" style="flex: 0 0 600px">
-      </h3>Interns signed up</h3>
+      </h3>Primary teams signed up</h3>
       <ol>
         {% for intern in call_liquid_interns %}
         <li style="color:{{ intern.fgcolor }}">{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>

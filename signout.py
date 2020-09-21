@@ -25,6 +25,7 @@ from flask import (
 import json
 import os
 import psycopg2
+import re
 
 app = Flask(__name__)
 
@@ -83,7 +84,6 @@ def nightfloat():
             {"id": x[0], "intern_name": x[1], "name": x[2], "intern_callback": x[3]}
             for x in cur.fetchall()
         ]
-        print(waiting_interns)
         cur.execute(
             """
                     SELECT intern_name, name 
@@ -120,7 +120,6 @@ def nightfloat():
         cur.close()
         conn.close()
         return render_template("removed.html", type=listtype)
-        return str(request.form)
 
 
 def get_foreground_color(activestate):
@@ -133,6 +132,7 @@ def get_foreground_color(activestate):
 @app.route("/submission", methods=["GET", "POST"])
 def submission():
     conn = get_db()
+    cleanup_timestamp = re.compile(r'\..*$')
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute("SELECT id, name FROM service where type='SOLID'")
@@ -141,7 +141,7 @@ def submission():
         liquid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
         cur.execute(
             """
-            SELECT intern_name, name, addtime, active 
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, active
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
             WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
@@ -155,7 +155,7 @@ def submission():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": x[2],
+                "addtime": cleanup_timestamp.sub('', str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
             }
@@ -163,7 +163,7 @@ def submission():
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime, active
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, active
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
             WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
@@ -178,6 +178,7 @@ def submission():
                 "intern_name": x[0],
                 "name": x[1],
                 "addtime": x[2],
+                "addtime": cleanup_timestamp.sub('', str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
             }
@@ -185,7 +186,7 @@ def submission():
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime, active
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, active
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
             WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
@@ -199,7 +200,7 @@ def submission():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": x[2],
+                "addtime": cleanup_timestamp.sub('', str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
             }
@@ -207,7 +208,7 @@ def submission():
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime, active
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, active
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
             WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
@@ -221,7 +222,7 @@ def submission():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": x[2],
+                "addtime": cleanup_timestamp.sub('', str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
             }
