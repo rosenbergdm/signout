@@ -16,7 +16,7 @@ import random
 
 names = [
     "Kara Thrace", "Nancie Hogg", "Jeri Sherrard", "Moises Newsom", "Gearldine Foxworth",
-    "Serina Lacomb", "Obdulia Delorenzo", "Meghan Beatson", "Lavada Golay" "Marnie Frith",
+    "Serina Lacomb", "Obdulia Delorenzo", "Meghan Beatson", "Lavada Golay", "Marnie Frith",
     "Trena Cressey", "Hermelinda Mullikin", "Cherly Caso", "Ola Torres",
     "Jacalyn Crews", "Piper Rolan-Adeyemi", "Lezlie Judd", "Marchelle Goode",
     "Evonne Granda", "Arlie Ditzler", "Carl Silverberg", "Sharolyn Erb",
