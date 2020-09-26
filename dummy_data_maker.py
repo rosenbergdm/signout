@@ -24,7 +24,7 @@ names = [
     "Dawna Cost", "Willodean Delafuente", "Youlanda Zajicek", "Gwenn Arnold"]
 
 
-def build_entry():
+def build_entry(oncall = False):
     """build a randomly timed db entry from the names set above
 
     :function: TODO
@@ -36,13 +36,16 @@ def build_entry():
     entrycallback = "x" + str(random.randrange(1000, 9999))
     entryservice = str(random.randrange(1, 33))
     entryaddtime = "current_timestamp + interval '%s minutes' + interval '%s seconds'" % (str(random.randrange(1, 60)), str(random.randrange(1, 60)))
-    entryoncall = "TRUE"
-    if random.random() < 0.3:
-        entryoncall = "FALSE"
+    entryoncall = "FALSE"
+    if oncall:
+        entryoncall = "TRUE"
+        entryaddtime = entryaddtime + " + interval '1 hour'"
     querystring = """INSERT INTO signout (intern_name, intern_callback, service, oncall, addtime) VALUES ('%s', '%s', %s, %s, %s);""" % (entryname, entrycallback, entryservice, entryoncall, entryaddtime)
     print(querystring)
 
 if __name__ == "__main__":
-    for x in range(20):
+    for x in range(13):
         build_entry()
+    for x in range(7):
+        build_entry(True)
 
