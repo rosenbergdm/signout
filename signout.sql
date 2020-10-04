@@ -27,46 +27,39 @@ CREATE TABLE signout (
 );
 
 
-INSERT INTO service (name, type) VALUES ('Breast, Intern #1', 'SOLID');
-INSERT INTO service (name, type) VALUES ('Breast, Intern #2', 'SOLID');
-INSERT INTO service (name, type) VALUES ('Breast, Intern #3', 'SOLID');
-INSERT INTO service (name, type) VALUES ('Breast, Sub-Intern', 'SOLID');
-INSERT INTO service (name, type) VALUES ('Breast, APP', 'SOLID');
-INSERT INTO service (name, type) VALUES ('GI A, Intern #1', 'SOLID');
-INSERT INTO service (name, type) VALUES ('GI A, Intern #2', 'SOLID');
-INSERT INTO service (name, type) VALUES ('GI A, Intern #3', 'SOLID');
-INSERT INTO service (name, type) VALUES ('GI B, Intern #1', 'SOLID');
-INSERT INTO service (name, type) VALUES ('GI B, Intern #2', 'SOLID');
-INSERT INTO service (name, type) VALUES ('GI B, Intern #3', 'SOLID');
-INSERT INTO service (name, type) VALUES ('GI B, Sub-Intern', 'SOLID');
-INSERT INTO service (name, type) VALUES ('GU, Intern #1', 'SOLID');
-INSERT INTO service (name, type) VALUES ('GU, Intern #2', 'SOLID');
-INSERT INTO service (name, type) VALUES ('GU, Intern #3', 'SOLID');
-INSERT INTO service (name, type) VALUES ('GU, Sub-Intern #1', 'SOLID');
-INSERT INTO service (name, type) VALUES ('GU, NP', 'SOLID');
-INSERT INTO service (name, type) VALUES ('Gen Med, Intern #1', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Gen Med, Intern #2', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Gen Med, Intern #3', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Leukemia A, Intern #1', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Leukemia A, Intern #2', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Leukemia A, Intern #3', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Leukemia A, NP', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Leukemia A, Sub-Intern', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Leukemia B, Intern #1', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Leukemia B, Intern #2', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Leukemia B, NP', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Leukemia B, Sub-Intern', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #1', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #2', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #3', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #3', 'LIQUID');
-INSERT INTO service (name, type) VALUES ('Lymphona Green, Sub-Intern', 'LIQUID');
+INSERT INTO service (name, type) VALUES ('Breast, Intern #1', 'NF9132');
+INSERT INTO service (name, type) VALUES ('Breast, Intern #2', 'NF9132');
+INSERT INTO service (name, type) VALUES ('Breast, Sub-Intern', 'NF9132');
+INSERT INTO service (name, type) VALUES ('Breast, APP', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI A, Intern #1', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI A, Intern #2', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI A, Intern #3', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI B, Intern #1', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI B, Intern #2', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI B, Intern #3', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI B, Sub-Intern', 'NF9132');
+INSERT INTO service (name, type) VALUES ('STR, Intern #1', 'NF9133');
+INSERT INTO service (name, type) VALUES ('STR, Intern #2', 'NF9133');
+INSERT INTO service (name, type) VALUES ('STR, Sub-Intern #1', 'NF9133');
+INSERT INTO service (name, type) VALUES ('STR, NP', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Gen Med, Intern #1', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Gen Med, Intern #2', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Gen Med, Intern #3', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Leukemia A, Intern #1', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Leukemia A, Intern #2', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Leukemia A, Intern #3', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Leukemia A, NP', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Leukemia A, Sub-Intern', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Leukemia B, Intern #1', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Leukemia B, Intern #2', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Leukemia B, NP', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Leukemia B, Sub-Intern', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #1', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #2', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #3', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #3', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Lymphoma Green, Sub-Intern', 'NF9133');
 
 -- DUMMY VALUES FOR TESTING
-INSERT INTO signout(intern_name, intern_callback, service) VALUES ('Thomas Butterworth', '773-240-3395', 1);
-INSERT INTO signout(intern_name, intern_callback, service, addtime) VALUES (
-  'Christina Butterworth', 'p8281', 3, current_timestamp + interval '10 minutes');
-INSERT INTO signout(intern_name, intern_callback, service, oncall, addtime) VALUES (
-  'Schiller Butterworth', 'x9100', 11, TRUE, current_timestamp + interval '15 minutes' + interval '3 seconds');
 
 -- vim:et

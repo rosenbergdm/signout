@@ -60,7 +60,7 @@ def index():
 @app.route("/nightfloat", methods=["GET", "POST"])
 def nightfloat():
     if request.args.get("list") is None:
-        listtype = "Solid"
+        listtype = "NF9132"
     else:
         listtype = request.args.get("list")
     conn = get_db()
@@ -135,9 +135,9 @@ def submission():
     cleanup_timestamp = re.compile(r'\..*$')
     if request.method == "GET":
         cur = conn.cursor()
-        cur.execute("SELECT id, name FROM service where type='SOLID'")
+        cur.execute("SELECT id, name FROM service where type='NF9132'")
         solid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
-        cur.execute("SELECT id, name FROM service where type='LIQUID'")
+        cur.execute("SELECT id, name FROM service where type='NF9133'")
         liquid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
         cur.execute(
             """
@@ -148,7 +148,7 @@ def submission():
                 and date_part('month', addtime) = date_part('month', current_timestamp) 
                 and date_part('year', addtime) = date_part('year', current_timestamp)
                 AND oncall is FALSE 
-                and type = 'SOLID' 
+                and type = 'NF9132' 
             ORDER BY addtime ASC"""
         )
         noncall_solid_interns = [
@@ -170,7 +170,7 @@ def submission():
                 and date_part('month', addtime) = date_part('month', current_timestamp) 
                 and date_part('year', addtime) = date_part('year', current_timestamp)
                 AND oncall is TRUE 
-                and type = 'SOLID' 
+                and type = 'NF9132' 
             ORDER BY addtime ASC"""
         )
         call_solid_interns = [
@@ -193,7 +193,7 @@ def submission():
                 and date_part('month', addtime) = date_part('month', current_timestamp) 
                 and date_part('year', addtime) = date_part('year', current_timestamp)
                 AND oncall is FALSE 
-                and type = 'LIQUID' 
+                and type = 'NF9133' 
             ORDER BY addtime ASC"""
         )
         noncall_liquid_interns = [
@@ -215,7 +215,7 @@ def submission():
                 and date_part('month', addtime) = date_part('month', current_timestamp) 
                 and date_part('year', addtime) = date_part('year', current_timestamp)
                 AND oncall is TRUE 
-                and type = 'LIQUID' 
+                and type = 'NF9133' 
             ORDER BY addtime ASC"""
         )
         call_liquid_interns = [
