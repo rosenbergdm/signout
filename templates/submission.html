@@ -11,7 +11,7 @@
 </center>
 
   <!-- NON-CALL SOLID TUMOR -->
-  <center><h1>Non-Call NF 9132</h1></center><br>
+  <center><h1>Non-Call NF 9132 (GI/Breast)</h1></center><br>
     <div class="flex-container">
     <div class="submissionform">
       <form id="signoutready" action="" method="POST">
@@ -37,17 +37,26 @@
       </form>
     </div>
     <div class="currentlist" style="flex: 0 0 600px">
-      </h3>Primary teams signed up</h3>
-      <ol>
+      <h3>Primary teams signed up</h3>
+      <table style="width:100%;text-align:left;">
+        <tr>
+          <th>Intern/Resident/NP</th>
+          <th>Service</th>
+          <th>Time marked ready</th>
+        </tr>
         {% for intern in noncall_solid_interns %}
-        <li style="color:{{ intern.fgcolor }}">{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
+        <tr style="color:{{ intern.fgcolor }}">
+          <td>{{ intern.intern_name }}</td>
+          <td>{{ intern.name }}</td>
+          <td>{{ intern.addtime }}</td>
+        </tr>
         {% endfor %}
-      </ol>
+      </table>
     </div>
   </div>
 
   <!-- NON-CALL LIQUID TUMOR / Gen Med -->
-  <center><h1>Non-Call NF 9133</h1></center><br>
+  <center><h1>Non-Call NF 9133 (STR, Leukemia, Lymphoma, Gen Med)</h1></center><br>
   <div class="flex-container">
     <div class="submissionform">
       <form id="signoutready" action="" method="POST">
@@ -73,18 +82,27 @@
       </form>
     </div>
     <div class="currentlist" style="flex: 0 0 600px">
-      </h3>Primary teams signed up</h3>
-      <ol>
+      <h3>Primary teams signed up</h3>
+      <table style="width:100%;text-align:left;">
+        <tr>
+          <th>Intern/Resident/NP</th>
+          <th>Service</th>
+          <th>Time marked ready</th>
+        </tr>
         {% for intern in noncall_liquid_interns %}
-        <li style="color:{{ intern.fgcolor }}">{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
+        <tr style="color:{{ intern.fgcolor }}">
+          <td>{{ intern.intern_name }}</td>
+          <td>{{ intern.name }}</td>
+          <td>{{ intern.addtime }}</td>
+        </tr>
         {% endfor %}
-      </ol>
+      </table>
     </div>
   </div>
 
 
   <!-- CALL SOLID TUMOR -->
-  <center><h1>On-Call NF 9132</h1></center><br>
+  <center><h1>On-Call NF 9132 (GI/Breast)</h1></center><br>
   <div class="flex-container">
     <div class="submissionform">
       <form id="signoutready" action="" method="POST">
@@ -110,18 +128,27 @@
       </form>
     </div>
     <div class="currentlist" style="flex: 0 0 600px">
-      </h3>Primary teams signed up</h3>
-      <ol>
+      <h3>Primary teams signed up</h3>
+      <table style="width:100%;text-align:left;">
+        <tr>
+          <th>Intern/Resident/NP</th>
+          <th>Service</th>
+          <th>Time marked ready</th>
+        </tr>
         {% for intern in call_solid_interns %}
-        <li style="color:{{ intern.fgcolor }}">{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
+        <tr style="color:{{ intern.fgcolor }}">
+          <td>{{ intern.intern_name }}</td>
+          <td>{{ intern.name }}</td>
+          <td>{{ intern.addtime }}</td>
+        </tr>
         {% endfor %}
-      </ol>
+      </table>
     </div>
   </div>
 
   <!-- CALL LIQUID TUMOR / Gen Med -->
 
-  <h1 align="center">On-Call NF 9133</h1><br>
+  <h1 align="center">On-Call NF 9133 (STR, Leukemia, Lymphoma, Gen Med)</h1><br>
   <div class="flex-container">
     <div class="submissionform">
       <form id="signoutready" action="" method="POST">
@@ -147,14 +174,24 @@
       </form>
     </div>
     <div class="currentlist" style="flex: 0 0 600px">
-      </h3>Primary teams signed up</h3>
-      <ol>
+      <h3>Primary teams signed up</h3>
+      <table style="width:100%;text-align:left;">
+        <tr>
+          <th>Intern/Resident/NP</th>
+          <th>Service</th>
+          <th>Time marked ready</th>
+        </tr>
         {% for intern in call_liquid_interns %}
-        <li style="color:{{ intern.fgcolor }}">{{ intern.intern_name }} - ({{ intern.name }}) - {{ intern.addtime }}</li>
+        <tr style="color:{{ intern.fgcolor }}">
+          <td>{{ intern.intern_name }}</td>
+          <td>{{ intern.name }}</td>
+          <td>{{ intern.addtime }}</td>
+        </tr>
         {% endfor %}
-      </ol>
+      </table>
     </div>
   </div>
+
 {% endblock %}
 
 <!-- vim: ft=htmldjango 
