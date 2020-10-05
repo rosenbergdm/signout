@@ -59,6 +59,14 @@ INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #2', 'NF9133');
 INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #3', 'NF9133');
 INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #3', 'NF9133');
 INSERT INTO service (name, type) VALUES ('Lymphoma Green, Sub-Intern', 'NF9133');
+INSERT INTO service (name, type) VALUES ('GI C, APP #1', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI C, APP #2', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI C, APP #3', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI C, APP #4', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI D, APP #1', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI D, APP #2', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI D, APP #3', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI D, APP #4', 'NF9132');
 
 -- DUMMY VALUES FOR TESTING
 
