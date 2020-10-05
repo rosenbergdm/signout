@@ -130,41 +130,48 @@ def get_foreground_color(activestate):
     else:
         return "#999999"
 
+
 @app.route("/query", methods=["GET", "POST"])
 def query():
     conn = get_db()
-    cleanup_timestamp = re.compile(r'\..*$')
+    cleanup_timestamp = re.compile(r"\..*$")
     if request.method == "GET":
         cur = conn.cursor()
-        rangestring = "Showing signouts for %s" % datetime.date.today().strftime("%Y-%M-%d") 
-        cur.execute("""
+        rangestring = "Showing signouts for %s" % datetime.date.today().strftime(
+            "%Y-%M-%d"
+        )
+        cur.execute(
+            """
             SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, completetime::TIMESTAMP::TIME
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id
             WHERE date_part('day', addtime) = 4
                 and date_part('month', addtime) = date_part('month', current_timestamp) 
                 and date_part('year', addtime) = date_part('year', current_timestamp)
-            ORDER BY completetime ASC""")
-            # WHERE date_part('day', addtime) = date_part('day', current_timestamp - interval '1 day')
+            ORDER BY completetime ASC"""
+        )
         signoutlog = [
-            { "intern_name": x[0], 
-            "name": x[1], 
-            "type": x[2], 
-            "addtime": cleanup_timestamp.sub('', str(x[3])),
-            "completetime": cleanup_timestamp.sub('', str(x[4])),
-            "elapsedtime": ""} for x in cur.fetchall()
+            {
+                "intern_name": x[0],
+                "name": x[1],
+                "type": x[2],
+                "addtime": cleanup_timestamp.sub("", str(x[3])),
+                "completetime": cleanup_timestamp.sub("", str(x[4])),
+                "elapsedtime": "",
+            }
+            for x in cur.fetchall()
         ]
         for idx in range(len(signoutlog)):
-            if idx == len(signoutlog)-1:
+            if idx == len(signoutlog) - 1:
                 signoutlog[idx]["elapsedtime"] = "Unable to be computed"
             else:
                 begintime_raw = signoutlog[idx]["completetime"]
-                if begintime_raw != 'None': 
-                    begintime = datetime.datetime.strptime(begintime_raw, '%H:%M:%S')
-                endtime_raw = signoutlog[idx+1]["completetime"]
-                if endtime_raw != 'None':
-                    endtime = datetime.datetime.strptime(endtime_raw, '%H:%M:%S')
-                if begintime_raw != 'None' and endtime_raw != 'None':
+                if begintime_raw != "None":
+                    begintime = datetime.datetime.strptime(begintime_raw, "%H:%M:%S")
+                endtime_raw = signoutlog[idx + 1]["completetime"]
+                if endtime_raw != "None":
+                    endtime = datetime.datetime.strptime(endtime_raw, "%H:%M:%S")
+                if begintime_raw != "None" and endtime_raw != "None":
                     timedelta = endtime - begintime
                     minutes = int(timedelta.seconds / 60)
                     seconds = timedelta.seconds - (minutes * 60)
@@ -173,23 +180,26 @@ def query():
                     signoutlog[idx]["elapsedtime"] = "Unable to be computed"
         cur.close()
         conn.close()
-        return render_template("query.html", signoutlog = signoutlog, rangestring = rangestring)
+        return render_template(
+            "query.html", signoutlog=signoutlog, rangestring=rangestring
+        )
     else:
         cur = conn.cursor()
-        if 'NF9133' in request.form.keys():
-            if 'NF9132' in request.form.keys():
+        if "NF9133" in request.form.keys():
+            if "NF9132" in request.form.keys():
                 typestring = ""
             else:
                 typestring = " AND type = 'NF9133' "
         else:
-            if 'NF9132' in request.form.keys():
+            if "NF9132" in request.form.keys():
                 typestring = " AND type = 'NF9132' "
-            else: 
+            else:
                 typestring = " AND type = 'notarealtype' "
-        if request.form['addtime_date2'] == "":
-            rangestring = "Showing signouts for %s" % request.form['addtime_date']
-            splitdate = request.form['addtime_date'].split("-")
-            cur.execute("""
+        if request.form["addtime_date2"] == "":
+            rangestring = "Showing signouts for %s" % request.form["addtime_date"]
+            splitdate = request.form["addtime_date"].split("-")
+            cur.execute(
+                """
                 SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, completetime::TIMESTAMP::TIME
                 FROM signout LEFT JOIN service 
                     ON signout.service = service.id
@@ -197,12 +207,18 @@ def query():
                     and date_part('month', addtime) = %s
                     and date_part('year', addtime) = %s
                     %s
-                ORDER BY completetime ASC""" % (splitdate[2], splitdate[1], splitdate[0], typestring))
+                ORDER BY completetime ASC"""
+                % (splitdate[2], splitdate[1], splitdate[0], typestring)
+            )
         else:
-            rangestring = "Showing signouts from %s to %s inclusive" % (request.form['addtime_date'], request.form['addtime_date2'])
-            splitdate = request.form['addtime_date'].split('-')
-            splitenddate = request.form['addtime_date2'].split('-')
-            cur.execute("""
+            rangestring = "Showing signouts from %s to %s inclusive" % (
+                request.form["addtime_date"],
+                request.form["addtime_date2"],
+            )
+            splitdate = request.form["addtime_date"].split("-")
+            splitenddate = request.form["addtime_date2"].split("-")
+            cur.execute(
+                """
                 SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, completetime::TIMESTAMP::TIME
                 FROM signout LEFT JOIN service 
                     ON signout.service = service.id
@@ -210,27 +226,40 @@ def query():
                     and date_part('month', addtime) >= %s AND date_part('month', addtime) <= %s
                     and date_part('year', addtime) >= %s AND date_part('year', addtime) <= %s
                     %s
-                ORDER BY completetime ASC""" % (splitdate[2], splitenddate[2], splitdate[1], splitenddate[1], splitdate[0], splitenddate[0], typestring))
+                ORDER BY completetime ASC"""
+                % (
+                    splitdate[2],
+                    splitenddate[2],
+                    splitdate[1],
+                    splitenddate[1],
+                    splitdate[0],
+                    splitenddate[0],
+                    typestring,
+                )
+            )
         signoutlog = [
-            { "intern_name": x[0], 
-            "name": x[1], 
-            "type": x[2], 
-            "addtime": cleanup_timestamp.sub('', str(x[3])),
-            "completetime": cleanup_timestamp.sub('', str(x[4])),
-            "elapsedtime": ""} for x in cur.fetchall()
+            {
+                "intern_name": x[0],
+                "name": x[1],
+                "type": x[2],
+                "addtime": cleanup_timestamp.sub("", str(x[3])),
+                "completetime": cleanup_timestamp.sub("", str(x[4])),
+                "elapsedtime": "",
+            }
+            for x in cur.fetchall()
         ]
 
         for idx in range(len(signoutlog)):
-            if idx == len(signoutlog)-1:
+            if idx == len(signoutlog) - 1:
                 signoutlog[idx]["elapsedtime"] = "Unable to be computed"
             else:
                 begintime_raw = signoutlog[idx]["completetime"]
-                if begintime_raw != 'None': 
-                    begintime = datetime.datetime.strptime(begintime_raw, '%H:%M:%S')
-                endtime_raw = signoutlog[idx+1]["completetime"]
-                if endtime_raw != 'None':
-                    endtime = datetime.datetime.strptime(endtime_raw, '%H:%M:%S')
-                if begintime_raw != 'None' and endtime_raw != 'None':
+                if begintime_raw != "None":
+                    begintime = datetime.datetime.strptime(begintime_raw, "%H:%M:%S")
+                endtime_raw = signoutlog[idx + 1]["completetime"]
+                if endtime_raw != "None":
+                    endtime = datetime.datetime.strptime(endtime_raw, "%H:%M:%S")
+                if begintime_raw != "None" and endtime_raw != "None":
                     timedelta = endtime - begintime
                     minutes = int(timedelta.seconds / 60)
                     seconds = timedelta.seconds - (minutes * 60)
@@ -239,15 +268,15 @@ def query():
                     signoutlog[idx]["elapsedtime"] = "Unable to be computed"
         cur.close()
         conn.close()
-        return render_template("query.html", signoutlog = signoutlog, rangestring = rangestring)
-
-
+        return render_template(
+            "query.html", signoutlog=signoutlog, rangestring=rangestring
+        )
 
 
 @app.route("/submission", methods=["GET", "POST"])
 def submission():
     conn = get_db()
-    cleanup_timestamp = re.compile(r'\..*$')
+    cleanup_timestamp = re.compile(r"\..*$")
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute("SELECT id, name FROM service where type='NF9132'")
@@ -270,7 +299,7 @@ def submission():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": cleanup_timestamp.sub('', str(x[2])),
+                "addtime": cleanup_timestamp.sub("", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
             }
@@ -292,8 +321,7 @@ def submission():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": x[2],
-                "addtime": cleanup_timestamp.sub('', str(x[2])),
+                "addtime": cleanup_timestamp.sub("", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
             }
@@ -315,7 +343,7 @@ def submission():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": cleanup_timestamp.sub('', str(x[2])),
+                "addtime": cleanup_timestamp.sub("", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
             }
@@ -337,7 +365,7 @@ def submission():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": cleanup_timestamp.sub('', str(x[2])),
+                "addtime": cleanup_timestamp.sub("", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
             }
