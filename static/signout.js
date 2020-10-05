@@ -1,4 +1,25 @@
 // TODO: Refactor all this duplicated code!
+//
+
+function displayTime() {
+  var today = new Date();
+  var h = today.getHours();
+  var m = today.getMinutes();
+  var s = today.getSeconds();
+  m = checkTime(m);
+  s = checkTime(s);
+  document.getElementById('runningclock').innerHTML =
+  "<h3>Current Time: " + h + ":" + m + ":" + s + "</h3></br>";
+  setTimeout(displayTime, 100);
+}
+
+function checkTime(i) {
+  if (i < 10) {
+    i = "0" + i;
+  }
+  return i;
+}
+
 function nonCallSubmit() {
   var cutoff_time;
   var d = new Date();

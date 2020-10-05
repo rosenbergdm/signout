@@ -383,6 +383,7 @@ def submission():
             call_liquid_interns=call_liquid_interns,
         )
     else:
+        print(request.form)
         cur = conn.cursor()
         cur.execute(
             "INSERT INTO signout (intern_name, intern_callback, service, oncall) \

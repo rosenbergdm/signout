@@ -5,12 +5,15 @@
 <script src="/static/signout.js"></script>
 {% endblock %}
 {% block title %}Primary Teams Ready-To-Signout Submission{% endblock %}
+{% block bodyattributes %} onload="displayTime()"{% endblock %}
 {% block body %}
 <center>
   <button onClick="location.href='/nightfloat?list=NF9132'">Night float 9132 callback page</button>
   <button onClick="location.href='/nightfloat?list=NF9133'">Night float 9133 callback page</button>
   <br>
   <button onClick="location.href='/query'">Query the signout log</button>
+  <br>
+  <div id="runningclock"></div>
 </center>
 <br>
 <hr>
