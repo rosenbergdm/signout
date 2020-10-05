@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="/static/signout.css">
+{% endblock %}
+{% block title %}MSKCC Signout Log Query{% endblock %}
+{% block body %}
+<center>
+  <h1>MSKCC Signout Log</h1>
+  <h3>Default is showing the previous day's signouts.</h3>
+  <button onClick="location.href='/submission'">Return to submission form</button>
+  <br>
+</center>
+<p>For querying a different day, use the form below.  When searching a range of days use both date selectors.  To search a single day leave the second date selector blank
+<br>
+<hr>
+<div class="flex-container">
+  <div class="submissionform">
+    <form id="queryselect" action="" method="POST">
+      <fieldset>
+        <input name="addtime_date" id="addtime_date" type="date" placeholder="From Date" required>
+        <label for="addtime_date">Start date</label><br>
+      </fieldset>
+      <fieldset>
+        <input name="addtime_date2" id="addtime_date2" type="date" placeholder="To Date" label="To date">
+        <label for="addtime_date2">End date (leave blank for single day search)</label><br>
+      <fieldset>
+        <p>Night Float Lists<br>
+        <input type="checkbox" id="NF9132" name="NF9132" value="NF9132" checked="true">
+        <label for="NF9132">NF 9132</label></br>
+        <input type="checkbox" id="NF9133" name="NF9133" value="NF9133" checked="true">
+        <label for="NF9133">NF 9133</label></br>
+      </fieldset>
+      <fieldset>
+        <button name="submit" type="submit" id="submit">Submit</button>
+      </fieldset>
+    </form>
+  </div>
+  <div class="currentlist">
+    <h2 style="text-align:center">{{ rangestring }}</h2>
+  </div>
+</div>
+<table style="width:90%;text-align:left;">
+  <tr>
+    <th>Submittee name</th>
+    <th>Service</th>
+    <th>Night float</th>
+    <th>Time submitted</th>
+    <th>Callback time</th>
+    <th>Signout duration</th>
+  </tr>
+  {% for signout in signoutlog %}
+  <tr class="{{ loop.cycle('odd', 'even') }}">
+    <td>{{ signout.intern_name }}</td>
+    <td>{{ signout.name }}</td>
+    <td>{{ signout.type }}</td>
+    <td>{{ signout.addtime }}</td>
+    <td>{{ signout.completetime }}</td>
+    <td>{{ signout.elapsedtime }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}
+
+<!-- vim: ft=htmldjango
+-->
