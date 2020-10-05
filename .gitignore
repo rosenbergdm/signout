@@ -1,3 +1,4 @@
 *.pyc
 dbsettings.json
 __pycache__
+**/.eslintrc*

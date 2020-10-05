@@ -2,6 +2,7 @@
 {% block head %}
 {{ super() }}
 <link rel="stylesheet" href="/static/signout.css">
+<script src="/static/signout.js"></script>
 {% endblock %}
 {% block title %}Primary Teams Ready-To-Signout Submission{% endblock %}
 {% block body %}
@@ -36,7 +37,7 @@
         </fieldset>
         <input type="hidden" id="oncall" name="oncall" value="FALSE">
         <fieldset>
-          <button name="submit" type="submit" id="submit">Submit</button>
+          <button name="submit" type="submit" id="submit" onclick="return nonCallSubmit()">Submit</button>
         </fieldset>
       </form>
     </div>
@@ -81,7 +82,7 @@
         </fieldset>
         <input type="hidden" id="oncall" name="oncall" value="FALSE">
         <fieldset>
-          <button name="submit" type="submit" id="submit">Submit</button>
+          <button name="submit" type="submit" id="submit" onclick="return nonCallSubmit()">Submit</button>
         </fieldset>
       </form>
     </div>
@@ -127,7 +128,7 @@
         </fieldset>
         <input type="hidden" id="oncall" name="oncall" value="TRUE">
         <fieldset>
-          <button name="submit" type="submit" id="submit">Submit</button>
+          <button name="submit" type="submit" id="submit" onclick="return onCallSubmit()">Submit</button>
         </fieldset>
       </form>
     </div>
@@ -173,7 +174,7 @@
         </fieldset>
         <input type="hidden" id="oncall" name="oncall" value="TRUE">
         <fieldset>
-          <button name="submit" type="submit" id="submit">Submit</button>
+          <button name="submit" type="submit" id="submit" onclick="return nonCallSubmit()">Submit</button>
         </fieldset>
       </form>
     </div>
