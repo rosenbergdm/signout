@@ -21,7 +21,7 @@ if [ $# -lt 2 ]; then
   exit 255
 else
   echo "Stress testing $2 with $1 simultaneous submissions"
-  seq $1 | parallel -I% --max-args 1 curl --silent -X POST -F intern_name=StressTestUser% -F 'intern_callback=1234' -F 'service=1' -F 'oncall=FALSE' -F 'submit=""' $2 >/dev/null &2>1
+  seq $1 | parallel -I% --max-args 1 curl --silent -X POST -F intern_name=StressTestUser% -F 'intern_callback=1234' -F 'service=1' -F 'oncall=FALSE' -F 'submit=""' >/dev/null 2>&1
 fi
 
 
