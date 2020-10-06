@@ -65,6 +65,7 @@ def nightfloat():
         listtype = "NF9132"
     else:
         listtype = request.args.get("list")
+        # TODO: This is sort of dangerous.  Should do differently
     conn = get_db()
     if request.method == "GET":
         cur = conn.cursor()
@@ -137,16 +138,16 @@ def query():
     cleanup_timestamp = re.compile(r"\..*$")
     if request.method == "GET":
         cur = conn.cursor()
-        rangestring = "Showing signouts for %s" % datetime.date.today().strftime(
-            "%Y-%M-%d"
-        )
+        rangestring = "Showing signouts for %s" % (
+            datetime.date.today() - datetime.timedelta(days=1)
+        ).strftime("%Y-%m-%d")
         cur.execute(
             """
             SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, completetime::TIMESTAMP::TIME
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id
-            WHERE date_part('day', addtime) = 4
-                and date_part('month', addtime) = date_part('month', current_timestamp) 
+            WHERE date_part('day', addtime) = date_part('day', current_timestamp - interval '1 day')
+                and date_part('month', addtime) = date_part('month', current_timestamp)
                 and date_part('year', addtime) = date_part('year', current_timestamp)
             ORDER BY completetime ASC"""
         )
