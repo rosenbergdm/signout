@@ -56,7 +56,8 @@ function nonCallSubmit() {
       (cutoff_time - date) / 1000 - 60 * minutes - 3600 * hours
     );
     alert(
-      `You cannot signout for another ${hours} hours, ${minutes} minutes, and ${seconds} seconds`
+      "You cannot signout for another " + hours + " hours, " + minutes + " minutes, and " + seconds + "seconds"
+      // `You cannot signout for another ${hours} hours, ${minutes} minutes, and ${seconds} seconds`
     );
     return false;
   }
