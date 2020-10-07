@@ -140,10 +140,10 @@ def query():
         cur = conn.cursor()
         rangestring = "Showing signouts for %s" % (
             datetime.date.today() - datetime.timedelta(days=1)
-        ).strftime("%Y-%m-%d")
+        ).strftime("%m-%d-%Y")
         cur.execute(
             """
-            SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, completetime::TIMESTAMP::TIME
+            SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, completetime::TIMESTAMP::TIME, addtime::TIMESTAMP::DATE as adddate
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id
             WHERE date_part('day', addtime) = date_part('day', current_timestamp - interval '1 day')
@@ -158,6 +158,7 @@ def query():
                 "type": x[2],
                 "addtime": cleanup_timestamp.sub("", str(x[3])),
                 "completetime": cleanup_timestamp.sub("", str(x[4])),
+                "adddate": x[5].strftime("%m-%d-%Y"),
                 "elapsedtime": "",
             }
             for x in cur.fetchall()
@@ -201,7 +202,7 @@ def query():
             splitdate = request.form["addtime_date"].split("-")
             cur.execute(
                 """
-                SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, completetime::TIMESTAMP::TIME
+                SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, completetime::TIMESTAMP::TIME, addtime::TIMESTAMP::DATE as adddate
                 FROM signout LEFT JOIN service 
                     ON signout.service = service.id
                 WHERE date_part('day', addtime) = %s
@@ -220,7 +221,7 @@ def query():
             splitenddate = request.form["addtime_date2"].split("-")
             cur.execute(
                 """
-                SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, completetime::TIMESTAMP::TIME
+                SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, completetime::TIMESTAMP::TIME, addtime::TIMESTAMP::DATE as adddate
                 FROM signout LEFT JOIN service 
                     ON signout.service = service.id
                 WHERE date_part('day', addtime) >= %s AND date_part('day', addtime) <= %s
@@ -245,6 +246,7 @@ def query():
                 "type": x[2],
                 "addtime": cleanup_timestamp.sub("", str(x[3])),
                 "completetime": cleanup_timestamp.sub("", str(x[4])),
+                "adddate": x[5].strftime("%m-%d-%Y"),
                 "elapsedtime": "",
             }
             for x in cur.fetchall()
