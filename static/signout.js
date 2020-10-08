@@ -1,8 +1,25 @@
 // TODO: Refactor all this duplicated code!
 //
+var timeoffset = 0;
+function updateTimeOffset(timestring) {
+  var splittimestring = timestring.split(":");
+  var localtime = new Date(Date.now());
+  var remotetime = new Date(Date.now());
+  remotetime.setHours(Number(splittimestring[0]), Number(splittimestring[1]), Number(splittimestring[2]));
+  timeoffset = remotetime - localtime;
+  console.log("time offset is " + timeoffset);
+}
+
+var timesyncXhr = new XMLHttpRequest();
+timesyncXhr.addEventListener("load", function() {
+  updateTimeOffset(this.responseText)
+});
+timesyncXhr.open("GET", "/synctime");
+timesyncXhr.send();
+
 
 function displayTime() {
-  var today = new Date();
+  var today = new Date(Date.now() + timeoffset);
   var h = today.getHours();
   var m = today.getMinutes();
   var s = today.getSeconds();
@@ -22,7 +39,7 @@ function checkTime(i) {
 
 function nonCallSubmit() {
   var cutoff_time;
-  var d = new Date();
+  var d = new Date(Date.now() + timeoffset);
   var date = new Date(
     Date.UTC(
       d.getYear() + 1900,
@@ -56,8 +73,7 @@ function nonCallSubmit() {
       (cutoff_time - date) / 1000 - 60 * minutes - 3600 * hours
     );
     alert(
-      "You cannot signout for another " + hours + " hours, " + minutes + " minutes, and " + seconds + "seconds"
-      // `You cannot signout for another ${hours} hours, ${minutes} minutes, and ${seconds} seconds`
+      "You cannot signout for another " + hours + " hours, " + minutes + " minutes, and " + seconds + " seconds"
     );
     return false;
   }
@@ -65,7 +81,7 @@ function nonCallSubmit() {
 
 function onCallSubmit() {
   var cutoff_time;
-  var d = new Date();
+  var d = new Date(Date.now() + timeoffset);
   var date = new Date(
     Date.UTC(
       d.getYear() + 1900,
@@ -92,8 +108,7 @@ function onCallSubmit() {
       (cutoff_time - date) / 1000 - 60 * minutes - 3600 * hours
     );
     alert(
-      "You cannot signout for another " + hours + " hours, " + minutes + " minutes, and " + seconds + "seconds"
-      // `You cannot signout for another ${hours} hours, ${minutes} minutes, and ${seconds} seconds`
+      "You cannot signout for another " + hours + " hours, " + minutes + " minutes, and " + seconds + " seconds"
     );
     return false;
   }

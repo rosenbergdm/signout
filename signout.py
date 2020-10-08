@@ -131,6 +131,10 @@ def get_foreground_color(activestate):
     else:
         return "#999999"
 
+@app.route("/synctime")
+def synctime():
+    return(datetime.datetime.now().strftime("%H:%M:%S"))
+
 
 @app.route("/query", methods=["GET", "POST"])
 def query():
