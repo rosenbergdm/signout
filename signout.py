@@ -131,9 +131,10 @@ def get_foreground_color(activestate):
     else:
         return "#999999"
 
+
 @app.route("/synctime")
 def synctime():
-    return(datetime.datetime.now().strftime("%H:%M:%S"))
+    return datetime.datetime.now().strftime("%H:%M:%S")
 
 
 @app.route("/query", methods=["GET", "POST"])
@@ -286,9 +287,13 @@ def submission():
     cleanup_timestamp = re.compile(r"\..*$")
     if request.method == "GET":
         cur = conn.cursor()
-        cur.execute("SELECT id, name FROM service where type='NF9132'")
+        cur.execute(
+            "SELECT id, name FROM service where type='NF9132' ORDER BY name ASC"
+        )
         solid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
-        cur.execute("SELECT id, name FROM service where type='NF9133'")
+        cur.execute(
+            "SELECT id, name FROM service where type='NF9133' ORDER BY name ASC"
+        )
         liquid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
         cur.execute(
             """

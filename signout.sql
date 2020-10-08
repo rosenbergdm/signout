@@ -67,6 +67,9 @@ INSERT INTO service (name, type) VALUES ('GI D, APP #1', 'NF9132');
 INSERT INTO service (name, type) VALUES ('GI D, APP #2', 'NF9132');
 INSERT INTO service (name, type) VALUES ('GI D, APP #3', 'NF9132');
 INSERT INTO service (name, type) VALUES ('GI D, APP #4', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI A, Sub-Intern', 'NF9132');
+INSERT INTO service (name, type) VALUES ('Lymphoma Green, APP', 'NF9133');
+
 
 -- DUMMY VALUES FOR TESTING
 
