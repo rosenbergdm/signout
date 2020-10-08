@@ -34,7 +34,7 @@ def build_entry(oncall = False):
     entryname = random.choice(names)
     names.remove(entryname)
     entrycallback = "x" + str(random.randrange(1000, 9999))
-    entryservice = str(random.randrange(1, 33))
+    entryservice = str(random.randrange(1, 40))
     entryaddtime = "current_timestamp + interval '%s minutes' + interval '%s seconds'" % (str(random.randrange(1, 60)), str(random.randrange(1, 60)))
     entryoncall = "FALSE"
     if oncall:
