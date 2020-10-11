@@ -398,8 +398,8 @@ def submission():
         cur = conn.cursor()
         cur.execute(
             "INSERT INTO signout (intern_name, intern_callback, service, oncall) \
-                    VALUES ('%s', '%s', %s, '%s')"
-            % (
+                    VALUES (%s, %s, %s, %s)", 
+            (
                 request.form["intern_name"],
                 request.form["intern_callback"],
                 request.form["service"],

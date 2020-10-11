@@ -54,7 +54,7 @@
         </tr>
         {% for intern in noncall_solid_interns %}
         <tr style="color:{{ intern.fgcolor }}">
-          <td>{{ intern.intern_name }}</td>
+          <td>{{ intern.intern_name|striptags }}</td>
           <td>{{ intern.name }}</td>
           <td>{{ intern.addtime }}</td>
         </tr>
@@ -99,7 +99,7 @@
         </tr>
         {% for intern in noncall_liquid_interns %}
         <tr style="color:{{ intern.fgcolor }}">
-          <td>{{ intern.intern_name }}</td>
+          <td>{{ intern.intern_name|striptags }}</td>
           <td>{{ intern.name }}</td>
           <td>{{ intern.addtime }}</td>
         </tr>
@@ -145,7 +145,7 @@
         </tr>
         {% for intern in call_solid_interns %}
         <tr style="color:{{ intern.fgcolor }}">
-          <td>{{ intern.intern_name }}</td>
+          <td>{{ intern.intern_name|striptags }}</td>
           <td>{{ intern.name }}</td>
           <td>{{ intern.addtime }}</td>
         </tr>
@@ -191,7 +191,7 @@
         </tr>
         {% for intern in call_liquid_interns %}
         <tr style="color:{{ intern.fgcolor }}">
-          <td>{{ intern.intern_name }}</td>
+          <td>{{ intern.intern_name|striptags }}</td>
           <td>{{ intern.name }}</td>
           <td>{{ intern.addtime }}</td>
         </tr>
