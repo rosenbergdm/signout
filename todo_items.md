@@ -1,7 +1,12 @@
 # Items for signout program
 
-*  ?Password for nf pages -- currently not planning to implement
-*  ?Admin interface for changing service lists
+*  ?Admin interface for changing service lists: Deferred
 *  Put Gen Med to the top of every sign out list
+*  Only 1 list per NF on weekends
+*  More accurate time representation
+*  Start and stop buttons
+*  Multi-select for weekends
+*  Melodik the Ref sheets
+*  Instructions for late sign ups
 
 
