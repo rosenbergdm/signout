@@ -27,6 +27,7 @@ import json
 import os
 import pdb
 import psycopg2
+import pprint
 import re
 
 app = Flask(__name__)
@@ -36,6 +37,12 @@ dbname = ""
 dbuser = ""
 dbpassword = ""
 
+def format_timestamp(ts):
+    cleanup_timestamp = re.compile(r"\.(..).*$")
+    if ts == "None":
+        return ""
+    else:
+        return cleanup_timestamp.sub(".\\1", ts)
 
 def load_db_settings():
     global dbname
@@ -168,7 +175,7 @@ def query():
         ).strftime("%m-%d-%Y")
         cur.execute(
             """
-            SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, completetime::TIMESTAMP::TIME, addtime::TIMESTAMP::DATE as adddate
+            SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, starttime::TIMESTAMP, completetime::TIMESTAMP, addtime::TIMESTAMP::DATE as adddate
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id
             WHERE date_part('day', addtime) = date_part('day', current_timestamp - interval '1 day')
@@ -182,29 +189,30 @@ def query():
                 "name": x[1],
                 "type": x[2],
                 "addtime": cleanup_timestamp.sub("", str(x[3])),
-                "completetime": cleanup_timestamp.sub("", str(x[4])),
-                "adddate": x[5].strftime("%m-%d-%Y"),
+                "starttime": x[4],
+                "completetime": x[5],
+                "adddate": x[6].strftime("%m-%d-%Y"),
                 "elapsedtime": "",
             }
             for x in cur.fetchall()
         ]
         for idx in range(len(signoutlog)):
-            if idx == len(signoutlog) - 1:
-                signoutlog[idx]["elapsedtime"] = "Unable to be computed"
+            sout = signoutlog[idx]
+            try:
+                timediff = sout["completetime"] - sout["starttime"]
+                elapsed_minutes = int(timediff.seconds / 60)
+                elapsed_seconds = timediff.seconds % 60
+                sout["elapsedtime"] = "%i:%02d" % (elapsed_minutes, elapsed_seconds)
+            except Exception:
+                sout["elapsedtime"] = "Unable to be computed"
+            if sout["starttime"] != None:
+                sout["starttime"] = cleanup_timestamp.sub("", str(sout["starttime"].time()))
             else:
-                begintime_raw = signoutlog[idx]["completetime"]
-                if begintime_raw != "None":
-                    begintime = datetime.datetime.strptime(begintime_raw, "%H:%M:%S")
-                endtime_raw = signoutlog[idx + 1]["completetime"]
-                if endtime_raw != "None":
-                    endtime = datetime.datetime.strptime(endtime_raw, "%H:%M:%S")
-                if begintime_raw != "None" and endtime_raw != "None":
-                    timedelta = endtime - begintime
-                    minutes = int(timedelta.seconds / 60)
-                    seconds = timedelta.seconds - (minutes * 60)
-                    signoutlog[idx]["elapsedtime"] = "%i:%02d" % (minutes, seconds)
-                else:
-                    signoutlog[idx]["elapsedtime"] = "Unable to be computed"
+                sout["starttime"] = ""
+            if sout["completetime"] != None:
+                sout["completetime"] = cleanup_timestamp.sub("", str(sout["completetime"].time()))
+            else:
+                sout["completetime"] = ""
         cur.close()
         conn.close()
         return render_template(
@@ -227,7 +235,7 @@ def query():
             splitdate = request.form["addtime_date"].split("-")
             cur.execute(
                 """
-                SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, completetime::TIMESTAMP::TIME, addtime::TIMESTAMP::DATE as adddate
+                SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, starttime::TIMESTAMP, completetime::TIMESTAMP, addtime::TIMESTAMP::DATE as adddate
                 FROM signout LEFT JOIN service 
                     ON signout.service = service.id
                 WHERE date_part('day', addtime) = %s
@@ -246,7 +254,7 @@ def query():
             splitenddate = request.form["addtime_date2"].split("-")
             cur.execute(
                 """
-                SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, completetime::TIMESTAMP::TIME, addtime::TIMESTAMP::DATE as adddate
+                SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, starttime::TIMESTAMP, completetime::TIMESTAMP, addtime::TIMESTAMP::DATE as adddate
                 FROM signout LEFT JOIN service 
                     ON signout.service = service.id
                 WHERE date_part('day', addtime) >= %s AND date_part('day', addtime) <= %s
@@ -270,30 +278,31 @@ def query():
                 "name": x[1],
                 "type": x[2],
                 "addtime": cleanup_timestamp.sub("", str(x[3])),
-                "completetime": cleanup_timestamp.sub("", str(x[4])),
-                "adddate": x[5].strftime("%m-%d-%Y"),
+                "starttime": x[4],
+                "completetime": x[5],
+                "adddate": x[6].strftime("%m-%d-%Y"),
                 "elapsedtime": "",
             }
             for x in cur.fetchall()
         ]
-
         for idx in range(len(signoutlog)):
-            if idx == len(signoutlog) - 1:
-                signoutlog[idx]["elapsedtime"] = "Unable to be computed"
+            sout = signoutlog[idx]
+            try:
+                timediff = sout["completetime"] - sout["starttime"]
+                elapsed_minutes = int(timediff.seconds / 60)
+                elapsed_seconds = timediff.seconds % 60
+                sout["elapsedtime"] = "%i:%02d" % (elapsed_minutes, elapsed_seconds)
+            except Exception:
+                sout["elapsedtime"] = "Unable to be computed"
+            if sout["starttime"] != None:
+                sout["starttime"] = cleanup_timestamp.sub("", str(sout["starttime"].time()))
             else:
-                begintime_raw = signoutlog[idx]["completetime"]
-                if begintime_raw != "None":
-                    begintime = datetime.datetime.strptime(begintime_raw, "%H:%M:%S")
-                endtime_raw = signoutlog[idx + 1]["completetime"]
-                if endtime_raw != "None":
-                    endtime = datetime.datetime.strptime(endtime_raw, "%H:%M:%S")
-                if begintime_raw != "None" and endtime_raw != "None":
-                    timedelta = endtime - begintime
-                    minutes = int(timedelta.seconds / 60)
-                    seconds = timedelta.seconds - (minutes * 60)
-                    signoutlog[idx]["elapsedtime"] = "%i:%02d" % (minutes, seconds)
-                else:
-                    signoutlog[idx]["elapsedtime"] = "Unable to be computed"
+                sout["starttime"] = ""
+            if sout["completetime"] != None:
+                sout["completetime"] = cleanup_timestamp.sub("", str(sout["completetime"].time()))
+            else:
+                sout["completetime"] = ""
+            signoutlog[idx] = sout
         cur.close()
         conn.close()
         return render_template(
@@ -303,7 +312,7 @@ def query():
 
 def submission_weekend():
     conn = get_db()
-    cleanup_timestamp = re.compile(r"\..*$")
+    cleanup_timestamp = re.compile(r"\.(..).*$")
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute(
@@ -316,7 +325,7 @@ def submission_weekend():
         liquid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active, completetime - starttime as elapsedtime
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
             WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
@@ -329,15 +338,16 @@ def submission_weekend():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": cleanup_timestamp.sub("", str(x[2])),
+                "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
+                "elapsedtime": format_timestamp(str(x[4]))
             }
             for x in cur.fetchall()
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active, completetime - starttime as elapsedtime
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
             WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
@@ -350,9 +360,10 @@ def submission_weekend():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": cleanup_timestamp.sub("", str(x[2])),
+                "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
+                "elapsedtime": format_timestamp(str(x[4]))
             }
             for x in cur.fetchall()
         ]
@@ -367,18 +378,21 @@ def submission_weekend():
         )
     else:
         cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp) \
-                    VALUES (%s, %s, %s, %s, %s, %s)",
-            (
-                request.form["intern_name"],
-                request.form["intern_callback"],
-                request.form["service"],
-                request.form["oncall"],
-                request.remote_addr,
-                request.form["hosttimestamp"],
-            ),
-        )
+        # pprint.pprint(request.form)
+        # pprint.pprint(request.form.getlist('service'))
+        for serviceid in request.form.getlist('service'):
+            cur.execute(
+                "INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp) \
+                        VALUES (%s, %s, %s, %s, %s, %s)",
+                (
+                    request.form["intern_name"],
+                    request.form["intern_callback"],
+                    serviceid,
+                    request.form["oncall"],
+                    request.remote_addr,
+                    request.form["hosttimestamp"],
+                ),
+            )
         conn.commit()
         cur.close()
         conn.close()
@@ -387,7 +401,7 @@ def submission_weekend():
 
 def submission_weekday():
     conn = get_db()
-    cleanup_timestamp = re.compile(r"\..*$")
+    cleanup_timestamp = re.compile(r"\.(..).*$")
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute(
@@ -400,7 +414,7 @@ def submission_weekday():
         liquid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active, completetime - starttime as elapsedtime
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
             WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
@@ -414,15 +428,16 @@ def submission_weekday():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": cleanup_timestamp.sub("", str(x[2])),
+                "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
+                "elapsedtime": format_timestamp(str(x[4]))
             }
             for x in cur.fetchall()
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active, completetime - starttime as elapsedtime
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
             WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
@@ -436,15 +451,16 @@ def submission_weekday():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": cleanup_timestamp.sub("", str(x[2])),
+                "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
+                "elapsedtime": format_timestamp(str(x[4]))
             }
             for x in cur.fetchall()
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active, completetime - starttime as elapsedtime
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
             WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
@@ -458,15 +474,16 @@ def submission_weekday():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": cleanup_timestamp.sub("", str(x[2])),
+                "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
+                "elapsedtime": format_timestamp(str(x[4]))
             }
             for x in cur.fetchall()
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active, completetime - starttime as elapsedtime
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
             WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
@@ -480,9 +497,10 @@ def submission_weekday():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": cleanup_timestamp.sub("", str(x[2])),
+                "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
+                "elapsedtime": format_timestamp(str(x[4]))
             }
             for x in cur.fetchall()
         ]
