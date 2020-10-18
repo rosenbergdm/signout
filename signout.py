@@ -78,7 +78,7 @@ def start_signout():
         conn = get_db()
         cur = conn.cursor()
         cur.execute(
-            "UPDATE signout set starttime=current_timestamp where id=%s", signout_id
+            "UPDATE signout set starttime=current_timestamp where id=%s" % str(signout_id)
         )
         conn.commit()
         cur.close()

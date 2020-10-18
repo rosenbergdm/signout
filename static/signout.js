@@ -16,8 +16,12 @@ function startsignout(internid) {
     this_signout.children[i].outerHTML =
       "<td style='color:blue;'>" + this_signout.children[i].innerText + "</td>";
   }
-  var startbutton = document.getElementById(internid).children[1];
-  startbutton.disabled = true;
+  var sbuttons = document.getElementsByClassName("startbutton");
+  for (i=0; i<=sbuttons.length-1; i++) {
+    sbuttons[i].disabled = true;
+  }
+  // var startbutton = document.getElementById(internid).children[1];
+  // startbutton.disabled = true;
 }
 
 /* For syncing time between clients and the server on the submission and 
