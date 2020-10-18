@@ -30,6 +30,7 @@ import psycopg2
 import re
 
 app = Flask(__name__)
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
 dbname = ""
 dbuser = ""
@@ -57,6 +58,25 @@ def get_db():
 @app.route("/")
 def index():
     return redirect(url_for("submission"))
+
+
+@app.route("/start_signout", methods=["GET"])
+def start_signout():
+    if request.args.get("id") is None:
+        return "ERROR: Tried to start signout without an id query parameter for which signout db entry"
+    try:
+        signout_id = request.args.get("id")
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE signout set starttime=current_timestamp where id=%s", signout_id
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+        return json.dumps({"id": signout_id, "status": "OK"})
+    except Exception:
+        return json.dumps({"id": signout_id, "status": "ERROR"})
 
 
 @app.route("/nightfloat", methods=["GET", "POST"])
@@ -349,7 +369,7 @@ def submission_weekend():
         cur = conn.cursor()
         cur.execute(
             "INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp) \
-                    VALUES (%s, %s, %s, %s, %s, %s)", 
+                    VALUES (%s, %s, %s, %s, %s, %s)",
             (
                 request.form["intern_name"],
                 request.form["intern_callback"],
@@ -357,8 +377,7 @@ def submission_weekend():
                 request.form["oncall"],
                 request.remote_addr,
                 request.form["hosttimestamp"],
-
-            )
+            ),
         )
         conn.commit()
         cur.close()
@@ -482,7 +501,7 @@ def submission_weekday():
         cur = conn.cursor()
         cur.execute(
             "INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp) \
-                    VALUES (%s, %s, %s, %s)", 
+                    VALUES (%s, %s, %s, %s)",
             (
                 request.form["intern_name"],
                 request.form["intern_callback"],
@@ -490,7 +509,7 @@ def submission_weekday():
                 request.form["oncall"],
                 request.remote_addr,
                 request.form["hosttimestamp"],
-            )
+            ),
         )
         conn.commit()
         cur.close()

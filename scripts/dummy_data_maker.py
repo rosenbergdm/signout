@@ -67,10 +67,15 @@ def build_entry(oncall=False):
     if oncall:
         entryoncall = "TRUE"
         entryaddtime = entryaddtime + " + interval '1 hour'"
-    querystring =  """\
+    querystring = """\
         INSERT INTO signout (intern_name, intern_callback, service, oncall, addtime)\
-        VALUES ('%s', '%s', '%s', %s, %s);""" % \
-        (entryname, entrycallback, entryservice, entryoncall, entryaddtime)
+        VALUES ('%s', '%s', '%s', %s, %s);""" % (
+        entryname,
+        entrycallback,
+        entryservice,
+        entryoncall,
+        entryaddtime,
+    )
     print(querystring)
 
 

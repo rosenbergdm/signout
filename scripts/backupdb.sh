@@ -8,8 +8,8 @@
 
 PG_DUMP="$(which pg_dump)"
 GIT_TAG="$(git tag)"
-TARGET="$(dirname $0)/backups/signout-${GIT_TAG}.sql.gz"
-WORKINGDIR="$(dirname $0)"
+TARGET="$(dirname $0)/../backups/signout-${GIT_TAG}.sql.gz"
+WORKINGDIR="$(dirname $0)/.."
 PASSWD="$(cat "$WORKINGDIR/dbsettings.json" | grep pass | sed -e 's#"##g' | awk '{print $2}')"
 USER="$(cat $WORKINGDIR/dbsettings.json | grep username | sed -e 's#["|,]##g' | awk '{print $2}')"
 DBNAME="$(cat $WORKINGDIR/dbsettings.json | grep dbname | sed -e 's#["|,]##g' | awk '{print $2}')"
