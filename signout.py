@@ -37,12 +37,14 @@ dbname = ""
 dbuser = ""
 dbpassword = ""
 
+
 def format_timestamp(ts):
     cleanup_timestamp = re.compile(r"\.(..).*$")
     if ts == "None":
         return ""
     else:
         return cleanup_timestamp.sub(".\\1", ts)
+
 
 def load_db_settings():
     global dbname
@@ -206,11 +208,15 @@ def query():
             except Exception:
                 sout["elapsedtime"] = "Unable to be computed"
             if sout["starttime"] != None:
-                sout["starttime"] = cleanup_timestamp.sub("", str(sout["starttime"].time()))
+                sout["starttime"] = cleanup_timestamp.sub(
+                    "", str(sout["starttime"].time())
+                )
             else:
                 sout["starttime"] = ""
             if sout["completetime"] != None:
-                sout["completetime"] = cleanup_timestamp.sub("", str(sout["completetime"].time()))
+                sout["completetime"] = cleanup_timestamp.sub(
+                    "", str(sout["completetime"].time())
+                )
             else:
                 sout["completetime"] = ""
         cur.close()
@@ -295,11 +301,15 @@ def query():
             except Exception:
                 sout["elapsedtime"] = "Unable to be computed"
             if sout["starttime"] != None:
-                sout["starttime"] = cleanup_timestamp.sub("", str(sout["starttime"].time()))
+                sout["starttime"] = cleanup_timestamp.sub(
+                    "", str(sout["starttime"].time())
+                )
             else:
                 sout["starttime"] = ""
             if sout["completetime"] != None:
-                sout["completetime"] = cleanup_timestamp.sub("", str(sout["completetime"].time()))
+                sout["completetime"] = cleanup_timestamp.sub(
+                    "", str(sout["completetime"].time())
+                )
             else:
                 sout["completetime"] = ""
             signoutlog[idx] = sout
@@ -341,7 +351,7 @@ def submission_weekend():
                 "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
-                "elapsedtime": format_timestamp(str(x[4]))
+                "elapsedtime": format_timestamp(str(x[4])),
             }
             for x in cur.fetchall()
         ]
@@ -363,7 +373,7 @@ def submission_weekend():
                 "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
-                "elapsedtime": format_timestamp(str(x[4]))
+                "elapsedtime": format_timestamp(str(x[4])),
             }
             for x in cur.fetchall()
         ]
@@ -380,7 +390,7 @@ def submission_weekend():
         cur = conn.cursor()
         # pprint.pprint(request.form)
         # pprint.pprint(request.form.getlist('service'))
-        for serviceid in request.form.getlist('service'):
+        for serviceid in request.form.getlist("service"):
             cur.execute(
                 "INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp) \
                         VALUES (%s, %s, %s, %s, %s, %s)",
@@ -431,7 +441,7 @@ def submission_weekday():
                 "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
-                "elapsedtime": format_timestamp(str(x[4]))
+                "elapsedtime": format_timestamp(str(x[4])),
             }
             for x in cur.fetchall()
         ]
@@ -454,7 +464,7 @@ def submission_weekday():
                 "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
-                "elapsedtime": format_timestamp(str(x[4]))
+                "elapsedtime": format_timestamp(str(x[4])),
             }
             for x in cur.fetchall()
         ]
@@ -477,7 +487,7 @@ def submission_weekday():
                 "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
-                "elapsedtime": format_timestamp(str(x[4]))
+                "elapsedtime": format_timestamp(str(x[4])),
             }
             for x in cur.fetchall()
         ]
@@ -500,7 +510,7 @@ def submission_weekday():
                 "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
-                "elapsedtime": format_timestamp(str(x[4]))
+                "elapsedtime": format_timestamp(str(x[4])),
             }
             for x in cur.fetchall()
         ]

@@ -89,8 +89,8 @@ function nonCallSubmit() {
     );
   }
   cutoff_time.setTime(cutoff_time.getTime() + offset * 60 * 10);
-  // if (date >= cutoff_time) {
-  if (true) {
+  if (date >= cutoff_time) {
+  // if (true) {
     let timestamp = new Date(Date.now());
     let hosttimestamps = document.getElementsByName("hosttimestamp");
     for (var i = hosttimestamps.length - 1; i >= 0; i--) {
@@ -136,8 +136,8 @@ function onCallSubmit() {
     Date.UTC(d.getYear() + 1900, d.getMonth(), d.getDate(), 19, 0, 0)
   );
   cutoff_time.setTime(cutoff_time.getTime() + offset * 60 * 10);
-  // if (date >= cutoff_time) {
-  if (true) {
+  if (date >= cutoff_time) {
+  // if (true) {
     let timestamp = new Date(Date.now());
     let hosttimestamps = document.getElementsByName("hosttimestamp");
     for (var i = hosttimestamps.length - 1; i >= 0; i--) {

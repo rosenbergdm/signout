@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   {% block head %}
-  <title>{% block title %}{% endblock %}</title>
-  {% endblock %}
+  <title>{% block title %}{% endblock title %}</title>
+  {% endblock head %}
 </head>
-<body{% block bodyattributes %}{% endblock %}>
+<body{% block bodyattributes %}{% endblock bodyattributes %}>
   {% block body %}
-  {% endblock %}
+  {% endblock body %}
   <div id="footer">
     &copy; Copyright 2020 by Thomas M. Butterworth
   </div>
