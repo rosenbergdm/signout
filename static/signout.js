@@ -125,3 +125,8 @@ function onCallSubmit() {
     return false;
   }
 }
+
+function startsignout(internid) {
+  alert("Starting signout for " + internid);
+}
+

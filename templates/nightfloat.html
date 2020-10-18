@@ -13,16 +13,29 @@
 <div class="flex-container">
   <div class="waitinglist" style="flex: 0 0 600px">
 	  <h4>Waiting to sign out</h4>
-    <ul>
+    <table style="width:100%;text-align:left;">
+      <tr>
+        <th>Intern/Resident/NP</th>
+        <th>Service</th>
+        <th>Callback number</th>
+      </tr>
       {% for intern in waiting_interns %}
-      <li>{{ intern.intern_name|striptags }} - ({{ intern.name|striptags }}); Callback: <strong>{{ intern.intern_callback|striptags }}</strong>
-	      <form id="{{ intern.id }}" name="{{ intern.id }}" action="" {%- if not(loop.first) -%} onSubmit="return confirm('This is not the first person on the list.  Do you really want to do this?')" {% endif %} method="POST">
+      <tr>
+        <td>{{ intern.intern_name|striptags }}</td>
+        <td>{{ intern.name|striptags }}</td>
+        <td><strong>{{ intern.intern_callback|striptags }}</strong></td>
+      </tr>
+      <tr>
+        <td colspan="3">
+	      <form id="{{ intern.id }}" name="{{ intern.id }}" action="" method="POST">
           <input type="hidden" name="signout.id" value="{{ intern.id }}">
+          <button name="start" type="button" onclick="{%- if not(loop.first) -%} confirm('This is not the first person on the list.  Do you really want to do this?') && {%- endif -%} startsignout({{ intern.id }})">Start</button>
           <button name="submit" type="submit" id="submit">Remove</button>
         </form>
-      </li>
+        </td>
+      </tr>
       {% endfor %}
-    </ul>
+    </table>
   </div>
   <div class="completelist" style="flex: 0 0 400px">
 	  <h4>Sign out already complete</h4>
