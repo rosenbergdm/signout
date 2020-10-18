@@ -5,6 +5,7 @@
  *
  * Distributed under terms of the MIT license.
  */
+UPDATE TABLE signout set completetime=NULL;
 
 ALTER TABLE service ADD COLUMN active boolean NOT NULL default TRUE;
 

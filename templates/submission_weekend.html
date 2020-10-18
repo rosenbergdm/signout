@@ -18,8 +18,7 @@
 <br>
 <hr>
 
-  <!-- NON-CALL SOLID TUMOR -->
-  <center><h1>Non-Call NF 9132 (GI/Breast)</h1></center><br>
+  <center><h1>NF 9132 (GI/Breast)</h1></center><br>
     <div class="flex-container">
     <div class="submissionform">
       <form id="signoutready" action="" method="POST">
@@ -64,8 +63,7 @@
     </div>
   </div>
 
-  <!-- NON-CALL LIQUID TUMOR / Gen Med -->
-  <center><h1>Non-Call NF 9133 (STR, Leukemia, Lymphoma, Gen Med)</h1></center><br>
+  <center><h1>NF 9133 (STR, Leukemia, Lymphoma, Gen Med)</h1></center><br>
   <div class="flex-container">
     <div class="submissionform">
       <form id="signoutready" action="" method="POST">
@@ -100,100 +98,6 @@
           <th>Time marked ready</th>
         </tr>
         {% for intern in noncall_liquid_interns %}
-        <tr style="color:{{ intern.fgcolor }}">
-          <td>{{ intern.intern_name|striptags }}</td>
-          <td>{{ intern.name }}</td>
-          <td>{{ intern.addtime }}</td>
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-  </div>
-
-
-  <!-- CALL SOLID TUMOR -->
-  <center><h1>On-Call NF 9132 (GI/Breast)</h1></center><br>
-  <div class="flex-container">
-    <div class="submissionform">
-      <form id="signoutready" action="" method="POST">
-        <h3>Primary Team Ready-To-Signout</h3>
-        <h4>Do not complete until you are ready to signout</h4>
-        <fieldset>
-          <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
-        </fieldset>
-        <fieldset>
-          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" pattern=".*[0-9]{4}.*" maxlength=15 required>
-        </fieldset>
-        <fieldset>
-          <select id="service" name="service">
-            {% for service in solid_services %}
-            <option value="{{ service.id }}">{{ service.name }}</option>
-            {% endfor %}
-          </select>
-        </fieldset>
-        <input type="hidden" id="oncall" name="oncall" value="TRUE">
-        <input type="hidden" id="hosttimestamp" name="hosttimestamp" value="">
-        <fieldset>
-          <button name="submit" type="submit" id="submit" onclick="return onCallSubmit()">Submit</button>
-        </fieldset>
-      </form>
-    </div>
-    <div class="currentlist" style="flex: 0 0 600px">
-      <h3>Primary teams signed up</h3>
-      <table style="width:100%;text-align:left;">
-        <tr>
-          <th>Intern/Resident/NP</th>
-          <th>Service</th>
-          <th>Time marked ready</th>
-        </tr>
-        {% for intern in call_solid_interns %}
-        <tr style="color:{{ intern.fgcolor }}">
-          <td>{{ intern.intern_name|striptags }}</td>
-          <td>{{ intern.name }}</td>
-          <td>{{ intern.addtime }}</td>
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-  </div>
-
-  <!-- CALL LIQUID TUMOR / Gen Med -->
-
-  <h1 align="center">On-Call NF 9133 (STR, Leukemia, Lymphoma, Gen Med)</h1><br>
-  <div class="flex-container">
-    <div class="submissionform">
-      <form id="signoutready" action="" method="POST">
-        <h3>Primary Team Ready-To-Signout</h3>
-        <h4>Do not complete until you are ready to signout</h4>
-        <fieldset>
-          <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
-        </fieldset>
-        <fieldset>
-          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" pattern=".*[0-9]{4}.*" maxlength=15 required>
-        </fieldset>
-        <fieldset>
-          <select id="service" name="service">
-            {% for service in liquid_services %}
-            <option value="{{ service.id }}">{{ service.name }}</option>
-            {% endfor %}
-          </select>
-        </fieldset>
-        <input type="hidden" id="oncall" name="oncall" value="TRUE">
-        <input type="hidden" id="hosttimestamp" name="hosttimestamp" value="">
-        <fieldset>
-          <button name="submit" type="submit" id="submit" onclick="return nonCallSubmit()">Submit</button>
-        </fieldset>
-      </form>
-    </div>
-    <div class="currentlist" style="flex: 0 0 600px">
-      <h3>Primary teams signed up</h3>
-      <table style="width:100%;text-align:left;">
-        <tr>
-          <th>Intern/Resident/NP</th>
-          <th>Service</th>
-          <th>Time marked ready</th>
-        </tr>
-        {% for intern in call_liquid_interns %}
         <tr style="color:{{ intern.fgcolor }}">
           <td>{{ intern.intern_name|striptags }}</td>
           <td>{{ intern.name }}</td>

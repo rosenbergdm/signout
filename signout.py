@@ -74,7 +74,7 @@ def nightfloat():
                     SELECT signout.id, intern_name, name, intern_callback 
                     FROM signout LEFT JOIN service 
                         ON signout.service = service.id 
-                    WHERE active is TRUE 
+                    WHERE signout.active is TRUE 
                         AND type = '%s' 
                         AND date_part('day', addtime) = date_part('day', current_timestamp) 
                         and date_part('month', addtime) = date_part('month', current_timestamp) 
@@ -92,7 +92,7 @@ def nightfloat():
                     SELECT intern_name, name 
                     FROM signout LEFT JOIN service 
                         ON signout.service = service.id 
-                    WHERE active is FALSE 
+                    WHERE signout.active is FALSE 
                         AND type = '%s'
                         AND date_part('day', addtime) = date_part('day', current_timestamp) 
                         and date_part('month', addtime) = date_part('month', current_timestamp) 
@@ -281,8 +281,7 @@ def query():
         )
 
 
-@app.route("/submission", methods=["GET", "POST"])
-def submission():
+def submission_weekend():
     conn = get_db()
     cleanup_timestamp = re.compile(r"\..*$")
     if request.method == "GET":
@@ -297,7 +296,92 @@ def submission():
         liquid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, active
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active
+            FROM signout LEFT JOIN service 
+                ON signout.service = service.id 
+            WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
+                and date_part('month', addtime) = date_part('month', current_timestamp) 
+                and date_part('year', addtime) = date_part('year', current_timestamp)
+                and type = 'NF9132' 
+            ORDER BY addtime ASC"""
+        )
+        noncall_solid_interns = [
+            {
+                "intern_name": x[0],
+                "name": x[1],
+                "addtime": cleanup_timestamp.sub("", str(x[2])),
+                "active": x[3],
+                "fgcolor": get_foreground_color(x[3]),
+            }
+            for x in cur.fetchall()
+        ]
+        cur.execute(
+            """
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active
+            FROM signout LEFT JOIN service 
+                ON signout.service = service.id 
+            WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
+                and date_part('month', addtime) = date_part('month', current_timestamp) 
+                and date_part('year', addtime) = date_part('year', current_timestamp)
+                and type = 'NF9133' 
+            ORDER BY addtime ASC"""
+        )
+        noncall_liquid_interns = [
+            {
+                "intern_name": x[0],
+                "name": x[1],
+                "addtime": cleanup_timestamp.sub("", str(x[2])),
+                "active": x[3],
+                "fgcolor": get_foreground_color(x[3]),
+            }
+            for x in cur.fetchall()
+        ]
+        cur.close()
+        conn.close()
+        return render_template(
+            "submission_weekend.html",
+            solid_services=solid_services,
+            liquid_services=liquid_services,
+            noncall_solid_interns=noncall_solid_interns,
+            noncall_liquid_interns=noncall_liquid_interns,
+        )
+    else:
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp) \
+                    VALUES (%s, %s, %s, %s, %s, %s)", 
+            (
+                request.form["intern_name"],
+                request.form["intern_callback"],
+                request.form["service"],
+                request.form["oncall"],
+                request.remote_addr,
+                request.form["hosttimestamp"],
+
+            )
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+        return render_template("received.html")
+
+
+def submission_weekday():
+    conn = get_db()
+    cleanup_timestamp = re.compile(r"\..*$")
+    if request.method == "GET":
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT id, name FROM service where type='NF9132' ORDER BY name ASC"
+        )
+        solid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
+        cur.execute(
+            "SELECT id, name FROM service where type='NF9133' ORDER BY name ASC"
+        )
+        liquid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
+        cur.execute(
+            """
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
             WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
@@ -319,7 +403,7 @@ def submission():
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, active
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
             WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
@@ -341,7 +425,7 @@ def submission():
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, active
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
             WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
@@ -363,7 +447,7 @@ def submission():
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, active
+            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active
             FROM signout LEFT JOIN service 
                 ON signout.service = service.id 
             WHERE date_part('day', addtime) = date_part('day', current_timestamp) 
@@ -397,19 +481,29 @@ def submission():
     else:
         cur = conn.cursor()
         cur.execute(
-            "INSERT INTO signout (intern_name, intern_callback, service, oncall) \
+            "INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp) \
                     VALUES (%s, %s, %s, %s)", 
             (
                 request.form["intern_name"],
                 request.form["intern_callback"],
                 request.form["service"],
                 request.form["oncall"],
+                request.remote_addr,
+                request.form["hosttimestamp"],
             )
         )
         conn.commit()
         cur.close()
         conn.close()
         return render_template("received.html")
+
+
+@app.route("/submission", methods=["GET", "POST"])
+def submission():
+    if datetime.datetime.now().isoweekday() > 5:
+        return submission_weekend()
+    else:
+        return submission_weekday()
 
 
 if __name__ == "__main__":

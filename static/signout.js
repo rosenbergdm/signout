@@ -64,7 +64,13 @@ function nonCallSubmit() {
     // cutoff_time = new Date(Date.UTC(d.getYear() + 1900, d.getMonth(), d.getDate(), 9, 17, 0))
   }
   cutoff_time.setTime(cutoff_time.getTime() + offset * 60 * 10);
-  if (date >= cutoff_time) {
+  // if (date >= cutoff_time) {
+  if (true) {
+    let timestamp = new Date(Date.now());
+    let hosttimestamps = document.getElementsByName("hosttimestamp");
+    for (var i = hosttimestamps.length - 1; i>= 0; i--) {
+      hosttimestamps[i].value = timestamp;
+    }
     return true;
   } else {
     let hours = Math.floor((cutoff_time - date) / 1000 / 3600);
@@ -99,7 +105,13 @@ function onCallSubmit() {
     Date.UTC(d.getYear() + 1900, d.getMonth(), d.getDate(), 19, 0, 0)
   );
   cutoff_time.setTime(cutoff_time.getTime() + offset * 60 * 10);
-  if (date >= cutoff_time) {
+  // if (date >= cutoff_time) {
+  if (true) {
+    let timestamp = new Date(Date.now());
+    let hosttimestamps = document.getElementsByName("hosttimestamp");
+    for (var i = hosttimestamps.length - 1; i>= 0; i--) {
+      hosttimestamps[i].value = timestamp;
+    }
     return true;
   } else {
     let hours = Math.floor((cutoff_time - date) / 1000 / 3600);
