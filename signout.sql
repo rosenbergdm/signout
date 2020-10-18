@@ -12,7 +12,8 @@ DROP TABLE IF EXISTS service;
 CREATE TABLE service (
   id SERIAL PRIMARY KEY NOT NULL,
   name VARCHAR(128) NOT NULL,
-  type VARCHAR(8)
+  type VARCHAR(8) NOT NULL,
+  active boolean NOT NULL default TRUE
 );
 
 CREATE TABLE signout (
@@ -23,7 +24,11 @@ CREATE TABLE signout (
   oncall BOOLEAN NOT NULL DEFAULT FALSE,
   active BOOLEAN NOT NULL DEFAULT TRUE,
   addtime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  completetime TIMESTAMP default NULL
+  starttime TIMESTAMP default NULL,
+  completetime TIMESTAMP default NULL,
+  ipaddress inet NOT NULL default '127.0.0.1',
+  hosttimestamp VARCHAR(64) default NULL
+
 );
 
 
@@ -57,7 +62,6 @@ INSERT INTO service (name, type) VALUES ('Leukemia B, Sub-Intern', 'NF9133');
 INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #1', 'NF9133');
 INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #2', 'NF9133');
 INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #3', 'NF9133');
-INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #3', 'NF9133');
 INSERT INTO service (name, type) VALUES ('Lymphoma Green, Sub-Intern', 'NF9133');
 INSERT INTO service (name, type) VALUES ('GI C, APP #1', 'NF9132');
 INSERT INTO service (name, type) VALUES ('GI C, APP #2', 'NF9132');
@@ -72,5 +76,6 @@ INSERT INTO service (name, type) VALUES ('Lymphoma Green, APP', 'NF9133');
 
 
 -- DUMMY VALUES FOR TESTING
+-- INSERT INTO signout (intern_name, intern_callback, service, oncall, addtime) VALUES ('Nancie Hogg', 'x3002', '5', FALSE, current_timestamp + interval '51 minutes' + interval '4 seconds');
 
 -- vim:et
