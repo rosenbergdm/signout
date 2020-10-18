@@ -5,7 +5,7 @@
 *  Only 1 list per NF on weekends COMPLETE
 *  More accurate time representation COMPLETE
 *  Start and stop buttons COMPLETE
-*  Multi-select for weekends
+*  Multi-select for weekends COMPLETE
 *  Melodik the Ref sheets COMPLETE
 *  Instructions for late sign ups COMPLETE
 
