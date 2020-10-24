@@ -2,4 +2,5 @@
 dbsettings.json
 __pycache__
 **/.eslintrc*
-./backups/*.sql.gz
+backups/*.sql.gz
+
