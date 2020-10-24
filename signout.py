@@ -45,6 +45,15 @@ def format_timestamp(ts):
     else:
         return cleanup_timestamp.sub(".\\1", ts)
 
+def cleanup_date_input(ds):
+    if "-" in ds:
+        print("ds = '%s'" % ds)
+        return ds
+    else:
+        parts = ds.split("/")
+        ds = "-".join([parts[2], parts[0], parts[1]])
+        print("ds = '%s'" % ds)
+        return ds
 
 def load_db_settings():
     global dbname
@@ -225,6 +234,7 @@ def query():
             "query.html", signoutlog=signoutlog, rangestring=rangestring
         )
     else:
+        print(request.form)
         cur = conn.cursor()
         if "NF9133" in request.form.keys():
             if "NF9132" in request.form.keys():
@@ -238,7 +248,7 @@ def query():
                 typestring = " AND type = 'notarealtype' "
         if request.form["addtime_date2"] == "":
             rangestring = "Showing signouts for %s" % request.form["addtime_date"]
-            splitdate = request.form["addtime_date"].split("-")
+            splitdate = cleanup_date_input(request.form["addtime_date"]).split("-")
             cur.execute(
                 """
                 SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, starttime::TIMESTAMP, completetime::TIMESTAMP, addtime::TIMESTAMP::DATE as adddate
@@ -256,8 +266,8 @@ def query():
                 request.form["addtime_date"],
                 request.form["addtime_date2"],
             )
-            splitdate = request.form["addtime_date"].split("-")
-            splitenddate = request.form["addtime_date2"].split("-")
+            splitdate = cleanup_date_input(request.form["addtime_date"]).split("-")
+            splitenddate = cleanup_date_input(request.form["addtime_date2"]).split("-")
             cur.execute(
                 """
                 SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, starttime::TIMESTAMP, completetime::TIMESTAMP, addtime::TIMESTAMP::DATE as adddate
