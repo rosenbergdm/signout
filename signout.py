@@ -539,7 +539,7 @@ def submission_weekday():
         cur = conn.cursor()
         cur.execute(
             "INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp) \
-                    VALUES (%s, %s, %s, %s)",
+                    VALUES (%s, %s, %s, %s, %s, %s)",
             (
                 request.form["intern_name"],
                 request.form["intern_callback"],
