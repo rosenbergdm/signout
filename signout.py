@@ -47,8 +47,8 @@ def format_timestamp(ts):
 
 
 def fix_earlytimes(ts):
-    shift_times = re.compile(r"^(..):59:59.*")
-    return shift_times.sub("\\1:00:00.00", ts)
+    shift_times = re.compile(r"^(..):59:59\.*")
+    return shift_times.sub("\\1:00:00.00", ts)[0 : len(ts)]
 
 
 def cleanup_date_input(ds):
