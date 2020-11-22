@@ -45,6 +45,12 @@ def format_timestamp(ts):
     else:
         return cleanup_timestamp.sub(".\\1", ts)
 
+
+def fix_earlytimes(ts):
+    shift_times = re.compile(r"^(..):59:59.*")
+    return shift_times.sub("\\1:00:00.00", ts)
+
+
 def cleanup_date_input(ds):
     if "-" in ds:
         print("ds = '%s'" % ds)
@@ -54,6 +60,7 @@ def cleanup_date_input(ds):
         ds = "-".join([parts[2], parts[0], parts[1]])
         print("ds = '%s'" % ds)
         return ds
+
 
 def load_db_settings():
     global dbname
@@ -87,7 +94,8 @@ def start_signout():
         conn = get_db()
         cur = conn.cursor()
         cur.execute(
-            "UPDATE signout set starttime=current_timestamp where id=%s" % str(signout_id)
+            "UPDATE signout set starttime=current_timestamp where id=%s"
+            % str(signout_id)
         )
         conn.commit()
         cur.close()
@@ -199,7 +207,7 @@ def query():
                 "intern_name": x[0],
                 "name": x[1],
                 "type": x[2],
-                "addtime": cleanup_timestamp.sub("", str(x[3])),
+                "addtime": fix_earlytimes(cleanup_timestamp.sub("", str(x[3]))),
                 "starttime": x[4],
                 "completetime": x[5],
                 "adddate": x[6].strftime("%m-%d-%Y"),
@@ -293,7 +301,7 @@ def query():
                 "intern_name": x[0],
                 "name": x[1],
                 "type": x[2],
-                "addtime": cleanup_timestamp.sub("", str(x[3])),
+                "addtime": fix_earlytimes(cleanup_timestamp.sub("", str(x[3]))),
                 "starttime": x[4],
                 "completetime": x[5],
                 "adddate": x[6].strftime("%m-%d-%Y"),
@@ -358,7 +366,7 @@ def submission_weekend():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
+                "addtime": fix_earlytimes(cleanup_timestamp.sub(".\\1", str(x[2]))),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
                 "elapsedtime": format_timestamp(str(x[4])),
@@ -380,7 +388,7 @@ def submission_weekend():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
+                "addtime": fix_earlytimes(cleanup_timestamp.sub(".\\1", str(x[2]))),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
                 "elapsedtime": format_timestamp(str(x[4])),
@@ -448,7 +456,7 @@ def submission_weekday():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
+                "addtime": fix_earlytimes(cleanup_timestamp.sub(".\\1", str(x[2]))),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
                 "elapsedtime": format_timestamp(str(x[4])),
@@ -471,7 +479,7 @@ def submission_weekday():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
+                "addtime": fix_earlytimes(cleanup_timestamp.sub(".\\1", str(x[2]))),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
                 "elapsedtime": format_timestamp(str(x[4])),
@@ -494,7 +502,7 @@ def submission_weekday():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
+                "addtime": fix_earlytimes(cleanup_timestamp.sub(".\\1", str(x[2]))),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
                 "elapsedtime": format_timestamp(str(x[4])),
@@ -517,7 +525,7 @@ def submission_weekday():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": cleanup_timestamp.sub(".\\1", str(x[2])),
+                "addtime": fix_earlytimes(cleanup_timestamp.sub(".\\1", str(x[2]))),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
                 "elapsedtime": format_timestamp(str(x[4])),
