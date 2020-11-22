@@ -5,6 +5,8 @@
 *  Add precision to the clock at top of submission page and resync/reload page regularly
 *  Add precision to query page
 *  Add email address to send problems/ bug reports to
+*  Millisecond timing for system clock sync
+*  Fix to never display "too early" signouts
 
 
 # COMPLETED tasks
