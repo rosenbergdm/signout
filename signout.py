@@ -200,7 +200,7 @@ def synctime():
 @app.route("/query", methods=["GET", "POST"])
 def query():
     conn = get_db()
-    cleanup_timestamp = re.compile(r"\..*$")
+    cleanup_timestamp = re.compile(r"\.(..).*$")
     if request.method == "GET":
         cur = conn.cursor()
         rangestring = "Showing signouts for %s" % (
@@ -221,7 +221,7 @@ def query():
                 "intern_name": x[0],
                 "name": x[1],
                 "type": x[2],
-                "addtime": fix_earlytimes(cleanup_timestamp.sub("", str(x[3]))),
+                "addtime": fix_earlytimes(cleanup_timestamp.sub(".\\1", str(x[3]))),
                 "starttime": x[4],
                 "completetime": x[5],
                 "adddate": x[6].strftime("%m-%d-%Y"),

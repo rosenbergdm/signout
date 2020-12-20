@@ -6,7 +6,7 @@
 *  ?Multi-signout for weekdays as well
 
 # TODO for v0.3 release
-*  Put Gen Med to the top of every sign out list
+*  COMPLETE - Put Gen Med to the top of every sign out list (b13a23197b3aa8e777bd150cbb48cc76eb9bacfbdd)
 *  Add precision to the clock at top of submission page and resync/reload page regularly
 *  Add precision to query page
 *  Display callbacks before and after calls
