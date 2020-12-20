@@ -6,9 +6,7 @@
 *  Add precision to query page
 *  Add email address to send problems/ bug reports to
 *  Millisecond timing for system clock sync
-*  Fix to never display "too early" signouts
 *  Display callbacks before and after calls
-*  Precise times on query form
 *  Warnings if not all lists for a service signed out at a predetermined time
 
 
@@ -20,5 +18,6 @@
 *  Multi-select for weekends COMPLETE
 *  Melodik the Ref sheets COMPLETE
 *  Instructions for late sign ups COMPLETE
+*  Fix to never display "too early" signouts COMPLETE
 
 
