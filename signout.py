@@ -40,6 +40,7 @@ dbpassword = ""
 CLEANUP_TIMESTAMP = re.compile(r"\.(..).*$")
 SHIFT_TIMES = re.compile(r"^(..):59:59\.*")
 
+
 def gen_med_sorter(intern_list):
     gen_med = []
     non_gen_med = []
@@ -162,7 +163,8 @@ def nightfloat():
             % listtype.upper()
         )
         completed_interns = [
-            {"intern_name": x[0], "name": x[1], "intern_callback": x[2]} for x in cur.fetchall()
+            {"intern_name": x[0], "name": x[1], "intern_callback": x[2]}
+            for x in cur.fetchall()
         ]
         cur.close()
         conn.close()

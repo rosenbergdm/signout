@@ -9,7 +9,7 @@
 *  COMPLETE - Put Gen Med to the top of every sign out list (b13a23197b3aa8e777bd150cbb48cc76eb9bacfbdd)
 *  Add precision to the clock at top of submission page and resync/reload page regularly
 *  COMPLETE Add precision to query page (3fc99ecef7fb82c074326b62047f81fe54c0020e)
-*  Display callbacks before and after calls
+*  COMPLETE Display callbacks before and after calls ()
 *  Add email address to send problems/ bug reports to
 
 

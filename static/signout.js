@@ -166,3 +166,11 @@ function onCallSubmit() {
     return false;
   }
 }
+
+function insertContact() {
+  var user = "support"
+  var site = "davidrosenberg.me"
+  var contact = document.getElementById("contact")
+  contact.href = "mailto:" + user + "@" + site
+  contact.text = user + "@" + site
+}

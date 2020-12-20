@@ -2,6 +2,7 @@
 {% block head %}
 {{ super() }}
 <link rel="stylesheet" href="/static/signout.css">
+<script src="/static/signout.js"></script>
   <script type="text/javascript">
     var datefield=document.createElement("input")
     datefield.setAttribute("type", "date")
@@ -24,6 +25,13 @@
 {% block title %}MSKCC Signout Log Query{% endblock %}
 {% block body %}
 <script src="/static/sorttable.js"></script>
+  <script>
+    var old_onload = window.onload
+    window.onload = function() {
+      old_onload()
+      insertContact()
+    }
+    </script>
 <center>
   <h1>MSKCC Signout Log</h1>
   <h3>Default is showing the previous day's signouts.</h3>
