@@ -38,6 +38,18 @@ dbuser = ""
 dbpassword = ""
 
 
+def gen_med_sorter(intern_list):
+    gen_med = []
+    non_gen_med = []
+    for i in intern_list:
+        if i["name"][0:7] == "Gen Med":
+            gen_med.append(i)
+        else:
+            non_gen_med.append(i)
+    gen_med.extend(non_gen_med)
+    return gen_med
+
+
 def format_timestamp(ts):
     cleanup_timestamp = re.compile(r"\.(..).*$")
     if ts == "None":
@@ -129,10 +141,12 @@ def nightfloat():
                     """
             % listtype.upper()
         )
-        waiting_interns = [
-            {"id": x[0], "intern_name": x[1], "name": x[2], "intern_callback": x[3]}
-            for x in cur.fetchall()
-        ]
+        waiting_interns = gen_med_sorter(
+            [
+                {"id": x[0], "intern_name": x[1], "name": x[2], "intern_callback": x[3]}
+                for x in cur.fetchall()
+            ]
+        )
         cur.execute(
             """
                     SELECT intern_name, name 
