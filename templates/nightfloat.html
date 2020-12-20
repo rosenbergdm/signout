@@ -12,11 +12,11 @@
   <br><hr>
 </center>
 <div class="flex-container">
-  <div class="waitinglist" style="flex: 0 0 600px">
+  <div class="waitinglist" style="flex: 0 0 500px">
 	  <h4>Waiting to sign out</h4>
     <table style="width:100%;text-align:left;">
       <tr>
-        <th>Intern/Resident/NP</th>
+        <th>Intern/Resident/APP</th>
         <th>Service</th>
         <th>Callback number</th>
       </tr>
@@ -38,14 +38,22 @@
       {% endfor %}
     </table>
   </div>
-  <div class="completelist" style="flex: 0 0 400px">
+  <div class="completelist" style="flex: 0 0 500px">
 	  <h4>Sign out already complete</h4>
-    <ul>
+    <table style="width:100%;text-align:left;">
+      <tr>
+        <th>Intern/Resident/APP</th>
+        <th>Name</th>
+        <th>Callback number</th>
+      </tr>
       {% for intern in completed_interns %}
-      <li>{{ intern.intern_name|striptags }} - ({{ intern.name|striptags }})
-      </li>
+      <tr>
+        <td>{{ intern.intern_name|striptags }}</td>
+        <td>{{ intern.name|striptags }}</td>
+        <td>{{ intern.intern_callback|striptags }}</td>
+      </tr>
       {% endfor %}
-    </ul>
+    </table>
   </div>
 </div>
 {% endblock %}

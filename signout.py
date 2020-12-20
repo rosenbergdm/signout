@@ -37,6 +37,8 @@ dbname = ""
 dbuser = ""
 dbpassword = ""
 
+CLEANUP_TIMESTAMP = re.compile(r"\.(..).*$")
+SHIFT_TIMES = re.compile(r"^(..):59:59\.*")
 
 def gen_med_sorter(intern_list):
     gen_med = []
@@ -51,16 +53,14 @@ def gen_med_sorter(intern_list):
 
 
 def format_timestamp(ts):
-    cleanup_timestamp = re.compile(r"\.(..).*$")
     if ts == "None":
         return ""
     else:
-        return cleanup_timestamp.sub(".\\1", ts)
+        return CLEANUP_TIMESTAMP.sub(".\\1", ts)
 
 
 def fix_earlytimes(ts):
-    shift_times = re.compile(r"^(..):59:59\.*")
-    return shift_times.sub("\\1:00:00.00", ts)[0 : len(ts)]
+    return SHIFT_TIMES.sub("\\1:00:00.00", ts)[0 : len(ts)]
 
 
 def cleanup_date_input(ds):
@@ -149,7 +149,7 @@ def nightfloat():
         )
         cur.execute(
             """
-                    SELECT intern_name, name 
+                    SELECT intern_name, name, intern_callback
                     FROM signout LEFT JOIN service 
                         ON signout.service = service.id 
                     WHERE signout.active is FALSE 
@@ -162,7 +162,7 @@ def nightfloat():
             % listtype.upper()
         )
         completed_interns = [
-            {"intern_name": x[0], "name": x[1]} for x in cur.fetchall()
+            {"intern_name": x[0], "name": x[1], "intern_callback": x[2]} for x in cur.fetchall()
         ]
         cur.close()
         conn.close()
@@ -200,7 +200,6 @@ def synctime():
 @app.route("/query", methods=["GET", "POST"])
 def query():
     conn = get_db()
-    cleanup_timestamp = re.compile(r"\.(..).*$")
     if request.method == "GET":
         cur = conn.cursor()
         rangestring = "Showing signouts for %s" % (
@@ -221,7 +220,7 @@ def query():
                 "intern_name": x[0],
                 "name": x[1],
                 "type": x[2],
-                "addtime": fix_earlytimes(cleanup_timestamp.sub(".\\1", str(x[3]))),
+                "addtime": fix_earlytimes(CLEANUP_TIMESTAMP.sub(".\\1", str(x[3]))),
                 "starttime": x[4],
                 "completetime": x[5],
                 "adddate": x[6].strftime("%m-%d-%Y"),
@@ -239,13 +238,13 @@ def query():
             except Exception:
                 sout["elapsedtime"] = "Unable to be computed"
             if sout["starttime"] != None:
-                sout["starttime"] = cleanup_timestamp.sub(
+                sout["starttime"] = CLEANUP_TIMESTAMP.sub(
                     "", str(sout["starttime"].time())
                 )
             else:
                 sout["starttime"] = ""
             if sout["completetime"] != None:
-                sout["completetime"] = cleanup_timestamp.sub(
+                sout["completetime"] = CLEANUP_TIMESTAMP.sub(
                     "", str(sout["completetime"].time())
                 )
             else:
@@ -315,7 +314,7 @@ def query():
                 "intern_name": x[0],
                 "name": x[1],
                 "type": x[2],
-                "addtime": fix_earlytimes(cleanup_timestamp.sub("", str(x[3]))),
+                "addtime": fix_earlytimes(CLEANUP_TIMESTAMP.sub("", str(x[3]))),
                 "starttime": x[4],
                 "completetime": x[5],
                 "adddate": x[6].strftime("%m-%d-%Y"),
@@ -333,13 +332,13 @@ def query():
             except Exception:
                 sout["elapsedtime"] = "Unable to be computed"
             if sout["starttime"] != None:
-                sout["starttime"] = cleanup_timestamp.sub(
+                sout["starttime"] = CLEANUP_TIMESTAMP.sub(
                     "", str(sout["starttime"].time())
                 )
             else:
                 sout["starttime"] = ""
             if sout["completetime"] != None:
-                sout["completetime"] = cleanup_timestamp.sub(
+                sout["completetime"] = CLEANUP_TIMESTAMP.sub(
                     "", str(sout["completetime"].time())
                 )
             else:
@@ -354,7 +353,6 @@ def query():
 
 def submission_weekend():
     conn = get_db()
-    cleanup_timestamp = re.compile(r"\.(..).*$")
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute(
@@ -380,7 +378,7 @@ def submission_weekend():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": fix_earlytimes(cleanup_timestamp.sub(".\\1", str(x[2]))),
+                "addtime": fix_earlytimes(CLEANUP_TIMESTAMP.sub(".\\1", str(x[2]))),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
                 "elapsedtime": format_timestamp(str(x[4])),
@@ -402,7 +400,7 @@ def submission_weekend():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": fix_earlytimes(cleanup_timestamp.sub(".\\1", str(x[2]))),
+                "addtime": fix_earlytimes(CLEANUP_TIMESTAMP.sub(".\\1", str(x[2]))),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
                 "elapsedtime": format_timestamp(str(x[4])),
@@ -443,7 +441,6 @@ def submission_weekend():
 
 def submission_weekday():
     conn = get_db()
-    cleanup_timestamp = re.compile(r"\.(..).*$")
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute(
@@ -470,7 +467,7 @@ def submission_weekday():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": fix_earlytimes(cleanup_timestamp.sub(".\\1", str(x[2]))),
+                "addtime": fix_earlytimes(CLEANUP_TIMESTAMP.sub(".\\1", str(x[2]))),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
                 "elapsedtime": format_timestamp(str(x[4])),
@@ -493,7 +490,7 @@ def submission_weekday():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": fix_earlytimes(cleanup_timestamp.sub(".\\1", str(x[2]))),
+                "addtime": fix_earlytimes(CLEANUP_TIMESTAMP.sub(".\\1", str(x[2]))),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
                 "elapsedtime": format_timestamp(str(x[4])),
@@ -516,7 +513,7 @@ def submission_weekday():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": fix_earlytimes(cleanup_timestamp.sub(".\\1", str(x[2]))),
+                "addtime": fix_earlytimes(CLEANUP_TIMESTAMP.sub(".\\1", str(x[2]))),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
                 "elapsedtime": format_timestamp(str(x[4])),
@@ -539,7 +536,7 @@ def submission_weekday():
             {
                 "intern_name": x[0],
                 "name": x[1],
-                "addtime": fix_earlytimes(cleanup_timestamp.sub(".\\1", str(x[2]))),
+                "addtime": fix_earlytimes(CLEANUP_TIMESTAMP.sub(".\\1", str(x[2]))),
                 "active": x[3],
                 "fgcolor": get_foreground_color(x[3]),
                 "elapsedtime": format_timestamp(str(x[4])),
