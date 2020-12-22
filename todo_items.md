@@ -12,7 +12,7 @@
 *  **COMPLETE** Display callbacks before and after calls (13969656f53df0f1ec666d175139cce0e20dbed9)
 *  **COMPLETE** Add email address to send problems/ bug reports to (44ffc826a31addd8c945d203e7449b45bf7d4d2b)
 *  Cron script using twilio to text night float if signout not received for a list by 9pm
-    * Database for NF and callback numbers
+    * **COMPLETE** Database for NF and callback numbers ()
     * Identify callbacks that have/haven't happened
     * Ability to send texts based on DB search
     * Test deployment
