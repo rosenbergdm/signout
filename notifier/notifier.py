@@ -13,6 +13,7 @@ to night float nightly.  Meant to be run as a cron job.
 
 """
 
+from os import environ
 from time import sleep
 from twilio.rest import Client
 
@@ -31,7 +32,8 @@ ACCOUNT_SID = ""
 AUTH_TOKEN = ""
 FROM = "+19388882701"
 DEBUG_CALLBACKS = 1
-DEBUG_PRINT_NOT_MESSAGE = 0
+DEBUG_TARGET_NUMBER = "+13123917570"
+DEBUG_PRINT_NOT_MESSAGE = 1
 
 
 def load_db_settings():
@@ -89,10 +91,10 @@ def get_callback_number(nflist):
     conn.close()
     if DEBUG_CALLBACKS:
         print(
-            "DEBUG_CALLBACKS set -- would have returned '%s' but returning '+13125551212' instead"
-            % callback
+            "DEBUG_CALLBACKS set -- would have returned '%s' but returning '%s' instead"
+            % (callback, DEBUG_TARGET_NUMBER)
         )
-        callback = "+13125551212"
+        callback = DEBUG_TARGET_NUMBER
     return callback
 
 
@@ -211,5 +213,13 @@ def notifier_main():
 
 
 if __name__ == "__main__":
+    for v in ["ACCOUNT_SID", "AUTH_TOKEN", "FROM", "DEBUG_TARGET_NUMBER"]:
+        env_val = environ.get(v)
+        if env_val:
+            globals()[v] = env_val
+    for v in ["DEBUG_CALLBACKS", "DEBUG_PRINT_NOT_MESSAGE"]:
+        env_val = environ.get(v)
+        if env_val:
+            globals()[v] = int(env_val)
     load_db_settings()
     notifier_main()
