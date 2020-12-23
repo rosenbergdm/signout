@@ -13,6 +13,9 @@ to night float nightly.  Meant to be run as a cron job.
 
 """
 
+from time import sleep
+from twilio.rest import Client
+
 import datetime
 import json
 import os
@@ -20,26 +23,31 @@ import pdb
 import psycopg2
 import re
 
-dbname = ""
-dbuser = ""
-dbpassword = ""
+DBNAME = ""
+DBUSER = ""
+DBPASSWORD = ""
+
+ACCOUNT_SID = ""
+AUTH_TOKEN = ""
+FROM = "+19388882701"
+DEBUG_CALLBACKS = 1
 
 
 def load_db_settings():
-    global dbname
-    global dbuser
-    global dbpassword
+    global DBNAME
+    global DBUSER
+    global DBPASSWORD
     scriptdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     fp = open(os.path.join(scriptdir, "dbsettings.json"))
     dbsettings = json.load(fp)
     fp.close()
-    dbname = dbsettings["dbname"]
-    dbuser = dbsettings["username"]
-    dbpassword = dbsettings["password"]
+    DBNAME = dbsettings["dbname"]
+    DBUSER = dbsettings["username"]
+    DBPASSWORD = dbsettings["password"]
 
 
 def get_db():
-    conn = psycopg2.connect(database=dbname, user=dbuser, password=dbpassword)
+    conn = psycopg2.connect(database=DBNAME, user=DBUSER, password=DBPASSWORD)
     return conn
 
 
@@ -70,18 +78,24 @@ def get_callback_number(nflist):
     callback = cur.fetchone()[0]
     cur.close()
     conn.close()
+    if DEBUG_CALLBACKS:
+        print(
+            "DEBUG_CALLBACKS set -- would have returned '%s' but returning '+13125551212' instead"
+            % callback
+        )
+        callback = "+13125551212"
     return callback
 
 
 def get_missing_signouts(nflist):
     """Get the active signouts that have not yet happened for the current day.
 
-    Keyword arguments:
-    nflist -- the night float list to get the missing signouts for (ex: "NF9132")
+    :param str nflist: the night float list to get the missing signouts for (ex: "NF9132")
 
-    Returns -- a list of strings representing the names of the lists that haven't
+    :returns: a list of strings representing the names of the lists that haven't
         been signed out yet (ex: ["Breast, APP", "STR, Intern #1"]) or None if
         all lists are signed out
+    :rtype: [str]
 
     """
     conn = get_db()
@@ -112,6 +126,57 @@ def get_missing_signouts(nflist):
         return [x[1] for x in results]
 
 
+def notify_missing_signouts(nflist):
+    """
+    Sends the text messages for missing signouts to the proper person, split
+      into sms messages of <160 characters.
+
+    :param str nflist: Nightfloat list to check and notify for (ex: "NF9132")
+
+    :returns: Number of messages sent
+    :rtype: int
+    """
+
+    missing_signouts = get_missing_signouts(nflist)
+    if missing_signouts is not None:
+        callback_number = get_callback_number(nflist)
+        client = Client(ACCOUNT_SID, AUTH_TOKEN)
+
+        if len(missing_signouts) <= 3:
+            body = (
+                "This is a notice from 'signout.mskcc.org'. "
+                + "The following lists are not showing as submitted: "
+                + "'"
+                + "', '".join(missing_signouts)
+                + "'"
+            )
+            message = client.messages.create(to=callback_number, from_=FROM, body=body)
+        else:
+            nmessages = int(len(missing_signouts) / 4) + 2
+            body = """This is notice (1/%s) from 'signout.mskcc.org'. \
+            The following lists are not showing as submitted: """ % str(
+                nmessages
+            )
+            message = client.messages.create(to=callback_number, from_=FROM, body=body)
+            for i in range(nmessages - 1):
+                mlist = missing_signouts[i * 4 : i * 4 + 3]
+                body = (
+                    "Notice (%s/%s): '" % (str(i + 2), str(nmessages))
+                    + "', '".join(mlist)
+                    + "'"
+                )
+                message = client.messages.create(
+                    to=callback_number, from_=FROM, body=body
+                )
+    return nmessages
+
+
+def notifier_main():
+    pass
+
+
 if __name__ == "__main__":
     load_db_settings()
     notifier_main()
+
+

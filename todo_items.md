@@ -7,13 +7,14 @@
 
 # TODO for v0.3 release
 *  **COMPLETE** - Put Gen Med to the top of every sign out list (b13a23197b3aa8e777bd150cbb48cc76eb9bacfbdd)
+*  Timed auto-refresh of submission and nightfloat callback pages ()
 *  Add precision to the clock at top of submission page and resync/reload page regularly
 *  **COMPLETE** Add precision to query page (3fc99ecef7fb82c074326b62047f81fe54c0020e)
 *  **COMPLETE** Display callbacks before and after calls (13969656f53df0f1ec666d175139cce0e20dbed9)
 *  **COMPLETE** Add email address to send problems/ bug reports to (44ffc826a31addd8c945d203e7449b45bf7d4d2b)
 *  Cron script using twilio to text night float if signout not received for a list by 9pm
-    * **COMPLETE** Database for NF and callback numbers ()
-    * Identify callbacks that have/haven't happened
+    * **COMPLETE** Database for NF and callback numbers (db4c24b2ecea222b3332459ae3d7067a838d89a7)
+    * **COMPLETE** Identify callbacks that have/haven't happened (df1f3c1009302e0a8a4ea430d59925cdae042660)
     * Ability to send texts based on DB search
     * Test deployment
     * Finalizd
