@@ -15,7 +15,7 @@
 *  Cron script using twilio to text night float if signout not received for a list by 9pm
     * **COMPLETE** Database for NF and callback numbers (db4c24b2ecea222b3332459ae3d7067a838d89a7)
     * **COMPLETE** Identify callbacks that have/haven't happened (df1f3c1009302e0a8a4ea430d59925cdae042660)
-    * Ability to send texts based on DB search
+    * **COMPLETE** Ability to send texts based on DB search (d10241c35aceaced824e6576bdd5fa25a1a873ba)
     * Test deployment
     * Finalizd
 

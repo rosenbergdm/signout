@@ -31,9 +31,15 @@ ACCOUNT_SID = ""
 AUTH_TOKEN = ""
 FROM = "+19388882701"
 DEBUG_CALLBACKS = 1
+DEBUG_PRINT_NOT_MESSAGE = 0
 
 
 def load_db_settings():
+    """
+    Loads the database settings from the 'dbsettings.json' file in
+    the project root directory
+
+    """
     global DBNAME
     global DBUSER
     global DBPASSWORD
@@ -47,20 +53,23 @@ def load_db_settings():
 
 
 def get_db():
+    """
+    Gets a new connection to the database
+
+    :returns: Database connection
+    :rtype: psycopg2.extensions.connection
+    """
     conn = psycopg2.connect(database=DBNAME, user=DBUSER, password=DBPASSWORD)
     return conn
 
 
 def get_callback_number(nflist):
-    """Get the phone number to text if there are missing signouts for a
-    given list.
+    """Get the phone number to text if there are missing signouts for a given list.
 
-    Keyword arguments:
-    nflist -- the night float list to get the callback number for (ex: "NF9132")
+    :param str nflist: the night float list to get the callback number for (ex: "NF9132")
 
-    Returns: --- a string representing the twilio-formatted callback to text
-        (ex: '+13128675309')
-
+    :returns: The twilio-formatted callback to text (ex: '+13128675309')
+    :rtype: str
     """
 
     conn = get_db()
@@ -150,33 +159,57 @@ def notify_missing_signouts(nflist):
                 + "', '".join(missing_signouts)
                 + "'"
             )
-            message = client.messages.create(to=callback_number, from_=FROM, body=body)
+            if DEBUG_PRINT_NOT_MESSAGE:
+                print(body)
+            else:
+                message = client.messages.create(
+                    to=callback_number, from_=FROM, body=body
+                )
         else:
             nmessages = int(len(missing_signouts) / 4) + 2
-            body = """This is notice (1/%s) from 'signout.mskcc.org'. \
-            The following lists are not showing as submitted: """ % str(
-                nmessages
+            if len(missing_signouts) % 4 == 0:
+                nmessages -= 1
+            body = (
+                "This is notice (1/%s) from 'signout.mskcc.org'. " % str(nmessages)
+                + "The following lists are not showing as submitted: "
             )
-            message = client.messages.create(to=callback_number, from_=FROM, body=body)
+            if DEBUG_PRINT_NOT_MESSAGE:
+                print(body)
+            else:
+                message = client.messages.create(
+                    to=callback_number, from_=FROM, body=body
+                )
             for i in range(nmessages - 1):
-                mlist = missing_signouts[i * 4 : i * 4 + 3]
+                sleep(1)
+                mlist = missing_signouts[i * 4 : i * 4 + 4]
                 body = (
                     "Notice (%s/%s): '" % (str(i + 2), str(nmessages))
                     + "', '".join(mlist)
                     + "'"
                 )
-                message = client.messages.create(
-                    to=callback_number, from_=FROM, body=body
-                )
+                if DEBUG_PRINT_NOT_MESSAGE:
+                    print(body)
+                else:
+                    message = client.messages.create(
+                        to=callback_number, from_=FROM, body=body
+                    )
+    sleep(1)
     return nmessages
 
 
 def notifier_main():
-    pass
+    """
+    Run the notifier script.
+
+    """
+    nflists = ["NF9132", "NF9133"]
+    total_messages = 0
+    for nflist in nflists:
+        total_messages += notify_missing_signouts(nflist)
+    print("%s total SMS messages sent" % str(total_messages))
+    return
 
 
 if __name__ == "__main__":
     load_db_settings()
     notifier_main()
-
-
