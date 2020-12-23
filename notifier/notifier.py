@@ -30,21 +30,25 @@ DBPASSWORD = ""
 
 ACCOUNT_SID = ""
 AUTH_TOKEN = ""
-FROM = "+19388882701"
+FROM = ""
+
 DEBUG_CALLBACKS = 1
-DEBUG_TARGET_NUMBER = "+7732403395"
+DEBUG_TARGET_NUMBER = "+13125551212"
 DEBUG_PRINT_NOT_MESSAGE = 1
 
 
-def load_db_settings():
+def load_settings():
     """
-    Loads the database settings from the 'dbsettings.json' file in
+    Loads the database and twilio settings from the 'dbsettings.json' file in
     the project root directory
 
     """
     global DBNAME
     global DBUSER
     global DBPASSWORD
+    global ACCOUNT_SID
+    global AUTH_TOKEN
+    global FROM
     scriptdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     fp = open(os.path.join(scriptdir, "dbsettings.json"))
     dbsettings = json.load(fp)
@@ -52,6 +56,9 @@ def load_db_settings():
     DBNAME = dbsettings["dbname"]
     DBUSER = dbsettings["username"]
     DBPASSWORD = dbsettings["password"]
+    ACCOUNT_SID = dbsettings["twilio-sid"]
+    AUTH_TOKEN = dbsettings["twilio-auth-token"]
+    FROM = dbsettings["twilio-number"]
 
 
 def get_db():
@@ -213,13 +220,13 @@ def notifier_main():
 
 
 if __name__ == "__main__":
-    for v in ["ACCOUNT_SID", "AUTH_TOKEN", "FROM", "DEBUG_TARGET_NUMBER"]:
-        env_val = environ.get(v)
-        if env_val:
-            globals()[v] = env_val
     for v in ["DEBUG_CALLBACKS", "DEBUG_PRINT_NOT_MESSAGE"]:
         env_val = environ.get(v)
         if env_val:
             globals()[v] = int(env_val)
-    load_db_settings()
+    load_settings()
+    for v in ["ACCOUNT_SID", "AUTH_TOKEN", "FROM", "DEBUG_TARGET_NUMBER"]:
+        env_val = environ.get(v)
+        if env_val:
+            globals()[v] = env_val
     notifier_main()

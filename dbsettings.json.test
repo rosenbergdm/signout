@@ -1,5 +1,8 @@
 {
 	"dbname": "signout",
 	"username": "signout",
-	"password": "YOUR-PASSWORD-HERE"
+	"password": "YOUR-PASSWORD-HERE",
+  "twilio-sid": "",
+  "twilio-auth-token": "",
+  "twilio-number": "+19388882701"
 }
