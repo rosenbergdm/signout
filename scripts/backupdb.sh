@@ -7,7 +7,7 @@
 #
 
 PG_DUMP="$(which pg_dump)"
-GIT_TAG="$(git tag)"
+GIT_TAG="$(git tag | tail -n1)"
 TARGET="$(dirname $0)/../backups/signout-${GIT_TAG}.sql.gz"
 WORKINGDIR="$(dirname $0)/.."
 PASSWD="$(cat "$WORKINGDIR/dbsettings.json" | grep pass | sed -e 's#"##g' | awk '{print $2}')"
