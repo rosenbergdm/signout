@@ -19,6 +19,7 @@
     * **COMPLETE** Working testable cron job (2861ee99ab89aafab72efbffaec7a3b4795163a8)
     * Test deployment
     * Finalizd
+* FIX for messed up fix_timestamps function in main python file for :59:59 times
 
 # COMPLETED tasks
 *  Only 1 list per NF on weekends **COMPLETE**
