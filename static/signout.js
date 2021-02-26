@@ -48,6 +48,23 @@ timesyncXhr.addEventListener("load", function () {
 timesyncXhr.open("GET", "/synctime");
 timesyncXhr.send();
 
+function updateTimeSync() {
+  console.log("RESETTING TIME OFFSET")
+  timesyncXhr = new XMLHttpRequest();
+  timesyncXhr.addEventListener("load", function () {
+    updateTimeOffset(this.responseText);
+  });
+  timesyncXhr.open("GET", "/synctime");
+  timesyncXhr.send();
+}
+
+setInterval(updateTimeSync, 30000);
+
+
+
+
+
+
 function displayTime() {
   var today = new Date(Date.now() + timeoffset);
   var h = today.getHours();
