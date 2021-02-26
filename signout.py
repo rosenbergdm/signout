@@ -60,7 +60,7 @@ def format_timestamp(ts):
         return CLEANUP_TIMESTAMP.sub(".\\1", ts)
 
 
-def fix_earlytimes2(ts):
+def fix_earlytimes(ts):
     if SHIFT_TIMES.match(ts):
         hour = str(int(SHIFT_TIMES.sub("\\1", ts)) + 1).zfill(2)
         return str(hour) + SHIFT_TIMES.sub(":00:00.\\3", ts)

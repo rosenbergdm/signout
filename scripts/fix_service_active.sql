@@ -1,6 +1,16 @@
 -- For v0.3 upgrade
 -- Set which services are currently active as of 2/26/21
 
+-- Set which services are for which NF groups
+BEGIN TRANSACTION;
+  UPDATE service set type='NF9132' where name like 'STR%';
+  UPDATE service set type='NF9132' where name like 'Breast%';
+  UPDATE service set type='NF9132' where name like 'GI%';
+  UPDATE service set type='NF9133' where name like 'Leukemia%';
+  UPDATE service set type='NF9133' where name like 'Lymphoma%';
+  UPDATE service set type='NF9133' where name like 'Gen Med%';
+END TRANSACTION;
+
 -- NF 9132=GI, Breast, STR
 BEGIN TRANSACTION;
   UPDATE service set active='f' where type='NF9132';
