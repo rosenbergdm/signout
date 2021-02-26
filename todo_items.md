@@ -19,9 +19,12 @@
     * **COMPLETE** Working testable cron job (2861ee99ab89aafab72efbffaec7a3b4795163a8)
     * Test deployment
     * Finalizd
-* **COMPLETE** FIX for messed up fix_timestamps function in main python file for :59:59 times
-* Switch to using active field for displaying choices in submission page
-* Set unused entries to not show as active (Leukemia A/B, STR NPs, GI C and GI D)
+* **COMPLETE** FIX for messed up fix_timestamps function in main python file for :59:59 times (ffceccc0ce62ab45353930b3c304674309ae27eb)
+* **COMPLETE** Switch to using active field for displaying choices in submission page
+* **COMPLETE** Set unused entries to not show as active (Leukemia A/B, STR NPs, GI C and GI D)
+    * Requires running scripts/updatedb.sh scripts/fix_service_active.sql
+* Warn that best if using chrome
+* Have javascript re-sync time every 30 seconds (to work around bug in IE)
 
 # COMPLETED tasks
 *  Only 1 list per NF on weekends **COMPLETE**

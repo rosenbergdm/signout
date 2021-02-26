@@ -362,11 +362,11 @@ def submission_weekend():
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute(
-            "SELECT id, name FROM service where type='NF9132' ORDER BY name ASC"
+            "SELECT id, name FROM service where type='NF9132' AND active='t' ORDER BY name ASC"
         )
         solid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
         cur.execute(
-            "SELECT id, name FROM service where type='NF9133' ORDER BY name ASC"
+            "SELECT id, name FROM service where type='NF9133' AND active='t' ORDER BY name ASC"
         )
         liquid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
         cur.execute(
@@ -450,11 +450,11 @@ def submission_weekday():
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute(
-            "SELECT id, name FROM service where type='NF9132' ORDER BY name ASC"
+            "SELECT id, name FROM service where type='NF9132' AND active='t' ORDER BY name ASC"
         )
         solid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
         cur.execute(
-            "SELECT id, name FROM service where type='NF9133' ORDER BY name ASC"
+            "SELECT id, name FROM service where type='NF9133' AND active='t' ORDER BY name ASC"
         )
         liquid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
         cur.execute(

@@ -14,15 +14,16 @@ usage() {
   echo -e "\n\n"
 }
 
+ECHO=$(which gecho || which echo)
 READLINK=$(which greadlink || which readlink)
 DIRNAME=$(which gdirname || which dirname)
 if [ -z "$1" ]; then
-  echo "SQL UPGRADE SCRIPT REQUIRED"
+  $ECHO "SQL UPGRADE SCRIPT REQUIRED"
   usage
   exit 1
 fi
 if [ ! -e "$1" ]; then
-  echo "FILE NOT FOUND"
+  $ECHO "FILE NOT FOUND"
   usage
   exit 1
 fi
@@ -37,20 +38,27 @@ CUR_TAG="$(git tag | tail -n1)"
 NEW_TAG="$CUR_TAG""-pre-upgrade"
 git tag "$NEW_TAG"
 
-echo "Backing up first... executing $WORKINGDIR/scripts/backupdb.sh with temporary tag $NEW_TAG"
-echo -n "----"
+$ECHO "Backing up first... executing $WORKINGDIR/scripts/backupdb.sh with temporary tag $NEW_TAG"
+$ECHO -n "----"
 $WORKINGDIR/scripts/backupdb.sh
-echo "Backup DONE"
+if [ "$?" -gt 0 ]; then
+  $ECHO "FAILED! Aborting"
+  rm $TMPFILE
+  git tag -d "$NEW_TAG"
+  exit 3
+else
+  $ECHO "Backup DONE"
+fi
 
-echo "Executing script '$SQLSCRIPT' for DB '$DBNAME' as user '$DB'..."
-echo -n "----"
+$ECHO "Executing script '$SQLSCRIPT' for DB '$DBNAME' as user '$DB'..."
+$ECHO -n "----"
 cat $SQLSCRIPT | PGPASSWORD="$PASSWD" psql -U "$DBUSER" "$DBNAME" 2>&1 | tee -a $TMPFILE
 if $(grep ERROR $TMPFILE 2>&1 > /dev/null); then
-  echo "FAILED to execute '$SQLSCRIPT', please roll back to 'backups/$NEW_TAG.sql.tar.gz' and delete the temp tag"
+  $ECHO "FAILED to execute '$SQLSCRIPT', please roll back to 'backups/$NEW_TAG.sql.tar.gz' and delete the temp tag"
   rm $TMPFILE
   exit 2
 else
-  echo "SUCCESS.  Cleaning up."
+  $ECHO "SUCCESS.  Cleaning up."
   rm $TMPFILE
   git tag -d "$NEW_TAG"
 fi
