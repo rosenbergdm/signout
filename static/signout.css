@@ -26,10 +26,9 @@ table.sortable tbody tr:nth-child(2n + 1) td {
 #wrapclock {
   display: inline-block;
   width: 50%;
-  margin:2% 2% auto 30%;
+  margin: 2% 2% auto 30%;
 }
 
 #runningclock {
   text-align: left;
 }
-

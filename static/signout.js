@@ -66,7 +66,6 @@ function updateTimeSync() {
 }
 setInterval(updateTimeSync, 15000);
 
-
 // Pad 0 to left
 function checkTime(i) {
   if (i < 10) {
@@ -76,7 +75,7 @@ function checkTime(i) {
 }
 
 function padright(i) {
-  return (i + "000").substring(0,3)
+  return (i + "000").substring(0, 3);
 }
 function displayTime() {
   var today = new Date(Date.now() + timeoffset);
@@ -87,11 +86,18 @@ function displayTime() {
   m = checkTime(m);
   s = checkTime(s);
   document.getElementById("runningclock").innerHTML =
-    '<h3 text-align="left;">Current Time: ' + h + ":" + m + ":" + s + "." + ms + "</h3></br>";
+    '<h3 text-align="left;">Current Time: ' +
+    h +
+    ":" +
+    m +
+    ":" +
+    s +
+    "." +
+    ms +
+    "</h3></br>";
   // Increment time every 119 ms (chosen because relatively prime to 1000 = 1 s)
   setTimeout(displayTime, 59);
 }
-
 
 function nonCallSubmit() {
   var cutoff_time;
