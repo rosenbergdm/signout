@@ -1,13 +1,13 @@
 # Items for signout program
 
 *  ?Admin interface for changing service lists: Deferred
-*  **COMPLETE** Millisecond timing for system clock sync
+*  **COMPLETE** Millisecond timing for system clock sync (75fb038334290b13b34d6a2963d07e5d76e6195e)
 *  ?Multi-signout for weekdays as well
 
 # TODO for v0.3 release
 *  **COMPLETE** - Put Gen Med to the top of every sign out list (b13a23197b3aa8e777bd150cbb48cc76eb9bacfbdd)
 *  Timed auto-refresh of submission and nightfloat callback pages ()
-*  **COMPLETE** Add precision to the clock at top of submission page and resync/reload page regularly
+*  **COMPLETE** Add precision to the clock at top of submission page and resync/reload page regularly (75fb038334290b13b34d6a2963d07e5d76e6195e)
 *  **COMPLETE** Add precision to query page (3fc99ecef7fb82c074326b62047f81fe54c0020e)
 *  **COMPLETE** Display callbacks before and after calls (13969656f53df0f1ec666d175139cce0e20dbed9)
 *  **COMPLETE** Add email address to send problems/ bug reports to (44ffc826a31addd8c945d203e7449b45bf7d4d2b)
@@ -20,11 +20,11 @@
     * Test deployment
     * Finalizd
 * **COMPLETE** FIX for messed up fix_timestamps function in main python file for :59:59 times (ffceccc0ce62ab45353930b3c304674309ae27eb)
-* **COMPLETE** Switch to using active field for displaying choices in submission page
+* **COMPLETE** Switch to using active field for displaying choices in submission page (d469673051ccb55e4e8664096cc0fe00808b61c7)
 * **COMPLETE** Set unused entries to not show as active (Leukemia A/B, STR NPs, GI C and GI D) (d469673051ccb55e4e8664096cc0fe00808b61c7)
     * Requires running scripts/updatedb.sh scripts/fix_service_active.sql
-* **COMPLETE** Warn that best if using chrome
-* **COMPLETE** Have javascript re-sync time every 15 seconds (to work around bug in IE)
+* **COMPLETE** Warn that best if using chrome (d469673051ccb55e4e8664096cc0fe00808b61c7)
+* **COMPLETE** Have javascript re-sync time every 15 seconds (to work around bug in IE) (75fb038334290b13b34d6a2963d07e5d76e6195e)
 
 # COMPLETED tasks
 *  Only 1 list per NF on weekends **COMPLETE**
