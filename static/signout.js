@@ -1,6 +1,7 @@
 // TODO: Refactor all this duplicated code!
 
 /* For the start-stop of signout on the nightfloat page */
+//{{{
 function startsignout(internid) {
   var startSignout = new XMLHttpRequest();
   startSignout.addEventListener("load", function () {
@@ -17,39 +18,45 @@ function startsignout(internid) {
       "<td style='color:blue;'>" + this_signout.children[i].innerText + "</td>";
   }
   var sbuttons = document.getElementsByClassName("startbutton");
-  for (i=0; i<=sbuttons.length-1; i++) {
+  for (i = 0; i <= sbuttons.length - 1; i++) {
     sbuttons[i].disabled = true;
   }
   // var startbutton = document.getElementById(internid).children[1];
   // startbutton.disabled = true;
 }
+//}}}
 
-/* For syncing time between clients and the server on the submission and 
+/* For syncing time between clients and the server on the submission and
  * submission_weekend pages */
 
 var timeoffset = 0;
+var timesyncXhr = new XMLHttpRequest();
+
 function updateTimeOffset(timestring) {
   var splittimestring = timestring.split(":");
+  var splitms = splittimestring[2].split(".");
   var localtime = new Date(Date.now());
   var remotetime = new Date(Date.now());
   remotetime.setHours(
     Number(splittimestring[0]),
     Number(splittimestring[1]),
-    Number(splittimestring[2])
+    Number(splitms[0]),
+    Number(splitms[1])
   );
   timeoffset = remotetime - localtime;
-  console.log("time offset is " + timeoffset);
+  console.log("time offset is " + timeoffset + " ms");
 }
 
-var timesyncXhr = new XMLHttpRequest();
+// For first time page loaded
 timesyncXhr.addEventListener("load", function () {
   updateTimeOffset(this.responseText);
 });
 timesyncXhr.open("GET", "/synctime");
 timesyncXhr.send();
 
+// Resets timesync every 15 seconds
 function updateTimeSync() {
-  console.log("RESETTING TIME OFFSET")
+  console.log("RESETTING TIME OFFSET");
   timesyncXhr = new XMLHttpRequest();
   timesyncXhr.addEventListener("load", function () {
     updateTimeOffset(this.responseText);
@@ -57,32 +64,34 @@ function updateTimeSync() {
   timesyncXhr.open("GET", "/synctime");
   timesyncXhr.send();
 }
-
-setInterval(updateTimeSync, 30000);
-
+setInterval(updateTimeSync, 15000);
 
 
-
-
-
-function displayTime() {
-  var today = new Date(Date.now() + timeoffset);
-  var h = today.getHours();
-  var m = today.getMinutes();
-  var s = today.getSeconds();
-  m = checkTime(m);
-  s = checkTime(s);
-  document.getElementById("runningclock").innerHTML =
-    "<h3>Current Time: " + h + ":" + m + ":" + s + "</h3></br>";
-  setTimeout(displayTime, 100);
-}
-
+// Pad 0 to left
 function checkTime(i) {
   if (i < 10) {
     i = "0" + i;
   }
   return i;
 }
+
+function padright(i) {
+  return (i + "000").substring(0,3)
+}
+function displayTime() {
+  var today = new Date(Date.now() + timeoffset);
+  var h = today.getHours();
+  var m = today.getMinutes();
+  var s = today.getSeconds();
+  var ms = padright(today.getMilliseconds());
+  m = checkTime(m);
+  s = checkTime(s);
+  document.getElementById("runningclock").innerHTML =
+    '<h3 text-align="left;">Current Time: ' + h + ":" + m + ":" + s + "." + ms + "</h3></br>";
+  // Increment time every 119 ms (chosen because relatively prime to 1000 = 1 s)
+  setTimeout(displayTime, 59);
+}
+
 
 function nonCallSubmit() {
   var cutoff_time;
@@ -111,7 +120,7 @@ function nonCallSubmit() {
   }
   cutoff_time.setTime(cutoff_time.getTime() + offset * 60 * 10);
   if (date >= cutoff_time) {
-  // if (true) {
+    // if (true) {
     let timestamp = new Date(Date.now());
     let hosttimestamps = document.getElementsByName("hosttimestamp");
     for (var i = hosttimestamps.length - 1; i >= 0; i--) {
@@ -158,7 +167,7 @@ function onCallSubmit() {
   );
   cutoff_time.setTime(cutoff_time.getTime() + offset * 60 * 10);
   if (date >= cutoff_time) {
-  // if (true) {
+    // if (true) {
     let timestamp = new Date(Date.now());
     let hosttimestamps = document.getElementsByName("hosttimestamp");
     for (var i = hosttimestamps.length - 1; i >= 0; i--) {
@@ -185,9 +194,9 @@ function onCallSubmit() {
 }
 
 function insertContact() {
-  var user = "support"
-  var site = "davidrosenberg.me"
-  var contact = document.getElementById("contact")
-  contact.href = "mailto:" + user + "@" + site
-  contact.text = user + "@" + site
+  var user = "support";
+  var site = "davidrosenberg.me";
+  var contact = document.getElementById("contact");
+  contact.href = "mailto:" + user + "@" + site;
+  contact.text = user + "@" + site;
 }

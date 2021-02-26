@@ -9,13 +9,19 @@
 {% block bodyattributes %} onload="displayTime(); insertContact()"{% endblock %}
 {% block body %}
 <center>
-  <button onClick="location.href='/nightfloat?list=NF9132'">Night float 9132 callback page</button>
-  <button onClick="location.href='/nightfloat?list=NF9133'">Night float 9133 callback page</button>
+  <a href='/nightfloat?list=NF9132' class="button"><button>Night float 9132 callback page</button><a>
+  <a href='/nightfloat?list=NF9133' class="button"><button>Night float 9133 callback page</button><a>
   <br>
-  <button onClick="location.href='/query'">Query the signout log</button>
+  <a href='/query' class="button"><button>Query the signout log</button></a>
   <br>
-  <div id="runningclock"></div>
 </center>
+
+<div id="wrapclock">
+  <ul style="list-style-type:none;">
+    <li style="text-align:left;" id="runningclock"></li>
+  </ul>
+</div>
+
 <br>
 <hr>
 <h3>Important signout information.</h3>
