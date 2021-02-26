@@ -19,7 +19,7 @@
     * **COMPLETE** Working testable cron job (2861ee99ab89aafab72efbffaec7a3b4795163a8)
     * Test deployment
     * Finalizd
-* FIX for messed up fix_timestamps function in main python file for :59:59 times
+* **COMPLETE** FIX for messed up fix_timestamps function in main python file for :59:59 times
 * Switch to using active field for displaying choices in submission page
 * Set unused entries to not show as active (Leukemia A/B, STR NPs, GI C and GI D)
 

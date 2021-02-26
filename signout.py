@@ -38,7 +38,7 @@ dbuser = ""
 dbpassword = ""
 
 CLEANUP_TIMESTAMP = re.compile(r"\.(..).*$")
-SHIFT_TIMES = re.compile(r"^(..):59:59\.*")
+SHIFT_TIMES = re.compile(r"^(\d{1,2})(:59:59\.)(.*)$")
 
 
 def gen_med_sorter(intern_list):
@@ -60,8 +60,12 @@ def format_timestamp(ts):
         return CLEANUP_TIMESTAMP.sub(".\\1", ts)
 
 
-def fix_earlytimes(ts):
-    return SHIFT_TIMES.sub("\\1:00:00.00", ts)[0 : len(ts)]
+def fix_earlytimes2(ts):
+    if SHIFT_TIMES.match(ts):
+        hour = str(int(SHIFT_TIMES.sub("\\1", ts)) + 1).zfill(2)
+        return str(hour) + SHIFT_TIMES.sub(":00:00.\\3", ts)
+    else:
+        return ts
 
 
 def cleanup_date_input(ds):
