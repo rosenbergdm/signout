@@ -50,9 +50,9 @@ else
   $ECHO "Backup DONE"
 fi
 
-$ECHO "Executing script '$SQLSCRIPT' for DB '$DBNAME' as user '$DB'..."
+$ECHO "Executing script '$SQLSCRIPT' for DB '$DBNAME' as user '$USER'..."
 $ECHO -n "----"
-cat $SQLSCRIPT | PGPASSWORD="$PASSWD" psql -U "$DBUSER" "$DBNAME" 2>&1 | tee -a $TMPFILE
+cat $SQLSCRIPT | PGPASSWORD="$PASSWD" psql -U "$USER" "$DBNAME" 2>&1 | tee -a $TMPFILE
 if $(grep ERROR $TMPFILE 2>&1 > /dev/null); then
   $ECHO "FAILED to execute '$SQLSCRIPT', please roll back to 'backups/$NEW_TAG.sql.tar.gz' and delete the temp tag"
   rm $TMPFILE
