@@ -21,9 +21,9 @@
     * Finalizd
 * **COMPLETE** FIX for messed up fix_timestamps function in main python file for :59:59 times (ffceccc0ce62ab45353930b3c304674309ae27eb)
 * **COMPLETE** Switch to using active field for displaying choices in submission page
-* **COMPLETE** Set unused entries to not show as active (Leukemia A/B, STR NPs, GI C and GI D)
+* **COMPLETE** Set unused entries to not show as active (Leukemia A/B, STR NPs, GI C and GI D) (d469673051ccb55e4e8664096cc0fe00808b61c7)
     * Requires running scripts/updatedb.sh scripts/fix_service_active.sql
-* Warn that best if using chrome
+* **COMPLETE** Warn that best if using chrome
 * Have javascript re-sync time every 30 seconds (to work around bug in IE)
 
 # COMPLETED tasks
