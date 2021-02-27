@@ -8,9 +8,11 @@
 //
 // TODO: Refactor all this duplicated code!
 
+var DEBUG_SIGNOUT_JS = 0;
+// set to DEBUG_SIGNOUT_JS = 1 to show extra console logging info
+
 /* Helper functions
  * */
-
 //{{{
 function insertContact() {
   var contact = document.getElementById("contact");
@@ -81,17 +83,24 @@ function updateTimeOffset(timestring) {
     Number(splitms[1])
   );
   timeoffset = remotetime - localtime;
-  console.log("time offset is " + timeoffset + " ms");
+  if (DEBUG_SIGNOUT_JS == 1) {
+    console.log("time offset is " + timeoffset + " ms");
+  }
 }
 
 // Resets timesync every 15 seconds
 function updateTimeSync() {
-  console.log("RESETTING TIME OFFSET");
   timesyncXhr = new XMLHttpRequest();
   timesyncXhr.addEventListener("load", function () {
+    if (DEBUG_SIGNOUT_JS == 1) {
+      console.log("time received from server:  " + this.responseText);
+    }
     updateTimeOffset(this.responseText);
   });
   timesyncXhr.open("GET", "/synctime");
+  if (DEBUG_SIGNOUT_JS == 1) {
+    console.log("Sending timesync request");
+  }
   timesyncXhr.send();
 }
 setInterval(updateTimeSync, 15000);
@@ -126,6 +135,7 @@ function displayTime() {
 
 /* Submission execution
  * */
+//{{{
 function nonCallSubmit() {
   var cutoff_time;
   var d = new Date(Date.now() + timeoffset);
@@ -153,7 +163,6 @@ function nonCallSubmit() {
   }
   cutoff_time.setTime(cutoff_time.getTime() + offset * 60 * 10);
   if (date >= cutoff_time) {
-    // if (true) {
     let timestamp = new Date(Date.now());
     let hosttimestamps = document.getElementsByName("hosttimestamp");
     for (var i = hosttimestamps.length - 1; i >= 0; i--) {
