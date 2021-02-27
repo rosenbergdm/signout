@@ -54,12 +54,12 @@ def load_settings():
     fp = open(os.path.join(scriptdir, "dbsettings.json"))
     dbsettings = json.load(fp)
     fp.close()
-    DBNAME = dbsettings["dbname"]
-    DBUSER = dbsettings["username"]
-    DBPASSWORD = dbsettings["password"]
-    ACCOUNT_SID = dbsettings["twilio-sid"]
-    AUTH_TOKEN = dbsettings["twilio-auth-token"]
-    FROM = dbsettings["twilio-number"]
+    globals()["DBNAME"] = dbsettings["dbname"]
+    globals()["DBUSER"] = dbsettings["username"]
+    globals()["DBPASSWORD"] = dbsettings["password"]
+    globals()["ACCOUNT_SID"] = dbsettings["twilio-sid"]
+    globals()["AUTH_TOKEN"] = dbsettings["twilio-auth-token"]
+    globals()["FROM"] = dbsettings["twilio-number"]
     if "DEBUG_CALLBACKS" in dbsettings.keys():
         if dbsettings["DEBUG_CALLBACKS"] in [0, 1]:
             DEBUG_CALLBACKS = dbsettings["DEBUG_CALLBACKS"]
