@@ -3,6 +3,7 @@
 # vim:fenc=utf-8
 #
 # Copyright © 2020-2021 Thomas Butterworth <dmr@davidrosenberg.me>
+# Last updated Sat Feb 27 00:13:00 EST 2021
 #
 # Distributed under terms of the MIT license.
 

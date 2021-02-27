@@ -9,12 +9,6 @@
   padding: 20px;
 }
 
-/*
-.odd {
-  background: #dddddd;
-}
-*/
-
 table.sortable tbody tr:nth-child(2n) td {
   background: white;
 }
