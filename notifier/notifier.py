@@ -47,19 +47,30 @@ def load_settings():
     the project root directory
 
     """
-    global DBNAME, DBUSER, DBPASSWORD
-    global ACCOUNT_SID, AUTH_TOKEN, FROM
-    global DEBUG_CALLBACKS, DEBUG_PRINT_NOT_MESSAGE, DEBUG_SIGNOUT_OUTPUT, DEBUG_TARGET_NUMBER
-    scriptdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    global DBNAME
+    global DBUSER
+    global DBPASSWORD
+    global ACCOUNT_SID
+    global AUTH_TOKEN
+    global FROM
+    global DEBUG_CALLBACKS
+    global DEBUG_PRINT_NOT_MESSAGE
+    global DEBUG_SIGNOUT_OUTPUT
+    global DEBUG_TARGET_NUMBER
+    if not "scriptdir" in globals():
+        scriptdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    else:
+        scriptdir = globals()["scriptdir"]
     fp = open(os.path.join(scriptdir, "dbsettings.json"))
     dbsettings = json.load(fp)
     fp.close()
-    globals()["DBNAME"] = dbsettings["dbname"]
-    globals()["DBUSER"] = dbsettings["username"]
-    globals()["DBPASSWORD"] = dbsettings["password"]
-    globals()["ACCOUNT_SID"] = dbsettings["twilio-sid"]
-    globals()["AUTH_TOKEN"] = dbsettings["twilio-auth-token"]
-    globals()["FROM"] = dbsettings["twilio-number"]
+    print(dbsettings)
+    DBNAME = dbsettings["dbname"]
+    DBUSER = dbsettings["username"]
+    DBPASSWORD = dbsettings["password"]
+    ACCOUNT_SID = dbsettings["twilio-sid"]
+    AUTH_TOKEN = dbsettings["twilio-auth-token"]
+    FROM = dbsettings["twilio-number"]
     if "DEBUG_CALLBACKS" in dbsettings.keys():
         if dbsettings["DEBUG_CALLBACKS"] in [0, 1]:
             DEBUG_CALLBACKS = dbsettings["DEBUG_CALLBACKS"]
@@ -72,9 +83,22 @@ def load_settings():
     if "DEBUG_PRINT_NOT_MESSAGE" in dbsettings.keys():
         if dbsettings["DEBUG_PRINT_NOT_MESSAGE"] in [0, 1]:
             DEBUG_PRINT_NOT_MESSAGE = dbsettings["DEBUG_PRINT_NOT_MESSAGE"]
+    for var in [
+        "DBNAME",
+        "DBUSER",
+        "DBPASSWORD",
+        "ACCOUNT_SID",
+        "AUTH_TOKEN",
+        "FROM",
+        "DEBUG_CALLBACKS",
+        "DEBUG_PRINT_NOT_MESSAGE",
+        "DEBUG_SIGNOUT_OUTPUT",
+        "DEBUG_TARGET_NUMBER",
+    ]:
+        globals()[var] = eval(var)
 
 
-def get_db():
+def get_notify_db():
     """
     Gets a new connection to the database
 
@@ -94,7 +118,7 @@ def get_callback_number(nflist):
     :rtype: str
     """
 
-    conn = get_db()
+    conn = get_notify_db()
     cur = conn.cursor()
     dayofyear = datetime.datetime.today().timetuple().tm_yday
     cur.execute(
@@ -128,7 +152,7 @@ def get_missing_signouts(nflist):
     :rtype: [str]
 
     """
-    conn = get_db()
+    conn = get_notify_db()
     cur = conn.cursor()
     cur.execute(
         """
@@ -218,7 +242,7 @@ def notify_missing_signouts(nflist):
     return nmessages
 
 
-def notify_late_signup(signout_id):
+def notify_late_signup(signout_id, notify=True):
     """TODO: Send a text message to night float indicating that a 'late' addition
     to the signout list has occured
 
@@ -227,7 +251,7 @@ def notify_late_signup(signout_id):
     :returns: none
 
     """
-    conn = get_db()
+    conn = get_notify_db()
     cur = conn.cursor()
     cur.execute(
         """SELECT intern_name, service.name, intern_callback, type 
@@ -243,7 +267,7 @@ def notify_late_signup(signout_id):
     callback_number = get_callback_number(results[3])
     client = Client(ACCOUNT_SID, AUTH_TOKEN)
     body = f"Notifying that the list {results[1]} was added when all other callbacks were complete.  Please call back {results[0]} at {results[2]}"
-    if DEBUG_PRINT_NOT_MESSAGE:
+    if globals()["DEBUG_PRINT_NOT_MESSAGE"] == 1 or notify == False:
         print(body)
     else:
         body = client.messages.create(to=callback_number, from_=FROM, body=body)

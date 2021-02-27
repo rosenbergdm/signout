@@ -24,7 +24,7 @@ from flask import (
     app,
     request,
 )
-import notifier.notifier
+from notifier.notifier import *
 import datetime
 import json
 import os
@@ -39,10 +39,10 @@ app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 dbname = ""
 dbuser = ""
 dbpassword = ""
+scriptdir = ""
 
 CLEANUP_TIMESTAMP = re.compile(r"\.(..).*$")
 SHIFT_TIMES = re.compile(r"^(\d{1,2})(:59:59\.)(.*)$")
-
 DEBUG_SIGNOUT_OUTPUT = os.environ.get("DEBUG_SIGNOUT_OUTPUT")
 
 
@@ -88,7 +88,18 @@ def load_db_settings():
     global dbname
     global dbuser
     global dbpassword
-    scriptdir = os.path.dirname(os.path.realpath(__file__))
+    global scriptdir
+    if "__file__" in dir():
+        scriptdir = os.path.dirname(os.path.realpath(__file__))
+    else:
+        if os.path.exists("/usr/local/src/signout/dbsettings.json"):
+            scriptdir = "/usr/local/src/signout/dbsettings.json"
+        elif os.path.exists(os.path.join(os.environ["HOME"], "src/signout")):
+            scriptdir = os.path.join(os.environ["HOME"], "src/signout")
+        else:
+            raise Exception
+    print(f"SCRIPTDIR set to {scriptdir}")
+    globals()["scriptdir"] = scriptdir
     fp = open(os.path.join(scriptdir, "dbsettings.json"))
     dbsettings = json.load(fp)
     fp.close()
@@ -472,7 +483,7 @@ def submission_weekend():
                 or (timenow.hour > 19)
                 or (timenow.hour < 12)
             ):
-                notifier.notifier.notify_late_signup(callback_id)
+                notify_late_signup(callback_id)
         return render_template("received.html")
 
 
@@ -607,6 +618,7 @@ def submission_weekday():
         )
         callback_id = cur.fetchone()[0]
         conn.commit()
+        serviceid = request.form["service"]
         cur.execute("SELECT type FROM service WHERE id = %s", (serviceid,))
         nflist = cur.fetchall()[0][0]
         cur.execute(
@@ -631,7 +643,7 @@ def submission_weekday():
                 or (timenow.hour > 19)
                 or (timenow.hour < 12)
             ):
-                notifier.notifier.notify_late_signup(callback_id)
+                notify_late_signup(callback_id)
         return render_template("received.html")
 
 
@@ -644,7 +656,7 @@ def submission():
 
 
 if __name__ == "__main__":
-    notifier.notifier.load_settings()
     load_db_settings()
+    load_settings()
     get_db()
     app.run(host="0.0.0.0")
