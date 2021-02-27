@@ -64,7 +64,6 @@ def load_settings():
     fp = open(os.path.join(scriptdir, "dbsettings.json"))
     dbsettings = json.load(fp)
     fp.close()
-    print(dbsettings)
     DBNAME = dbsettings["dbname"]
     DBUSER = dbsettings["username"]
     DBPASSWORD = dbsettings["password"]

@@ -94,14 +94,12 @@ def load_db_settings():
     else:
         if "scriptdir" in globals().keys():
             scriptdir = globals()["scriptdir"]
-            print("SET FROM GLOBALS")
         if os.path.exists("/usr/local/src/signout/dbsettings.json"):
             scriptdir = "/usr/local/src/signout"
         elif os.path.exists(os.path.join(os.environ["HOME"], "src/signout")):
             scriptdir = os.path.join(os.environ["HOME"], "src/signout")
         else:
             raise Exception
-    print(f"SCRIPTDIR set to {scriptdir}")
     globals()["scriptdir"] = scriptdir
     fp = open(os.path.join(scriptdir, "dbsettings.json"))
     dbsettings = json.load(fp)
@@ -280,7 +278,6 @@ def query():
             "query.html", signoutlog=signoutlog, rangestring=rangestring
         )
     else:
-        print(request.form)
         cur = conn.cursor()
         if "NF9133" in request.form.keys():
             if "NF9132" in request.form.keys():
