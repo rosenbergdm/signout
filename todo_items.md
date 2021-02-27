@@ -11,8 +11,8 @@
 *  **COMPLETE** Add precision to query page (3fc99ecef7fb82c074326b62047f81fe54c0020e)
 *  **COMPLETE** Display callbacks before and after calls (13969656f53df0f1ec666d175139cce0e20dbed9)
 *  **COMPLETE** Add email address to send problems/ bug reports to (44ffc826a31addd8c945d203e7449b45bf7d4d2b)
-*  NEW - Send a Text message to NF if someone adds their name to a list after it is already 'empty'
-*  Cron script using twilio to text night float if signout not received for a list by 9pm
+*  **COMPLETE** NEW - Send a Text message to NF if someone adds their name to a list after it is already 'empty' (8c86ee4361d10b743e06436b3c735ba93d42f396)
+*  **COMPLETE** Cron script using twilio to text night float if signout not received for a list by 9pm
     * **COMPLETE** Database for NF and callback numbers (db4c24b2ecea222b3332459ae3d7067a838d89a7)
     * **COMPLETE** Identify callbacks that have/haven't happened (df1f3c1009302e0a8a4ea430d59925cdae042660)
     * **COMPLETE** Ability to send texts based on DB search (d10241c35aceaced824e6576bdd5fa25a1a873ba)
