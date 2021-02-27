@@ -8,8 +8,7 @@
 //
 // TODO: Refactor all this duplicated code!
 
-
-/* Helper functions 
+/* Helper functions
  * */
 
 //{{{
@@ -21,7 +20,7 @@ function insertContact() {
 
 // Pad 0 to left
 function padLeft(i) {
-  return ("0" + i).slice(-2)
+  return ("0" + i).slice(-2);
 }
 
 function padright(i) {
@@ -31,7 +30,7 @@ function padright(i) {
 // Set pagewide variables
 var timeoffset = 0;
 
-// For first time page loaded -- set initial timestamp and calc 
+// For first time page loaded -- set initial timestamp and calc
 // offset
 var timesyncXhr = new XMLHttpRequest();
 timesyncXhr.addEventListener("load", function () {
@@ -40,7 +39,6 @@ timesyncXhr.addEventListener("load", function () {
 timesyncXhr.open("GET", "/synctime");
 timesyncXhr.send();
 //}}}
-
 
 /* Limit action to the signout initiated by NF and make it visible */
 //{{{
@@ -84,7 +82,6 @@ function updateTimeOffset(timestring) {
   timeoffset = remotetime - localtime;
   console.log("time offset is " + timeoffset + " ms");
 }
-
 
 // Resets timesync every 15 seconds
 function updateTimeSync() {

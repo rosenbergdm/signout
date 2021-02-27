@@ -32,3 +32,5 @@ table.sortable tbody tr:nth-child(2n + 1) td {
 #runningclock {
   text-align: left;
 }
+
+/* vim: ft=css  : */
