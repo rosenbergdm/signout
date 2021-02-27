@@ -42,6 +42,8 @@ dbpassword = ""
 CLEANUP_TIMESTAMP = re.compile(r"\.(..).*$")
 SHIFT_TIMES = re.compile(r"^(\d{1,2})(:59:59\.)(.*)$")
 
+DEBUG_SIGNOUT_OUTPUT = os.environ.get("DEBUG_SIGNOUT_OUTPUT")
+
 
 def gen_med_sorter(intern_list):
     gen_med = []
@@ -426,8 +428,9 @@ def submission_weekend():
         )
     else:
         cur = conn.cursor()
-        # pprint.pprint(request.form)
-        # pprint.pprint(request.form.getlist('service'))
+        if DEBUG_SIGNOUT_OUTPUT == 1:
+            pprint.pprint(request.form)
+            pprint.pprint(request.form.getlist("service"))
         for serviceid in request.form.getlist("service"):
             cur.execute(
                 "INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp) \
