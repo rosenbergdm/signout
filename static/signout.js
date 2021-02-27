@@ -19,6 +19,7 @@ function insertContact() {
 }
 
 // Pad 0 to left
+
 function padLeft(i) {
   return ("0" + i).slice(-2);
 }

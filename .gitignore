@@ -4,3 +4,4 @@ __pycache__
 **/.eslintrc*
 backups/*.sql.gz
 
+backups/

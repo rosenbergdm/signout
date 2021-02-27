@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /usr/bin/env bash
 #
 # updatedb.sh
 # Copyright (C) 2021 Thomas Butterworth <dmr@davidrosenberg.me>
@@ -29,12 +29,14 @@ if [ ! -e "$1" ]; then
 fi
 
 SQLSCRIPT="$($READLINK -f $1)"
-WORKINGDIR=$($READLINK -f "$($DIRNAME $0)/..")
+WORKINGDIR="$($READLINK -f $($DIRNAME $0)/..)"
+pushd "$WORKINGDIR"
+mkdir -p "$WORKINGDIR/backups" > /dev/null 2>&1
 PASSWD="$(cat "$WORKINGDIR/dbsettings.json" | grep pass | sed -e 's#"##g' | awk '{print $2}')"
 USER="$(cat $WORKINGDIR/dbsettings.json | grep username | sed -e 's#["|,]##g' | awk '{print $2}')"
 DBNAME="$(cat $WORKINGDIR/dbsettings.json | grep dbname | sed -e 's#["|,]##g' | awk '{print $2}')"
-TMPFILE=$(mktemp)
-CUR_TAG="$(git tag | tail -n1)"
+TMPFILE="$(mktemp)"
+CUR_TAG="$(git describe --tags | tail -n1)"
 NEW_TAG="$CUR_TAG""-pre-upgrade"
 git tag "$NEW_TAG"
 
@@ -62,7 +64,5 @@ else
   rm $TMPFILE
   git tag -d "$NEW_TAG"
 fi
-
-
 
 # vim: ft=sh
