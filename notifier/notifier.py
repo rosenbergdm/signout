@@ -24,6 +24,7 @@ import pdb
 import psycopg2
 import re
 
+# {{{ Defaults, dbsettings.json overrides this
 DBNAME = ""
 DBUSER = ""
 DBPASSWORD = ""
@@ -32,9 +33,12 @@ ACCOUNT_SID = ""
 AUTH_TOKEN = ""
 FROM = ""
 
-DEBUG_CALLBACKS = 1
+DEBUG_CALLBACKS = 0
 DEBUG_TARGET_NUMBER = "+13125551212"
-DEBUG_PRINT_NOT_MESSAGE = 1
+DEBUG_PRINT_NOT_MESSAGE = 0
+DEBUG_SIGNOUT_OUTPUT = 0
+
+# }}}
 
 
 def load_settings():
@@ -43,12 +47,9 @@ def load_settings():
     the project root directory
 
     """
-    global DBNAME
-    global DBUSER
-    global DBPASSWORD
-    global ACCOUNT_SID
-    global AUTH_TOKEN
-    global FROM
+    global DBNAME, DBUSER, DBPASSWORD
+    global ACCOUNT_SID, AUTH_TOKEN, FROM
+    global DEBUG_CALLBACKS, DEBUG_PRINT_NOT_MESSAGE, DEBUG_SIGNOUT_OUTPUT, DEBUG_TARGET_NUMBER
     scriptdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     fp = open(os.path.join(scriptdir, "dbsettings.json"))
     dbsettings = json.load(fp)
@@ -59,6 +60,18 @@ def load_settings():
     ACCOUNT_SID = dbsettings["twilio-sid"]
     AUTH_TOKEN = dbsettings["twilio-auth-token"]
     FROM = dbsettings["twilio-number"]
+    if "DEBUG_CALLBACKS" in dbsettings.keys():
+        if dbsettings["DEBUG_CALLBACKS"] in [0, 1]:
+            DEBUG_CALLBACKS = dbsettings["DEBUG_CALLBACKS"]
+    if "DEBUG_TARGET_NUMBER" in dbsettings.keys():
+        if dbsettings["DEBUG_TARGET_NUMBER"].__len__() == 12:
+            DEBUG_TARGET_NUMBER = dbsettings["DEBUG_TARGET_NUMBER"]
+    if "DEBUG_SIGNOUT_OUTPUT" in dbsettings.keys():
+        if dbsettings["DEBUG_SIGNOUT_OUTPUT"] in [0, 1]:
+            DEBUG_SIGNOUT_OUTPUT = dbsettings["DEBUG_SIGNOUT_OUTPUT"]
+    if "DEBUG_PRINT_NOT_MESSAGE" in dbsettings.keys():
+        if dbsettings["DEBUG_PRINT_NOT_MESSAGE"] in [0, 1]:
+            DEBUG_PRINT_NOT_MESSAGE = dbsettings["DEBUG_PRINT_NOT_MESSAGE"]
 
 
 def get_db():
@@ -85,15 +98,14 @@ def get_callback_number(nflist):
     cur = conn.cursor()
     dayofyear = datetime.datetime.today().timetuple().tm_yday
     cur.execute(
-        """
-        SELECT callback 
-        FROM assignments INNER JOIN nightfloat 
-            ON assignments.nightfloat = nightfloat.id 
-        WHERE dayofyear = %s
-            AND type = %s """,
+        """ SELECT callback FROM assignments INNER JOIN nightfloat ON assignments.nightfloat = nightfloat.id WHERE dayofyear = %s AND type = %s """,
         (dayofyear, nflist),
     )
-    callback = cur.fetchone()[0]
+    callback = cur.fetchall()
+    if len(callback) > 0:
+        callback = callback[0][0]
+    else:
+        callback = "+13125551212"
     cur.close()
     conn.close()
     if DEBUG_CALLBACKS:
@@ -204,6 +216,38 @@ def notify_missing_signouts(nflist):
                     )
     sleep(1)
     return nmessages
+
+
+def notify_late_signup(signout_id):
+    """TODO: Send a text message to night float indicating that a 'late' addition
+    to the signout list has occured
+
+    :param int signout_id: DB id of the late signup
+
+    :returns: none
+
+    """
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        """SELECT intern_name, service.name, intern_callback, type 
+                    FROM signout
+                    INNER JOIN service ON signout.service = service.id
+                    WHERE signout.id = %s""",
+        (signout_id,),
+    )
+    results = cur.fetchall()[0]
+    cur.close()
+    conn.close()
+
+    callback_number = get_callback_number(results[3])
+    client = Client(ACCOUNT_SID, AUTH_TOKEN)
+    body = f"Notifying that the list {results[1]} was added when all other callbacks were complete.  Please call back {results[0]} at {results[2]}"
+    if DEBUG_PRINT_NOT_MESSAGE:
+        print(body)
+    else:
+        body = client.messages.create(to=callback_number, from_=FROM, body=body)
+    return
 
 
 def notifier_main():

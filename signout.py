@@ -24,6 +24,7 @@ from flask import (
     app,
     request,
 )
+import notifier.notifier
 import datetime
 import json
 import os
@@ -434,7 +435,7 @@ def submission_weekend():
         for serviceid in request.form.getlist("service"):
             cur.execute(
                 "INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp) \
-                        VALUES (%s, %s, %s, %s, %s, %s)",
+                        VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
                 (
                     request.form["intern_name"],
                     request.form["intern_callback"],
@@ -444,9 +445,34 @@ def submission_weekend():
                     request.form["hosttimestamp"],
                 ),
             )
+            callback_id = cur.fetchone()[0]
         conn.commit()
+        cur.execute("SELECT type FROM service WHERE id = %s", (serviceid,))
+        nflist = cur.fetchall()[0][0]
+        cur.execute(
+            """ SELECT Count(service.id)
+                        FROM   signout
+                               INNER JOIN service
+                                       ON signout.service = service.id
+                        WHERE  Date_part('day', addtime) = Date_part('day', CURRENT_TIMESTAMP)
+                               AND Date_part('month', addtime) = Date_part('month', CURRENT_TIMESTAMP)
+                               AND Date_part('year', addtime) = Date_part('year', CURRENT_TIMESTAMP)
+                               AND signout.active = 't'
+                               AND service.type = %s;""",
+            (nflist,),
+        )
+
+        count = cur.fetchall()[0][0]
         cur.close()
         conn.close()
+        timenow = datetime.datetime.now()
+        if count < 2:
+            if (
+                (timenow.hour == 19 and timenow.minute > 30)
+                or (timenow.hour > 19)
+                or (timenow.hour < 12)
+            ):
+                notifier.notifier.notify_late_signup(callback_id)
         return render_template("received.html")
 
 
@@ -569,7 +595,7 @@ def submission_weekday():
         cur = conn.cursor()
         cur.execute(
             "INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp) \
-                    VALUES (%s, %s, %s, %s, %s, %s)",
+                    VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
             (
                 request.form["intern_name"],
                 request.form["intern_callback"],
@@ -579,9 +605,33 @@ def submission_weekday():
                 request.form["hosttimestamp"],
             ),
         )
+        callback_id = cur.fetchone()[0]
         conn.commit()
+        cur.execute("SELECT type FROM service WHERE id = %s", (serviceid,))
+        nflist = cur.fetchall()[0][0]
+        cur.execute(
+            """ SELECT count(service.id)
+                        FROM   signout
+                               INNER JOIN service
+                                       ON signout.service = service.id
+                        WHERE  Date_part('day', addtime) = Date_part('day', CURRENT_TIMESTAMP)
+                               AND Date_part('month', addtime) = Date_part('month', CURRENT_TIMESTAMP)
+                               AND Date_part('year', addtime) = Date_part('year', CURRENT_TIMESTAMP)
+                               AND signout.active = 't'
+                               AND service.type = %s;""",
+            (nflist,),
+        )
+        count = cur.fetchall()[0][0]
         cur.close()
         conn.close()
+        timenow = datetime.datetime.now()
+        if count < 2:
+            if (
+                (timenow.hour == 19 and timenow.minute > 30)
+                or (timenow.hour > 19)
+                or (timenow.hour < 12)
+            ):
+                notifier.notifier.notify_late_signup(callback_id)
         return render_template("received.html")
 
 
@@ -594,6 +644,7 @@ def submission():
 
 
 if __name__ == "__main__":
+    notifier.notifier.load_settings()
     load_db_settings()
     get_db()
     app.run(host="0.0.0.0")
