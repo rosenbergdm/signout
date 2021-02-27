@@ -86,13 +86,21 @@ function displayTime() {
   m = checkTime(m);
   s = checkTime(s);
   document.getElementById("runningclock").innerHTML =
-    '<h3 text-align="left;">Current Time: ' + h + ":" + m + ":" + s + "." + ms + "</h3></br>";
+    '<h3 text-align="left;">Current Time: ' +
+    h +
+    ":" +
+    m +
+    ":" +
+    s +
+    "." +
+    ms +
+    "</h3></br>";
   // Increment time every 119 ms (chosen because relatively prime to 1000 = 1 s)
   setTimeout(displayTime, 19);
   var i;
   clocks = document.getElementsByClassName("runningclock");
-  for (i=0; i<clocks.length; i++) {
-    clocks[i].innerHTML = 'Time: ' + h + ":" + m + ":" + s + "." + ms
+  for (i = 0; i < clocks.length; i++) {
+    clocks[i].innerHTML = "Time: " + h + ":" + m + ":" + s + "." + ms;
   }
 }
 
