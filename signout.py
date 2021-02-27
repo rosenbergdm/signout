@@ -92,8 +92,11 @@ def load_db_settings():
     if "__file__" in dir():
         scriptdir = os.path.dirname(os.path.realpath(__file__))
     else:
+        if "scriptdir" in globals().keys():
+            scriptdir = globals()["scriptdir"]
+            print("SET FROM GLOBALS")
         if os.path.exists("/usr/local/src/signout/dbsettings.json"):
-            scriptdir = "/usr/local/src/signout/dbsettings.json"
+            scriptdir = "/usr/local/src/signout"
         elif os.path.exists(os.path.join(os.environ["HOME"], "src/signout")):
             scriptdir = os.path.join(os.environ["HOME"], "src/signout")
         else:
