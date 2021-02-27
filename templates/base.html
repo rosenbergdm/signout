@@ -6,8 +6,10 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
   <link rel="manifest" href="/static/site.webmanifest">
   <script>
-    window.onload = function() { 
-      insertContact() || true
+    if(typeof(insertContact) == "function") {
+      window.onload = function() { 
+        insertContact()
+      }
     }
   </script>
   {% block head %}
