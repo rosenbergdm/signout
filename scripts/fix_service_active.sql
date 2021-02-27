@@ -45,3 +45,19 @@ BEGIN TRANSACTION;
     'Gen Med, Intern #1');
 END TRANSACTION;
 
+-- Fix the fact that somehow there's two active Lymphoma Green #3s
+BEGIN TRANSACTION;
+  UPDATE service
+  SET    active = 'f'
+  WHERE  NAME = 'Lymphoma Green, Intern #3';
+
+  UPDATE service
+  SET    active = 't'
+  WHERE  id IN
+         (
+                SELECT id
+                FROM   service
+                WHERE  NAME LIKE 'Lymphoma Green, Intern #3' limit 1);
+END TRANSACTION;
+
+
