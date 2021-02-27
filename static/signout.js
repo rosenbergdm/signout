@@ -184,7 +184,6 @@ function nonCallSubmit() {
         seconds +
         " seconds"
     );
-    return true;
     return false;
   }
 }
