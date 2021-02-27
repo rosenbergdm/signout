@@ -1,6 +1,48 @@
+// js
+// -*- coding: utf-8 -*-
+// vim:fenc=utf-8
+//
+// Copyright © 2020 Thomas Butterworth <dmr@davidrosenberg.me>
+//
+// Distributed under terms of the MIT license.
+//
 // TODO: Refactor all this duplicated code!
 
-/* For the start-stop of signout on the nightfloat page */
+
+/* Helper functions 
+ * */
+
+//{{{
+function insertContact() {
+  var contact = document.getElementById("contact");
+  contact.href = "mailto:" + "support" + "@" + "davidrosenberg.me";
+  contact.text = "support" + "@" + "davidrosenberg.me";
+}
+
+// Pad 0 to left
+function padLeft(i) {
+  return ("0" + i).slice(-2)
+}
+
+function padright(i) {
+  return (i + "000").substring(0, 3);
+}
+
+// Set pagewide variables
+var timeoffset = 0;
+
+// For first time page loaded -- set initial timestamp and calc 
+// offset
+var timesyncXhr = new XMLHttpRequest();
+timesyncXhr.addEventListener("load", function () {
+  updateTimeOffset(this.responseText);
+});
+timesyncXhr.open("GET", "/synctime");
+timesyncXhr.send();
+//}}}
+
+
+/* Limit action to the signout initiated by NF and make it visible */
 //{{{
 function startsignout(internid) {
   var startSignout = new XMLHttpRequest();
@@ -21,16 +63,12 @@ function startsignout(internid) {
   for (i = 0; i <= sbuttons.length - 1; i++) {
     sbuttons[i].disabled = true;
   }
-  // var startbutton = document.getElementById(internid).children[1];
-  // startbutton.disabled = true;
 }
 //}}}
 
 /* For syncing time between clients and the server on the submission and
  * submission_weekend pages */
-
-var timeoffset = 0;
-var timesyncXhr = new XMLHttpRequest();
+//{{{
 
 function updateTimeOffset(timestring) {
   var splittimestring = timestring.split(":");
@@ -47,12 +85,6 @@ function updateTimeOffset(timestring) {
   console.log("time offset is " + timeoffset + " ms");
 }
 
-// For first time page loaded
-timesyncXhr.addEventListener("load", function () {
-  updateTimeOffset(this.responseText);
-});
-timesyncXhr.open("GET", "/synctime");
-timesyncXhr.send();
 
 // Resets timesync every 15 seconds
 function updateTimeSync() {
@@ -66,25 +98,14 @@ function updateTimeSync() {
 }
 setInterval(updateTimeSync, 15000);
 
-// Pad 0 to left
-function checkTime(i) {
-  if (i < 10) {
-    i = "0" + i;
-  }
-  return i;
-}
-
-function padright(i) {
-  return (i + "000").substring(0, 3);
-}
 function displayTime() {
   var today = new Date(Date.now() + timeoffset);
   var h = today.getHours();
   var m = today.getMinutes();
   var s = today.getSeconds();
   var ms = padright(today.getMilliseconds());
-  m = checkTime(m);
-  s = checkTime(s);
+  m = padLeft(m);
+  s = padLeft(s);
   document.getElementById("runningclock").innerHTML =
     '<h3 text-align="left;">Current Time: ' +
     h +
@@ -95,15 +116,18 @@ function displayTime() {
     "." +
     ms +
     "</h3></br>";
-  // Increment time every 119 ms (chosen because relatively prime to 1000 = 1 s)
+  // Increment time every 19 ms (chosen because relatively prime to 1000 = 1 s)
   setTimeout(displayTime, 19);
   var i;
-  clocks = document.getElementsByClassName("runningclock");
+  var clocks = document.getElementsByClassName("runningclock");
   for (i = 0; i < clocks.length; i++) {
     clocks[i].innerHTML = "Time: " + h + ":" + m + ":" + s + "." + ms;
   }
 }
+//}}}
 
+/* Submission execution
+ * */
 function nonCallSubmit() {
   var cutoff_time;
   var d = new Date(Date.now() + timeoffset);
@@ -178,7 +202,6 @@ function onCallSubmit() {
   );
   cutoff_time.setTime(cutoff_time.getTime() + offset * 60 * 10);
   if (date >= cutoff_time) {
-    // if (true) {
     let timestamp = new Date(Date.now());
     let hosttimestamps = document.getElementsByName("hosttimestamp");
     for (var i = hosttimestamps.length - 1; i >= 0; i--) {
@@ -204,10 +227,6 @@ function onCallSubmit() {
   }
 }
 
-function insertContact() {
-  var user = "support";
-  var site = "davidrosenberg.me";
-  var contact = document.getElementById("contact");
-  contact.href = "mailto:" + user + "@" + site;
-  contact.text = user + "@" + site;
-}
+//}}}
+
+// vim: ft=javascript :
