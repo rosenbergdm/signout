@@ -97,7 +97,10 @@ function updateTimeSync() {
     }
     updateTimeOffset(this.responseText);
   });
-  timesyncXhr.open("GET", "/synctime");
+  timesyncXhr.open(
+    "GET",
+    "/synctime?iesucks=" + String(Math.random()).substr(2, 10)
+  );
   if (DEBUG_SIGNOUT_JS == 1) {
     console.log("Sending timesync request");
   }
