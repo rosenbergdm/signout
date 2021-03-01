@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# vim:fenc=utf-8
+# vim:enc=utf-8
 #
 # Copyright © 2020-2021 Thomas Butterworth <dmr@davidrosenberg.me>
 # Last updated Sat Feb 27 00:13:00 EST 2021
@@ -13,26 +13,30 @@ Program to run the MSKCC intern signout page
 
 """
 
+import pprint
+import sys
 
 from flask import (
     Flask,
-    current_app,
-    g,
     url_for,
     render_template,
     redirect,
-    app,
     request,
 )
+
 from notifier.notifier import *
-import datetime
-import json
-import os
-import pdb
-import psycopg2
-import pprint
-import re
-import sys
+
+# This also ends up importing the follwing:
+#   from os import environ
+#   from time import sleep
+#   from twilio.rest import Client
+
+#   import datetime
+#   import json
+#   import os
+#   import pdb
+#   import psycopg2
+#   import re
 
 app = Flask(__name__)
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
@@ -122,6 +126,7 @@ def index():
 
 @app.route("/start_signout", methods=["GET"])
 def start_signout():
+    signout_id = 0
     if request.args.get("id") is None:
         return "ERROR: Tried to start signout without an id query parameter for which signout db entry"
     try:
@@ -438,6 +443,9 @@ def submission_weekend():
         )
     else:
         cur = conn.cursor()
+        # nflist = "NF9132"
+        if request.form.getlist("service") is None:
+            return render_template("received.html")
         if DEBUG_SIGNOUT_OUTPUT == 1:
             pprint.pprint(request.form)
             pprint.pprint(request.form.getlist("service"))
@@ -455,7 +463,7 @@ def submission_weekend():
                 ),
             )
             callback_id = cur.fetchone()[0]
-        conn.commit()
+            conn.commit()
         cur.execute("SELECT type FROM service WHERE id = %s", (serviceid,))
         nflist = cur.fetchall()[0][0]
         cur.execute(
@@ -649,8 +657,7 @@ def submission_weekday():
 def submission():
     if datetime.datetime.now().isoweekday() > 5:
         return submission_weekend()
-    else:
-        return submission_weekday()
+    return submission_weekday()
 
 
 if __name__ == "__main__":
