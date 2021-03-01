@@ -32,6 +32,7 @@ import pdb
 import psycopg2
 import pprint
 import re
+import sys
 
 app = Flask(__name__)
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
@@ -44,6 +45,8 @@ scriptdir = ""
 CLEANUP_TIMESTAMP = re.compile(r"\.(..).*$")
 SHIFT_TIMES = re.compile(r"^(\d{1,2})(:59:59\.)(.*)$")
 DEBUG_SIGNOUT_OUTPUT = os.environ.get("DEBUG_SIGNOUT_OUTPUT")
+if DEBUG_SIGNOUT_OUTPUT:
+    pdb.set_trace()
 
 
 def gen_med_sorter(intern_list):
@@ -75,12 +78,10 @@ def fix_earlytimes(ts):
 
 def cleanup_date_input(ds):
     if "-" in ds:
-        print("ds = '%s'" % ds)
         return ds
     else:
         parts = ds.split("/")
         ds = "-".join([parts[2], parts[0], parts[1]])
-        print("ds = '%s'" % ds)
         return ds
 
 
@@ -304,6 +305,8 @@ def query():
                 ORDER BY completetime ASC"""
                 % (splitdate[2], splitdate[1], splitdate[0], typestring)
             )
+            if DEBUG_SIGNOUT_OUTPUT:
+                print(cur.query, file=sys.stderr)
         else:
             rangestring = "Showing signouts from %s to %s inclusive" % (
                 request.form["addtime_date"],
@@ -316,21 +319,16 @@ def query():
                 SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, starttime::TIMESTAMP, completetime::TIMESTAMP, addtime::TIMESTAMP::DATE as adddate
                 FROM signout LEFT JOIN service 
                     ON signout.service = service.id
-                WHERE date_part('day', addtime) >= %s AND date_part('day', addtime) <= %s
-                    and date_part('month', addtime) >= %s AND date_part('month', addtime) <= %s
-                    and date_part('year', addtime) >= %s AND date_part('year', addtime) <= %s
-                    %s
+                WHERE addtime BETWEEN
+                    '"""
+                + "-".join(splitdate)
+                + """' and '"""
+                + "-".join(splitenddate)
+                + """'
                 ORDER BY completetime ASC"""
-                % (
-                    splitdate[2],
-                    splitenddate[2],
-                    splitdate[1],
-                    splitenddate[1],
-                    splitdate[0],
-                    splitenddate[0],
-                    typestring,
-                )
             )
+            if DEBUG_SIGNOUT_OUTPUT:
+                print(cur.query, file=sys.stderr)
         signoutlog = [
             {
                 "intern_name": x[0],
