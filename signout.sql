@@ -1,10 +1,10 @@
-/*
- * signout.sql
- * schema for the MSKCC intern signout webpage database schema
- * Copyright (C) 2020 Thomas Butterworth <dmr@davidrosenberg.me>
- *
- * Distributed under terms of the MIT license.
- */
+--
+-- signout.sql
+-- schema for the MSKCC intern signout webpage database schema
+-- Copyright (C) 2020 Thomas Butterworth <dmr@davidrosenberg.me>
+--
+-- Distributed under terms of the MIT license.
+--
 
 DROP TABLE IF EXISTS signout;
 DROP TABLE IF EXISTS service;
@@ -482,7 +482,7 @@ INSERT INTO assignments (dayofyear, type, nightfloat) VALUES (171, 'NF9133', (SE
 
 --- }}}
 
-UPDATE SERVICE SET active = FALSE);
+UPDATE SERVICE SET active = FALSE;
 UPDATE SERVICE SET active = TRUE where id in (42,  38,  37,  34,  33,  30,  29,  28,  25,  24,  23,  21,  20,  19,  17,  16,  13,  12,  11,  10,   9,   8,   7,   6,   5,   4,   2,   1);
 
 
@@ -490,4 +490,4 @@ UPDATE SERVICE SET active = TRUE where id in (42,  38,  37,  34,  33,  30,  29, 
 -- DUMMY VALUES FOR TESTING
 -- INSERT INTO signout (intern_name, intern_callback, service, oncall, addtime) VALUES ('Nancie Hogg', 'x3002', '5', FALSE, current_timestamp + interval '51 minutes' + interval '4 seconds');
 
--- vim:et
+-- vim: ft=sql :
