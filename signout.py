@@ -8,7 +8,7 @@
 # Distributed under terms of the MIT license.
 
 """
-signout.py 
+signout.py
 Program to run the MSKCC intern signout page
 
 """
@@ -443,7 +443,6 @@ def submission_weekend():
         )
     else:
         cur = conn.cursor()
-        # nflist = "NF9132"
         if request.form.getlist("service") is None:
             return render_template("received.html")
         if DEBUG_SIGNOUT_OUTPUT == 1:
@@ -610,21 +609,37 @@ def submission_weekday():
         )
     else:
         cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp) \
-                    VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
-            (
-                request.form["intern_name"],
-                request.form["intern_callback"],
-                request.form["service"],
-                request.form["oncall"],
-                request.remote_addr,
-                request.form["hosttimestamp"],
-            ),
-        )
-        callback_id = cur.fetchone()[0]
-        conn.commit()
-        serviceid = request.form["service"]
+        if request.form.getlist("service") is None:
+            # This should never happen
+            return render_template("received.html")
+        if DEBUG_SIGNOUT_OUTPUT == 1:
+            pprint.pprint(request.form)
+            pprint.pprint(request.form.getlist("service"))
+        for serviceid in request.form.getlist("service"):
+            cur.execute(
+                """
+                INSERT INTO
+                  signout (
+                    intern_name,
+                    intern_callback,
+                    service,
+                    oncall,
+                    ipaddress,
+                    hosttimestamp
+                  )
+                VALUES
+                  (%s, %s, %s, %s, %s, %s) RETURNING id;""",
+                (
+                    request.form["intern_name"],
+                    request.form["intern_callback"],
+                    serviceid,
+                    request.form["oncall"],
+                    request.remote_addr,
+                    request.form["hosttimestamp"],
+                ),
+            )
+            callback_id = cur.fetchone()[0]
+            conn.commit()
         cur.execute("SELECT type FROM service WHERE id = %s", (serviceid,))
         nflist = cur.fetchall()[0][0]
         cur.execute(
@@ -639,6 +654,7 @@ def submission_weekday():
                                AND service.type = %s;""",
             (nflist,),
         )
+
         count = cur.fetchall()[0][0]
         cur.close()
         conn.close()
