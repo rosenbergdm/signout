@@ -99,7 +99,7 @@ function updateTimeSync() {
   });
   timesyncXhr.open(
     "GET",
-    "/synctime?iesucks=" + String(Math.random()).substr(2, 10)
+    "/synctime?cachefix=" + String(Math.random()).substr(2, 10)
   );
   if (DEBUG_SIGNOUT_JS == 1) {
     console.log("Sending timesync request");

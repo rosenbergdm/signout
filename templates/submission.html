@@ -30,6 +30,7 @@
   <li>If you are putting your name down after 7:30 pm, it is possible that nightfloat might not see your name being added to the list.  Please page the night float number (9132 or 9133) to let them know you've added yourself to the list</li>
   <li>Oral signouts should follow the modified <strong>IPASS</strong> format, available <a href="/static/mskcc_ipass.pdf">here</a></li>
   <li>Before adding your name, please ensure that you've done all pre-signout requirements, listed <a href="/static/pre_signout_checklist.pdf">here</a></li>
+  <li>If you are signing out multiple lists, you can select multiple lists in the forms below</li>
 </ul>
 <hr>
 <br>
@@ -48,7 +49,7 @@
           <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" pattern=".*[0-9]{4}.*" maxlength=15 required>
         </fieldset>
         <fieldset>
-          <select id="service" name="service">
+          <select multiple id="service" name="service" required>
             {% for service in solid_services %}
             <option value="{{ service.id }}">{{ service.name }}</option>
             {% endfor %}
@@ -99,7 +100,7 @@
           <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" pattern=".*[0-9]{4}.*" maxlength=15 required>
         </fieldset>
         <fieldset>
-          <select id="service" name="service">
+          <select multiple id="service" name="service" required>
             {% for service in liquid_services %}
             <option value="{{ service.id }}">{{ service.name }}</option>
             {% endfor %}
@@ -151,7 +152,7 @@
           <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" pattern=".*[0-9]{4}.*" maxlength=15 required>
         </fieldset>
         <fieldset>
-          <select id="service" name="service">
+          <select multiple id="service" name="service" required>
             {% for service in solid_services %}
             <option value="{{ service.id }}">{{ service.name }}</option>
             {% endfor %}
@@ -203,7 +204,7 @@
           <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" pattern=".*[0-9]{4}.*" maxlength=15 required>
         </fieldset>
         <fieldset>
-          <select id="service" name="service">
+          <select multiple id="service" name="service" required>
             {% for service in liquid_services %}
             <option value="{{ service.id }}">{{ service.name }}</option>
             {% endfor %}
