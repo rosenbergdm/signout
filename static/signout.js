@@ -2,49 +2,51 @@
 // -*- coding: utf-8 -*-
 // vim:fenc=utf-8
 //
-// Copyright © 2020 Thomas Butterworth <dmr@davidrosenberg.me>
+// Copyright © 2020-2021 Thomas Butterworth <dmr@davidrosenberg.me>
 //
 // Distributed under terms of the MIT license.
 //
 // TODO: Refactor all this duplicated code!
 
-var DEBUG_SIGNOUT_JS = 0;
+//{{{ Global variables and initialization
+
 // set to DEBUG_SIGNOUT_JS = 1 to show extra console logging info
-
-/* Helper functions
- * */
-//{{{
-function insertContact() {
-  var contact = document.getElementById("contact");
-  contact.href = "mailto:" + "support" + "@" + "davidrosenberg.me";
-  contact.text = "support" + "@" + "davidrosenberg.me";
-}
-
-// Pad 0 to left
-
-function padLeft(i) {
-  return ("0" + i).slice(-2);
-}
-
-function padright(i) {
-  return (i + "000").substring(0, 3);
-}
-
-// Set pagewide variables
+var DEBUG_SIGNOUT_JS = 0;
+// time difference in ms between client and server
 var timeoffset = 0;
 
-// For first time page loaded -- set initial timestamp and calc
-// offset
+// For first time page loaded -- set initial timestamp and calc offset
 var timesyncXhr = new XMLHttpRequest();
 timesyncXhr.addEventListener("load", function () {
   updateTimeOffset(this.responseText);
 });
 timesyncXhr.open("GET", "/synctime");
 timesyncXhr.send();
+
+// Re-sync time and calc offset every 15 seconds
+setInterval(updateTimeSync, 15000);
 //}}}
 
+//{{{ Helper functions
+function insertContact() {
+  var contact = document.getElementById("contact");
+  contact.href = "mailto:" + "support" + "@" + "davidrosenberg.me";
+  contact.text = "support" + "@" + "davidrosenberg.me";
+}
+
+// 0 pad on the left to left
+function padLeft(i) {
+  return ("0" + i).slice(-2);
+}
+
+// 0 pad right
+function padright(i) {
+  return (i + "000").substring(0, 3);
+}
+//}}}
+
+//{{{ Manage NF signout progression
 /* Limit action to the signout initiated by NF and make it visible */
-//{{{
 function startsignout(internid) {
   var startSignout = new XMLHttpRequest();
   startSignout.addEventListener("load", function () {
@@ -67,10 +69,9 @@ function startsignout(internid) {
 }
 //}}}
 
-/* For syncing time between clients and the server on the submission and
- * submission_weekend pages */
-//{{{
+//{{{ Time syncing
 
+// Given a server-issued timestamp, update the timesync (offset) variable
 function updateTimeOffset(timestring) {
   var splittimestring = timestring.split(":");
   var splitms = splittimestring[2].split(".");
@@ -88,7 +89,7 @@ function updateTimeOffset(timestring) {
   }
 }
 
-// Resets timesync every 15 seconds
+// Request the time from server, and update the timesync var with resposne
 function updateTimeSync() {
   timesyncXhr = new XMLHttpRequest();
   timesyncXhr.addEventListener("load", function () {
@@ -101,13 +102,10 @@ function updateTimeSync() {
     "GET",
     "/synctime?cachefix=" + String(Math.random()).substr(2, 10)
   );
-  if (DEBUG_SIGNOUT_JS == 1) {
-    console.log("Sending timesync request");
-  }
   timesyncXhr.send();
 }
-setInterval(updateTimeSync, 15000);
 
+// update the running clocks (top and each section) every 19 ms
 function displayTime() {
   var today = new Date(Date.now() + timeoffset);
   var h = today.getHours();
@@ -136,9 +134,7 @@ function displayTime() {
 }
 //}}}
 
-/* Submission execution
- * */
-//{{{
+//{{{ Execute submission
 function nonCallSubmit() {
   var cutoff_time;
   var d = new Date(Date.now() + timeoffset);
@@ -165,7 +161,11 @@ function nonCallSubmit() {
     );
   }
   cutoff_time.setTime(cutoff_time.getTime() + offset * 60 * 10);
-  if (date >= cutoff_time) {
+  var allow_signout = date >= cutoff_time;
+  if (DEBUG_SIGNOUT_JS == 1) {
+    allow_signout = true;
+  }
+  if (allow_signout) {
     let timestamp = new Date(Date.now());
     let hosttimestamps = document.getElementsByName("hosttimestamp");
     for (var i = hosttimestamps.length - 1; i >= 0; i--) {
@@ -211,7 +211,11 @@ function onCallSubmit() {
     Date.UTC(d.getYear() + 1900, d.getMonth(), d.getDate(), 19, 0, 0)
   );
   cutoff_time.setTime(cutoff_time.getTime() + offset * 60 * 10);
-  if (date >= cutoff_time) {
+  var allow_signout = date >= cutoff_time;
+  if (DEBUG_SIGNOUT_JS == 1) {
+    allow_signout = true;
+  }
+  if (allow_signout) {
     let timestamp = new Date(Date.now());
     let hosttimestamps = document.getElementsByName("hosttimestamp");
     for (var i = hosttimestamps.length - 1; i >= 0; i--) {
@@ -239,4 +243,4 @@ function onCallSubmit() {
 
 //}}}
 
-// vim: ft=javascript :
+// vim: ft=javascript fenc=utf-8:
