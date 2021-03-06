@@ -6,7 +6,7 @@
 //
 // Distributed under terms of the MIT license.
 //
-// TODO: Refactor all this duplicated code!
+// TODO: Refactor nonCallSubmit vs onCallSubmit
 
 //{{{ Global variables and initialization
 
@@ -14,17 +14,15 @@
 var DEBUG_SIGNOUT_JS = 0;
 // time difference in ms between client and server
 var timeoffset = 0;
+var timesyncXhr = new XMLHttpRequest();
 
 // For first time page loaded -- set initial timestamp and calc offset
-var timesyncXhr = new XMLHttpRequest();
-timesyncXhr.addEventListener("load", function () {
-  updateTimeOffset(this.responseText);
-});
-timesyncXhr.open("GET", "/synctime");
-timesyncXhr.send();
 
-// Re-sync time and calc offset every 15 seconds
-setInterval(updateTimeSync, 15000);
+// timesyncXhr.addEventListener("load", function () {
+//   updateTimeOffset(this.responseText);
+// });
+// timesyncXhr.open("GET", "/synctime");
+
 //}}}
 
 //{{{ Helper functions
@@ -43,6 +41,14 @@ function padLeft(i) {
 function padright(i) {
   return (i + "000").substring(0, 3);
 }
+
+function runTimesyncOnLoad() {
+  displayTime();
+  updateTimeSync();
+  // Re-sync time and calc offset every 15 seconds
+  setInterval(updateTimeSync, 15000);
+}
+
 //}}}
 
 //{{{ Manage NF signout progression
@@ -135,6 +141,63 @@ function displayTime() {
 //}}}
 
 //{{{ Execute submission
+
+function submitSignout(on_call = false) {
+  var cutoff_time;
+  var d = new Date(Date.now() + timeoffset);
+  var date = new Date(
+    Date.UTC(
+      d.getYear() + 1900,
+      d.getMonth(),
+      d.getDate(),
+      d.getHours(),
+      d.getMinutes(),
+      d.getSeconds()
+    )
+  );
+  var offset = date.getTimezoneOffset();
+  date.setTime(date.getTime() + offset * 60 * 10);
+  if (d.getDay() == 6 || d.getDay() == 0 || on_call) {
+    cutoff_time = new Date(
+      Date.UTC(d.getYear() + 1900, d.getMonth(), d.getDate(), 19, 0, 0)
+    );
+  } else {
+    cutoff_time = new Date(
+      Date.UTC(d.getYear() + 1900, d.getMonth(), d.getDate(), 17, 30, 0)
+    );
+  }
+  cutoff_time.setTime(cutoff_time.getTime() + offset * 60 * 10);
+  var allow_signout = date >= cutoff_time;
+  if (DEBUG_SIGNOUT_JS == 1) {
+    allow_signout = true;
+  }
+  if (allow_signout) {
+    let timestamp = new Date(Date.now());
+    let hosttimestamps = document.getElementsByName("hosttimestamp");
+    for (var i = hosttimestamps.length - 1; i >= 0; i--) {
+      hosttimestamps[i].value = timestamp;
+    }
+    return true;
+  } else {
+    let hours = Math.floor((cutoff_time - date) / 1000 / 3600);
+    let minutes = Math.floor((cutoff_time - date) / 1000 / 60 - 60 * hours);
+    let seconds = Math.floor(
+      (cutoff_time - date) / 1000 - 60 * minutes - 3600 * hours
+    );
+    alert(
+      "You cannot signout for another " +
+        hours +
+        " hours, " +
+        minutes +
+        " minutes, and " +
+        seconds +
+        " seconds"
+    );
+    return false;
+  }
+}
+
+/*
 function nonCallSubmit() {
   var cutoff_time;
   var d = new Date(Date.now() + timeoffset);
@@ -240,6 +303,7 @@ function onCallSubmit() {
     return false;
   }
 }
+*/
 
 //}}}
 

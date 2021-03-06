@@ -49,6 +49,10 @@ scriptdir = ""
 CLEANUP_TIMESTAMP = re.compile(r"\.(..).*$")
 SHIFT_TIMES = re.compile(r"^(\d{1,2})(:59:59\.)(.*)$")
 DEBUG_SIGNOUT_OUTPUT = os.environ.get("DEBUG_SIGNOUT_OUTPUT")
+DEBUG_PAGES = 0
+if os.environ.get("DEBUG_PAGES"):
+    DEBUG_PAGES = os.environ.get("DEBUG_PAGES")
+
 if DEBUG_SIGNOUT_OUTPUT:
     pdb.set_trace()
 
@@ -667,6 +671,20 @@ def submission_weekday():
             ):
                 notify_late_signup(callback_id)
         return render_template("received.html")
+
+
+@app.route("/submission_weekday", methods=["GET", "POST"])
+def debug_submission_weekday():
+    if DEBUG_PAGES:
+        return submission_weekday()
+    return "NOT IN DEBUG MODE"
+
+
+@app.route("/submission_weekend", methods=["GET", "POST"])
+def debug_submission_weekend():
+    if DEBUG_PAGES:
+        return submission_weekend()
+    return "NOT IN DEBUG MODE"
 
 
 @app.route("/submission", methods=["GET", "POST"])
