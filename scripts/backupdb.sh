@@ -33,6 +33,7 @@ GIT_TAG="$(git describe --tags | tail -n1)"
 DIRNAME="$(which gdirname || which dirname)"
 READLINK="$(which greadlink || which readlink)"
 WORKINGDIR="$($READLINK -f $($DIRNAME $0)/..)"
+source "$WORKINGDIR/scripts/common.sh"
 TARGET="$($DIRNAME $0)/../backups/signout-${GIT_TAG}.sql.gz"
 if echo -- "$@" | grep "target.*sql.*" > /dev/null; then
   TARGET=$(echo -- "$@" | perl -p -e 's/ /\n/g' | grep -- target | perl -p -e 's/.*target=(.*)$/\1/g')
@@ -44,21 +45,20 @@ fi
 if echo -- "$@"  | grep -- "-\{1,2\}h" > /dev/null; then
   debuglog "help requested"
   usage
+  trap - EXIT
   exit 1
 fi
 debuglog "TARGET=$TARGET"
 mkdir -p "$WORKINGDIR/backups" > /dev/null 2>&1
-PASSWD="$(cat "$WORKINGDIR/dbsettings.json" | grep pass | sed -e 's#"##g' | awk '{print $2}')"
-USER="$(cat $WORKINGDIR/dbsettings.json | grep username | sed -e 's#["|,]##g' | awk '{print $2}')"
-DBNAME="$(cat $WORKINGDIR/dbsettings.json | grep dbname | sed -e 's#["|,]##g' | awk '{print $2}')"
-if [ -f "$TARGET" ]; then
+if [ -e "$TARGET" ]; then
   echo "BACKUP FILE $TARGET already exists. Use a different targetfile or bump the git tag if using the default backupfile"
   echo
   usage
   echo
+  trap - EXIT
   exit 255
 else
-  PGPASSWORD="$PASSWD" $PG_DUMP "$DBNAME" -U "$USER" | gzip - - > "${TARGET}"
+  PGPASSWORD=$PASSWD $PG_DUMP -U $USER $DBNAME | gzip - - > ${TARGET}
   if [ $? -gt 0 ]; then
     echo "BACKUP FAILED"
     rm -i "$TARGET"
@@ -68,8 +68,7 @@ else
   fi
 fi
 
-set +x
+trap - EXIT
 exit 0
-
 
 # vim: ft=sh

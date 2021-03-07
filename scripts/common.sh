@@ -13,6 +13,7 @@ if [ ${DEBUG_SCRIPT:-0} -gt 1 ]; then
   set -x
 fi
 
+WHICH="$(which gwhich || which which)"
 ECHO="$($WHICH gecho || $WHICH echo)"
 PRINTF="$($WHICH gprintf || $WHICH printf)"
 debuglog() {
@@ -40,7 +41,7 @@ MKTEMP="$($WHICH gmktemp || $WHICH mktemp)" && debuglog "MKTEMP=$MKTEMP"
 
 cleanup() {
   if [ -z $1 ]; then
-    abortmsg="Aborting abnormally.  Logfile written to '$LOGFILE'"
+    abortmsg="Aborting abnormally.  Logfile written to '$LOGFILE'\n\n"
   else
     abortmsg="$@"
   fi

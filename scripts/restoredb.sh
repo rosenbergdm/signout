@@ -26,9 +26,25 @@ DIRNAME="$($WHICH gdirname || $WHICH dirname)"
 READLINK="$($WHICH greadlink || $WHICH readlink)"
 WORKINGDIR="$($READLINK -f $($DIRNAME ${BASH_SOURCE[0]})/..)"
 source "$WORKINGDIR/scripts/common.sh"
+trap - EXIT
 source "$WORKINGDIR/scripts/docopts.sh" --auto "$@"
 version=0.0.1
 helptext=$(docopt_get_help_string $0)
+if [[ ${ARGS[-v]} == true ]]; then
+  DEBUG_SCRIPT=1
+fi
+
+cleanup() {
+  errorcode=${1:-255}
+  errormessage="$2"
+  if [ -z "$errormessage" ]; then
+    $PRINTF "An unknown error occured.  Aborting.\n"
+    $PRINTF "$helptext\n"
+    trap - EXIT
+    exit $errorcode
+  fi
+}
+trap cleanup EXIT
 
 debuglog() {
   if [ ${DEBUG_SCRIPT:-0} -gt 1 ]; then
@@ -40,10 +56,6 @@ debuglog() {
  && debuglog "DIRNAME=$DIRNAME" \
  && debuglog "READLINK=$READLINK" \
  && debuglog "WORKINGDIR=$WORKINGDIR"
-
-usage() {
-  printf "$helptext"
-}
 
 RESTORECMD="cat ${ARGS[BACKUPFILE]} | gunzip |"
 
@@ -65,18 +77,20 @@ else
   targetdb=${ARGS[DBNAME]}
 fi
 
-
-cat<<EOF | $PSQL -U $USER $targetdb >/dev/null 2>&1
-DROP TABLE IF EXISTS assignments CASCADE;
-DROP TABLE IF EXISTS nightfloat CASCADE;
-DROP TABLE IF EXISTS service CASCADE;
-DROP TABLE IF EXISTS signout CASCADE;
-EOF
+$PRINTF "Dropping tables from $targetdb as $USER\n"
+read -p "Press enter to continue" x
+echo " DROP TABLE IF EXISTS assignments CASCADE; \
+  DROP TABLE IF EXISTS nightfloat CASCADE; \
+  DROP TABLE IF EXISTS service CASCADE; \
+  DROP TABLE IF EXISTS signout CASCADE; " | \
+  PGPASSWORD=$PASSWD $PSQL -U $USER $targetdb >/dev/null 2>&1
 debuglog "clearing existing db"
 
 RESTORECMD="$RESTORECMD $PSQL -U $USER $targetdb"
 debuglog "executing '$RESTORECMD'"
+export PGPASSWORD=$PASSWD
 eval "PGPASSWORD=$PASSWD $RESTORECMD" > /dev/null 2>&1
+unset PGPASSWORD
 
 if [ $? -gt 0 ]; then
   cleanup "Error restoring database.  Aborting" 4
