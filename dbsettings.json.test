@@ -1,5 +1,14 @@
 {
-	"dbname": "signout",
-	"username": "signout",
-	"password": "YOUR-PASSWORD-HERE"
+  "dbname": "signout",
+  "username": "signout",
+  "password": "YOUR-PASSWORD-HERE",
+  "twilio-sid": "",
+  "twilio-auth-token": "",
+  "twilio-number": "+19388882701",
+  "DEBUG_CALLBACKS": 0,
+  "DEBUG_TARGET_NUMBER": "+13125551212",
+  "DEBUG_PRINT_NOT_MESSAGE": 0,
+  "DEBUG_SIGNOUT_OUTPUT": 0,
+  "DEBUG_PAGES": 0,
+  "USERS": { "testuser": "hashed123"}
 }

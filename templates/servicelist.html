@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="/static/signout.css">
+<script src="/static/signout.js"></script>
+<script src="/static/sorttable.js"></script>
+<script>
+  var old_onload = window.onload
+  window.onload = function() {
+    old_onload()
+    insertContact()
+  }
+  function confirmChange(actionmsg, url) {
+    if (confirm(actionmsg)) {
+      location.href = url;
+    }
+  }
+</script>
+{% endblock %}
+{% block title %}Servicelist{% endblock %}
+{% block body %}
+<center>
+  <h1>MSKCC Service List</h1>
+  <h3>Please don't edit unless you really mean in!</h3>
+  <h2>You can sort columns by clicking on the header</h2>
+  <p><a href="/addservice"><button>Add a new service</button></a>
+  <p><a href="/admin"><button>Back to admin page</button></a>
+  <p><a href="/submission"><button>Return to submission page</button></a>
+</center>
+<br>
+<hr>
+<table class="sortable" style="width:90%;text-align:left;">
+  <thead>
+    <th>id</th>
+    <th>Service Name</th>
+    <th>NF List</th>
+    <th>Is Active</th>
+    <th>Activate</th>
+    <th>Decativate</th>
+    <th>Change list</th>
+  </thead>
+  <tbody>
+    {% for service in servicelist %}
+    <tr class="{{ loop.cycle('odd', 'even') }}">
+      <td>{{ service.id }}</td>
+      <td>{{ service.name }}</td>
+      <td>{{ service.type }}</td>
+      {% if service.active == true %}
+      <td>Active</td>
+      {% else %}
+      <td>Inactive</td>
+      {% endif %}
+      <!-- <td><a href=" class="button">Set active</a></td> -->
+      <td><button onclick="confirmChange('Activate service \'{{ service.name }}\'', '/service?id={{ service.id }}&action=activate')">Activate</button></td>
+      <td><button onclick="confirmChange('Deactivate service \'{{ service.name }}\'', '/service?id={{ service.id }}&action=deactivate')">Set inactive</button></td>
+      <td><button onclick="confirmChange('Set service \'{{ service.name }}\' to \'{{ service.othertype }}\'', '/service?id={{ service.id }}&action=set_type&newtype={{ service.othertype }}')" class="button">Set to {{ service.othertype }}</button></td>
+      {% endfor %}
+  </tbody>
+</table>
+
+<br />
+{% endblock %}
+
+<!-- vim: ft=htmldjango
+-->

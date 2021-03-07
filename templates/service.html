@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<meta http-equiv="refresh" content="3, url=/servicelist" />
+{% endblock %}
+{% block title %}Service Update{% endblock %}
+{% block body %}
+<h1>Update NF Service List {{ service.name }}</h1>
+<p>{{ msg }}
+{% endblock %}
