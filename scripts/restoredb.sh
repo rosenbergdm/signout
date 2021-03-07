@@ -21,7 +21,8 @@ set -o pipefail
 if [ ${DEBUG_SCRIPT:-0} -gt 1 ]; then
   set -x
 fi
-if echo -- "$@" | grep -- '-v'>/dev/null; then
+if echo -- "$@" | grep -- ' -v'>/dev/null; then
+  echo "-v option passed, setting DEBUG_SCRIPT"
   if [ ${DEBUG_SCRIPT:-0} -lt 2 ]; then
     DEBUG_SCRIPT=1
   fi
@@ -95,16 +96,19 @@ echo " DROP TABLE IF EXISTS assignments CASCADE; \
 debuglog "clearing existing db"
 
 export PGPASSWORD=$PASSWD
-cat ${ARGS[BACKUPFILE]} | gunzip | $PSQL -U $USER $targetdb
+gunzip ${ARGS[BACKUPFILE]}
+
+echo ${ARGS[BACKUPFILE]//.gz}
+cat ${ARGS[BACKUPFILE]//.gz}| $PSQL -U $USER $targetdb
 
 if [ $? -gt 0 ]; then
   echo "Error restoring database.  Aborting"
   rm -f "$TMPFILE" "$LOGFILE"
   trap - EXIT
   exit 4
-
 fi
 debuglog "Restored '$targetdb'"
+gzip ${ARGS[BACKUPFILE]//.gz}
 
 rm -f "$TMPFILE" "$LOGFILE"
 trap - EXIT
