@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# Make sure you add WSGIPassAuthorization to the apache conf
 import sys
 import logging
 logging.basicConfig(stream=sys.stderr)
