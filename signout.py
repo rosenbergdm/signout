@@ -25,20 +25,17 @@ from flask import (
 )
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import check_password_hash
+from os import environ
+from time import sleep
+from twilio.rest import Client
 
-from notifier.notifier import *
+import datetime
+import json
+import os
+import pdb
+import psycopg2
+import re
 
-# This also ends up importing the follwing:
-#   from os import environ
-#   from time import sleep
-#   from twilio.rest import Client
-
-#   import datetime
-#   import json
-#   import os
-#   import pdb
-#   import psycopg2
-#   import re
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
@@ -819,6 +816,186 @@ def addservice():
     conn.commit()
     conn.close()
     return redirect(url_for("servicelist"))
+
+
+def get_callback_number(nflist):
+    """Get the phone number to text if there are missing signouts for a given list.
+
+    :param str nflist: the night float list to get the callback number for (ex: "NF9132")
+
+    :returns: The twilio-formatted callback to text (ex: '+13128675309')
+    :rtype: str
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+    dayofyear = datetime.datetime.today().timetuple().tm_yday
+    cur.execute(
+        """ SELECT callback FROM assignments INNER JOIN nightfloat ON assignments.nightfloat = nightfloat.id WHERE dayofyear = %s AND type = %s """,
+        (dayofyear, nflist),
+    )
+    callback = cur.fetchall()
+    if len(callback) > 0:
+        callback = callback[0][0]
+    else:
+        callback = "+13125551212"
+    cur.close()
+    conn.close()
+    if app.config["DEBUG_CALLBACKS"]:
+        print(
+            "DEBUG_CALLBACKS set -- would have returned '%s' but returning '%s' instead"
+            % (callback, app.config["DEBUG_TARGET_NUMBER"])
+        )
+        callback = app.config["DEBUG_TARGET_NUMBER"]
+    return callback
+
+
+def get_missing_signouts(nflist):
+    """Get the active signouts that have not yet happened for the current day.
+
+    :param str nflist: the night float list to get the missing signouts for (ex: "NF9132")
+
+    :returns: a list of strings representing the names of the lists that haven't
+        been signed out yet (ex: ["Breast, APP", "STR, Intern #1"]) or None if
+        all lists are signed out
+    :rtype: [str]
+
+    """
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT id, name 
+        FROM service 
+        WHERE active IS true 
+          AND type = %s 
+          AND id NOT IN (
+            SELECT service 
+            FROM signout 
+              INNER JOIN service 
+                ON signout.service = service.id
+            WHERE date_part('day', addtime) = date_part('day', current_timestamp)
+              AND date_part('month', addtime) = date_part('month', current_timestamp)
+              AND date_part('year', addtime) = date_part('year', current_timestamp) 
+              AND type = %s);""",
+        (nflist, nflist),
+    )
+    results = cur.fetchall()
+    cur.close()
+    conn.close()
+    if len(results) == 0:
+        return None
+    else:
+        return [x[1] for x in results]
+
+
+def notify_missing_signouts(nflist):
+    """
+    Sends the text messages for missing signouts to the proper person, split
+      into sms messages of <160 characters.
+
+    :param str nflist: Nightfloat list to check and notify for (ex: "NF9132")
+
+    :returns: Number of messages sent
+    :rtype: int
+    """
+
+    missing_signouts = get_missing_signouts(nflist)
+    if missing_signouts is not None:
+        callback_number = get_callback_number(nflist)
+        client = Client(app.config["twilio-sid"], app.config["twilio-auth-token"])
+
+        if len(missing_signouts) <= 3:
+            body = (
+                "This is a notice from 'signout.mskcc.org'. "
+                + "The following lists are not showing as submitted: "
+                + "'"
+                + "', '".join(missing_signouts)
+                + "'"
+            )
+            if app.config["DEBUG_PRINT_NOT_MESSAGE"]:
+                print(body)
+            else:
+                message = client.messages.create(
+                    to=callback_number, from_=app.config["twilio-number"], body=body
+                )
+        else:
+            nmessages = int(len(missing_signouts) / 4) + 2
+            if len(missing_signouts) % 4 == 0:
+                nmessages -= 1
+            body = (
+                "This is notice (1/%s) from 'signout.mskcc.org'. " % str(nmessages)
+                + "The following lists are not showing as submitted: "
+            )
+            if app.config["DEBUG_PRINT_NOT_MESSAGE"]:
+                print(body)
+            else:
+                message = client.messages.create(
+                    to=callback_number, from_=app.config["twilio-number"], body=body
+                )
+            for i in range(nmessages - 1):
+                sleep(1)
+                mlist = missing_signouts[i * 4 : i * 4 + 4]
+                body = (
+                    "Notice (%s/%s): '" % (str(i + 2), str(nmessages))
+                    + "', '".join(mlist)
+                    + "'"
+                )
+                if app.config["DEBUG_PRINT_NOT_MESSAGE"]:
+                    print(body)
+                else:
+                    message = client.messages.create(
+                        to=callback_number, from_=app.config["twilio-number"], body=body
+                    )
+    sleep(1)
+    return nmessages
+
+
+def notifier_main():
+    """
+    Run the notifier script.
+
+    """
+    nflists = ["NF9132", "NF9133"]
+    total_messages = 0
+    for nflist in nflists:
+        total_messages += notify_missing_signouts(nflist)
+    print("%s total SMS messages sent" % str(total_messages))
+    return
+
+
+def notify_late_signup(signout_id, notify=True):
+    """TODO: Send a text message to night float indicating that a 'late' addition
+    to the signout list has occured
+
+    :param int signout_id: DB id of the late signup
+
+    :returns: none
+
+    """
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        """SELECT intern_name, service.name, intern_callback, type 
+                    FROM signout
+                    INNER JOIN service ON signout.service = service.id
+                    WHERE signout.id = %s""",
+        (signout_id,),
+    )
+    results = cur.fetchall()[0]
+    cur.close()
+    conn.close()
+
+    callback_number = get_callback_number(results[3])
+    client = Client(app.config["twilio-sid"], app.config["twilio-auth-token"])
+    body = f"Notifying that the list {results[1]} was added when all other callbacks were complete.  Please call back {results[0]} at {results[2]}"
+    if app.config["DEBUG_PRINT_NOT_MESSAGE"] == 1 or notify == False:
+        print(body)
+    else:
+        body = client.messages.create(
+            to=callback_number, from_=app.config["twilio-number"], body=body
+        )
+    return
 
 
 if __name__ == "__main__":
