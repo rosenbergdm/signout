@@ -3,7 +3,15 @@
 # backupdb.sh
 # Copyright (C) 2020 Thomas Butterworth <dmr@davidrosenberg.me>
 #
-# Distributed under terms of the MIT license.
+# Usage: backupdb.sh [-vhq] [--target=<TARGETFILE>]
+#
+# restore the database backup BACKUPFILE to database DBNAME
+#
+# Options:
+#   -h --help
+#   -v       verbose mode
+#   -q       quiet mode
+#   --target=<TARGETFILE>
 #
 
 set -o pipefail
@@ -15,18 +23,6 @@ if [ ${DEBUG_SCRIPT:-0} -gt 1 ]; then
   set -x
 fi
 
-debuglog() {
-  [ ${DEBUG_SCRIPT:-0} -gt 0 ] && echo "$@" > /dev/stderr
-}
-
-usage() {
-  echo USAGE:
-  echo
-  echo -e "\t\t > $0 [--target=TARGETFILE]"
-  echo 
-  echo "Backs up the datebase.  If targetfile isn't given, uses a name defined from the git tag"
-  echo 
-}
 
 PG_DUMP="$(which pg_dump)"
 GIT_TAG="$(git describe --tags | tail -n1)"
@@ -34,27 +30,38 @@ DIRNAME="$(which gdirname || which dirname)"
 READLINK="$(which greadlink || which readlink)"
 WORKINGDIR="$($READLINK -f $($DIRNAME $0)/..)"
 source "$WORKINGDIR/scripts/common.sh"
-TARGET="$($DIRNAME $0)/../backups/signout-${GIT_TAG}.sql.gz"
-if echo -- "$@" | grep "target.*sql.*" > /dev/null; then
-  TARGET=$(echo -- "$@" | perl -p -e 's/ /\n/g' | grep -- target | perl -p -e 's/.*target=(.*)$/\1/g')
-  debuglog "target file specified as '$TARGET'"
+trap - EXIT
+source $WORKINGDIR/scripts/docopts.sh --auto "$@"
+version="0.0.1"
+helptext="$(docopt_get_help_string $0)"
+usage=$(docopt_get_help_string "$0")
+eval "$(docopts -A ARGS -V "$VERSION" -h "$usage" : "$@")"
+
+
+debuglog() {
+  [ ${DEBUG_SCRIPT:-0} -gt 0 ] && echo "$@" > /dev/stderr
+}
+
+if [[ "${ARGS[-v]}" == true ]]; then
+  DEBUG_SCRIPT=${DEBUG_SCRIPT:-1}
+  debuglog "Setting DEBUG_SCRIPT=1 since verbose option passed"
+fi
+
+usage() {
+  echo "$helptext"
+}
+
+if [ -a ${ARGS[--target]} ]; then
+  TARGET="$($DIRNAME $0)/../backups/signout-${GIT_TAG}.sql.gz"
 else
-  TARGET="$WORKINGDIR/backups/signout-$GIT_TAG.sql.gz"
-  debuglog "using default target file '$TARGET'"
+  TARGET=${ARGS[--target]}
 fi
-if echo -- "$@"  | grep -- "-\{1,2\}h" > /dev/null; then
-  debuglog "help requested"
-  usage
-  trap - EXIT
-  exit 1
-fi
-debuglog "TARGET=$TARGET"
+debuglog "Target file specified as '$TARGET'"
 mkdir -p "$WORKINGDIR/backups" > /dev/null 2>&1
 if [ -e "$TARGET" ]; then
-  echo "BACKUP FILE $TARGET already exists. Use a different targetfile or bump the git tag if using the default backupfile"
-  echo
+  echo "BACKUP FILE $TARGET already exists."
+  echo "Use a different targetfile or bump the git tag if using the default backupfile"
   usage
-  echo
   trap - EXIT
   exit 255
 else

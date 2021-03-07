@@ -20,6 +20,12 @@ set +x
 if [ ${DEBUG_SCRIPT:-0} -gt 1 ]; then
   set -x
 fi
+if echo -- "$@" | grep -- '-v'>/dev/null; then
+  if [ ${DEBUG_SCRIPT:-0} -lt 2 ]; then
+    DEBUG_SCRIPT=1
+  fi
+fi
+  
 
 WHICH="$(which gwhich || which which)"
 DIRNAME="$($WHICH gdirname || $WHICH dirname)"
@@ -30,8 +36,10 @@ trap - EXIT
 source "$WORKINGDIR/scripts/docopts.sh" --auto "$@"
 version=0.0.1
 helptext=$(docopt_get_help_string $0)
-if [[ ${ARGS[-v]} == true ]]; then
-  DEBUG_SCRIPT=1
+usage=$(docopt_get_help_string "$0")
+eval "$(docopts -A ARGS -V "$VERSION" -h "$usage" : "$@")"
+if [[ "${ARGS[-v]}" == true ]]; then
+  DEBUG_SCRIPT=${DEBUG_SCRIPT:-1}
 fi
 
 cleanup() {
@@ -45,12 +53,6 @@ cleanup() {
   fi
 }
 trap cleanup EXIT
-
-debuglog() {
-  if [ ${DEBUG_SCRIPT:-0} -gt 1 ]; then
-    $ECHO "$@" > /dev/stderr
-  fi
-}
 
 [ ${DEBUG_SCRIPT:-0} -gt 0 ] && debuglog "WHICH=$WHICH" \
  && debuglog "DIRNAME=$DIRNAME" \
