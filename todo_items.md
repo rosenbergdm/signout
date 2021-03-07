@@ -1,6 +1,6 @@
 # Items for signout program
 
-* **COMPLETE** Admin interface for changing service lists: ()
+* **COMPLETE** Admin interface for changing service lists: (3a21e20102042741c27116403a3e0be60fa6f3b5)
 * **COMPLETE** Millisecond timing for system clock sync (75fb038334290b13b34d6a2963d07e5d76e6195e)
 
 # TODO for v0.3 release
@@ -24,8 +24,8 @@
   * Requires running `scripts/updatedb.sh scripts/fix_service_active.sql`
 * **COMPLETE** Warn that best if using chrome (d469673051ccb55e4e8664096cc0fe00808b61c7)
 * **COMPLETE** Have javascript re-sync time every 15 seconds (to work around bug in IE) (75fb038334290b13b34d6a2963d07e5d76e6195e)
-* **COMPLETE** Multi-signout for weekdays as well ()
-* **PARTIAL** Timed auto-refresh of submission and nightfloat callback pages ()
+* **COMPLETE** Multi-signout for weekdays as well (3a21e20102042741c27116403a3e0be60fa6f3b5)
+* **PARTIAL** Timed auto-refresh of submission and nightfloat callback pages (3a21e20102042741c27116403a3e0be60fa6f3b5)
   * **COMPLETE** Nightfloat page will auto-refresh every 60 seconds to ensure that newly added
   * Not needed - refreshing submission page
 
