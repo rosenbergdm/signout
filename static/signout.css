@@ -15,6 +15,10 @@
   padding: 20px;
 }
 
+#addform {
+  padding: 5% 30% 5% 30%;
+}
+
 table.sortable tbody tr:nth-child(2n) td {
   background: white;
 }

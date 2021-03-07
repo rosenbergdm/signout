@@ -6,10 +6,13 @@
 {% endblock %}
 {% block title %}MSKCC Signout Admin{% endblock %}
 {% block body %}
-<h1>Add new Signout List</h1>
 <center>
+  <h1>Add new Signout List</h1>
+  <button onClick="location.href='/submission'">Return to submission form</button>
+  <br>
+  <br>
   <div class="flex-container">
-    <div class="submissionform">
+    <div class="submissionform" name="addform" id="addform" align="center">
       <form id="queryselect" action="" method="POST">
         <fieldset>
           <input name="name" id="name" type="text" placeholder="Service Name" required>

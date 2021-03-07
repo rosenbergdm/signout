@@ -692,17 +692,15 @@ def submission_weekday():
 
 
 @app.route("/submission_weekday", methods=["GET", "POST"])
+@auth.login_required
 def debug_submission_weekday():
-    if app.config["DEBUG_PAGES"]:
-        return submission_weekday()
-    return "NOT IN DEBUG MODE"
+    return submission_weekday()
 
 
 @app.route("/submission_weekend", methods=["GET", "POST"])
+@auth.login_required
 def debug_submission_weekend():
-    if app.config["DEBUG_PAGES"]:
-        return submission_weekend()
-    return "NOT IN DEBUG MODE"
+    return submission_weekend()
 
 
 @app.route("/submission", methods=["GET", "POST"])
