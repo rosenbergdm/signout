@@ -15,12 +15,14 @@
 #
 
 set -o pipefail
-
-unset PROMPT_COMMAND
-PS1=" >"
-
+set +x
 if [ ${DEBUG_SCRIPT:-0} -gt 1 ]; then
   set -x
+fi
+if echo -- "$@" | grep -- '-v'>/dev/null; then
+  if [ ${DEBUG_SCRIPT:-0} -lt 2 ]; then
+    DEBUG_SCRIPT=1
+  fi
 fi
 
 
