@@ -3,15 +3,16 @@
 # backupdb.sh
 # Copyright (C) 2020 Thomas Butterworth <dmr@davidrosenberg.me>
 #
-# Usage: backupdb.sh [-vhq] [--target=<TARGETFILE>]
+# Usage: backupdb.sh [-vhq] [--target=<TARGETFILE>] [--dbname=<DBNAME>]
 #
-# restore the database backup BACKUPFILE to database DBNAME
+# backup the database DBNAME to file TARGETFILE
 #
 # Options:
 #   -h --help
 #   -v       verbose mode
 #   -q       quiet mode
 #   --target=<TARGETFILE>
+#   --dbname=<DBNAME>
 #
 
 set -o pipefail
@@ -53,21 +54,28 @@ usage() {
   echo "$helptext"
 }
 
-if [ -a ${ARGS[--target]} ]; then
-  TARGET="$($DIRNAME $0)/../backups/signout-${GIT_TAG}.sql.gz"
+if [ -z ${ARGS[--dbname]} ]; then
+  DB=$DBNAME
+else
+  DB=${ARGS[--dbname]}
+fi
+debuglog "DB=$DB"
+
+if [ -z ${ARGS[--target]} ]; then
+  TARGET="$($DIRNAME $0)/../backups/$DB-${GIT_TAG}.sql.gz"
 else
   TARGET=${ARGS[--target]}
 fi
+
 debuglog "Target file specified as '$TARGET'"
 mkdir -p "$WORKINGDIR/backups" > /dev/null 2>&1
 if [ -e "$TARGET" ]; then
   echo "BACKUP FILE $TARGET already exists."
   echo "Use a different targetfile or bump the git tag if using the default backupfile"
-  usage
   trap - EXIT
   exit 255
 else
-  PGPASSWORD=$PASSWD $PG_DUMP -U $USER $DBNAME | gzip - - > ${TARGET}
+  PGPASSWORD=$PASSWD $PG_DUMP -U $USER $DB | gzip - - > ${TARGET}
   if [ $? -gt 0 ]; then
     echo "BACKUP FAILED"
     rm -i "$TARGET"
