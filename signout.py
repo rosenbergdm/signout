@@ -127,8 +127,6 @@ def load_db_settings():
     ]:
         if var in dbsettings:
             app.config[var] = dbsettings[var]
-        else:
-            print(f"Config missing setting '{var}'")
         if os.environ.get(var):
             e_val = os.environ.get(var)
             dbg(f"Setting '{var}' to '{e_val}' based on environment variable")

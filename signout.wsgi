@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Make sure you add WSGIPassAuthorization to the apache conf
 import sys
 import logging
