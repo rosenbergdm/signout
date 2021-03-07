@@ -1,3 +1,9 @@
+/* signout.css
+ *
+ * Copyright 2020-2021 Thomas Butterworth <dmr@davidrosenberg.me>
+ *
+ * Distributed under terms of the MIT license. */
+
 .flex-container {
   display: flex;
   background-color: DodgerBlue;
@@ -9,11 +15,9 @@
   padding: 20px;
 }
 
-/*
-.odd {
-  background: #dddddd;
+#addform {
+  padding: 5% 30% 5% 30%;
 }
-*/
 
 table.sortable tbody tr:nth-child(2n) td {
   background: white;
@@ -22,3 +26,15 @@ table.sortable tbody tr:nth-child(2n) td {
 table.sortable tbody tr:nth-child(2n + 1) td {
   background: #dddddd;
 }
+
+#wrapclock {
+  display: inline-block;
+  width: 50%;
+  margin: 2% 2% auto 30%;
+}
+
+#runningclock {
+  text-align: left;
+}
+
+/* vim:ft=css  : */
