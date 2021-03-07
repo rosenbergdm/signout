@@ -25,87 +25,87 @@ import psycopg2
 import re
 
 # {{{ Defaults, dbsettings.json overrides this
-DBNAME = ""
-DBUSER = ""
-DBPASSWORD = ""
+# DBNAME = ""
+# DBUSER = ""
+# DBPASSWORD = ""
 
-ACCOUNT_SID = ""
-AUTH_TOKEN = ""
-FROM = ""
+# ACCOUNT_SID = ""
+# AUTH_TOKEN = ""
+# FROM = ""
 
-DEBUG_CALLBACKS = 0
-DEBUG_TARGET_NUMBER = "+13125551212"
-DEBUG_PRINT_NOT_MESSAGE = 0
-DEBUG_SIGNOUT_OUTPUT = 0
+# DEBUG_CALLBACKS = 0
+# DEBUG_TARGET_NUMBER = "+13125551212"
+# DEBUG_PRINT_NOT_MESSAGE = 0
+# DEBUG_SIGNOUT_OUTPUT = 0
 
 # }}}
 
 
-def load_settings():
-    """
-    Loads the database and twilio settings from the 'dbsettings.json' file in
-    the project root directory
+# def load_settings():
+#     """
+#     Loads the database and twilio settings from the 'dbsettings.json' file in
+#     the project root directory
 
-    """
-    global DBNAME
-    global DBUSER
-    global DBPASSWORD
-    global ACCOUNT_SID
-    global AUTH_TOKEN
-    global FROM
-    global DEBUG_CALLBACKS
-    global DEBUG_PRINT_NOT_MESSAGE
-    global DEBUG_SIGNOUT_OUTPUT
-    global DEBUG_TARGET_NUMBER
-    if not "scriptdir" in globals():
-        scriptdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    else:
-        scriptdir = globals()["scriptdir"]
-    fp = open(os.path.join(scriptdir, "dbsettings.json"))
-    dbsettings = json.load(fp)
-    fp.close()
-    DBNAME = dbsettings["dbname"]
-    DBUSER = dbsettings["username"]
-    DBPASSWORD = dbsettings["password"]
-    ACCOUNT_SID = dbsettings["twilio-sid"]
-    AUTH_TOKEN = dbsettings["twilio-auth-token"]
-    FROM = dbsettings["twilio-number"]
-    if "DEBUG_CALLBACKS" in dbsettings.keys():
-        if dbsettings["DEBUG_CALLBACKS"] in [0, 1]:
-            DEBUG_CALLBACKS = dbsettings["DEBUG_CALLBACKS"]
-    if "DEBUG_TARGET_NUMBER" in dbsettings.keys():
-        if dbsettings["DEBUG_TARGET_NUMBER"].__len__() == 12:
-            DEBUG_TARGET_NUMBER = dbsettings["DEBUG_TARGET_NUMBER"]
-    if "DEBUG_SIGNOUT_OUTPUT" in dbsettings.keys():
-        if dbsettings["DEBUG_SIGNOUT_OUTPUT"] in [0, 1]:
-            DEBUG_SIGNOUT_OUTPUT = dbsettings["DEBUG_SIGNOUT_OUTPUT"]
-    if "DEBUG_PRINT_NOT_MESSAGE" in dbsettings.keys():
-        if dbsettings["DEBUG_PRINT_NOT_MESSAGE"] in [0, 1]:
-            DEBUG_PRINT_NOT_MESSAGE = dbsettings["DEBUG_PRINT_NOT_MESSAGE"]
-    for var in [
-        "DBNAME",
-        "DBUSER",
-        "DBPASSWORD",
-        "ACCOUNT_SID",
-        "AUTH_TOKEN",
-        "FROM",
-        "DEBUG_CALLBACKS",
-        "DEBUG_PRINT_NOT_MESSAGE",
-        "DEBUG_SIGNOUT_OUTPUT",
-        "DEBUG_TARGET_NUMBER",
-    ]:
-        globals()[var] = eval(var)
+#     """
+#     global DBNAME
+#     global DBUSER
+#     global DBPASSWORD
+#     global ACCOUNT_SID
+#     global AUTH_TOKEN
+#     global FROM
+#     global DEBUG_CALLBACKS
+#     global DEBUG_PRINT_NOT_MESSAGE
+#     global DEBUG_SIGNOUT_OUTPUT
+#     global DEBUG_TARGET_NUMBER
+#     if not "scriptdir" in globals():
+#         scriptdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+#     else:
+#         scriptdir = globals()["scriptdir"]
+#     fp = open(os.path.join(scriptdir, "dbsettings.json"))
+#     dbsettings = json.load(fp)
+#     fp.close()
+#     DBNAME = dbsettings["dbname"]
+#     DBUSER = dbsettings["username"]
+#     DBPASSWORD = dbsettings["password"]
+#     ACCOUNT_SID = dbsettings["twilio-sid"]
+#     AUTH_TOKEN = dbsettings["twilio-auth-token"]
+#     FROM = dbsettings["twilio-number"]
+#     if "DEBUG_CALLBACKS" in dbsettings.keys():
+#         if dbsettings["DEBUG_CALLBACKS"] in [0, 1]:
+#             DEBUG_CALLBACKS = dbsettings["DEBUG_CALLBACKS"]
+#     if "DEBUG_TARGET_NUMBER" in dbsettings.keys():
+#         if dbsettings["DEBUG_TARGET_NUMBER"].__len__() == 12:
+#             DEBUG_TARGET_NUMBER = dbsettings["DEBUG_TARGET_NUMBER"]
+#     if "DEBUG_SIGNOUT_OUTPUT" in dbsettings.keys():
+#         if dbsettings["DEBUG_SIGNOUT_OUTPUT"] in [0, 1]:
+#             DEBUG_SIGNOUT_OUTPUT = dbsettings["DEBUG_SIGNOUT_OUTPUT"]
+#     if "DEBUG_PRINT_NOT_MESSAGE" in dbsettings.keys():
+#         if dbsettings["DEBUG_PRINT_NOT_MESSAGE"] in [0, 1]:
+#             DEBUG_PRINT_NOT_MESSAGE = dbsettings["DEBUG_PRINT_NOT_MESSAGE"]
+#     for var in [
+#         "DBNAME",
+#         "DBUSER",
+#         "DBPASSWORD",
+#         "ACCOUNT_SID",
+#         "AUTH_TOKEN",
+#         "FROM",
+#         "DEBUG_CALLBACKS",
+#         "DEBUG_PRINT_NOT_MESSAGE",
+#         "DEBUG_SIGNOUT_OUTPUT",
+#         "DEBUG_TARGET_NUMBER",
+#     ]:
+#         globals()[var] = eval(var)
 
 
-def get_notify_db():
-    """
-    Gets a new connection to the database
+# def get_notify_db():
+#     """
+#     Gets a new connection to the database
 
-    :returns: Database connection
-    :rtype: psycopg2.extensions.connection
-    """
-    conn = psycopg2.connect(database=DBNAME, user=DBUSER, password=DBPASSWORD)
-    return conn
+#     :returns: Database connection
+#     :rtype: psycopg2.extensions.connection
+#     """
+#     conn = psycopg2.connect(database=DBNAME, user=DBUSER, password=DBPASSWORD)
+#     return conn
 
 
 def get_callback_number(nflist):
@@ -117,7 +117,7 @@ def get_callback_number(nflist):
     :rtype: str
     """
 
-    conn = get_notify_db()
+    conn = get_db()
     cur = conn.cursor()
     dayofyear = datetime.datetime.today().timetuple().tm_yday
     cur.execute(
@@ -151,7 +151,7 @@ def get_missing_signouts(nflist):
     :rtype: [str]
 
     """
-    conn = get_notify_db()
+    conn = get_db()
     cur = conn.cursor()
     cur.execute(
         """
@@ -250,7 +250,7 @@ def notify_late_signup(signout_id, notify=True):
     :returns: none
 
     """
-    conn = get_notify_db()
+    conn = get_db()
     cur = conn.cursor()
     cur.execute(
         """SELECT intern_name, service.name, intern_callback, type 

@@ -1,6 +1,6 @@
 # Items for signout program
 
-* ?Admin interface for changing service lists: Deferred
+* **COMPLETE** Admin interface for changing service lists: ()
 * **COMPLETE** Millisecond timing for system clock sync (75fb038334290b13b34d6a2963d07e5d76e6195e)
 
 # TODO for v0.3 release

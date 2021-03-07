@@ -23,6 +23,8 @@ from flask import (
     redirect,
     request,
 )
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import check_password_hash
 
 from notifier.notifier import *
 
@@ -39,22 +41,38 @@ from notifier.notifier import *
 #   import re
 
 app = Flask(__name__)
-app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
+auth = HTTPBasicAuth()
 
-dbname = ""
-dbuser = ""
-dbpassword = ""
-scriptdir = ""
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
+if "__file__" in dir():
+    app.config["SCRIPTDIR"] = os.path.dirname(os.path.realpath(__file__))
+else:
+    if "SCRIPTDIR" in globals().keys():
+        app.config["SCRIPTDIR"] = globals()["SCRIPTDIR"]
+    if os.path.exists("/usr/local/src/signout/dbsettings.json"):
+        app.config["SCRIPTDIR"] = "/usr/local/src/signout"
+    elif os.path.exists(os.path.join(os.environ["HOME"], "src/signout")):
+        app.config["SCRIPTDIR"] = os.path.join(os.environ["HOME"], "src/signout")
+    else:
+        raise Exception
+
 
 CLEANUP_TIMESTAMP = re.compile(r"\.(..).*$")
 SHIFT_TIMES = re.compile(r"^(\d{1,2})(:59:59\.)(.*)$")
-DEBUG_SIGNOUT_OUTPUT = os.environ.get("DEBUG_SIGNOUT_OUTPUT")
-DEBUG_PAGES = 0
-if os.environ.get("DEBUG_PAGES"):
-    DEBUG_PAGES = os.environ.get("DEBUG_PAGES")
+app.config["USERS"] = dict()
 
-if DEBUG_SIGNOUT_OUTPUT:
-    pdb.set_trace()
+
+@auth.verify_password
+def verify_password(username, password):
+    if username in app.config["USERS"] and check_password_hash(
+        app.config["USERS"].get(username), password
+    ):
+        return username
+
+
+def dbg(msg):
+    if app.config["DEBUG_SIGNOUT_OUTPUT"]:
+        pprint.pprint(msg, stream=sys.stderr)
 
 
 def gen_med_sorter(intern_list):
@@ -94,32 +112,39 @@ def cleanup_date_input(ds):
 
 
 def load_db_settings():
-    global dbname
-    global dbuser
-    global dbpassword
-    global scriptdir
-    if "__file__" in dir():
-        scriptdir = os.path.dirname(os.path.realpath(__file__))
-    else:
-        if "scriptdir" in globals().keys():
-            scriptdir = globals()["scriptdir"]
-        if os.path.exists("/usr/local/src/signout/dbsettings.json"):
-            scriptdir = "/usr/local/src/signout"
-        elif os.path.exists(os.path.join(os.environ["HOME"], "src/signout")):
-            scriptdir = os.path.join(os.environ["HOME"], "src/signout")
-        else:
-            raise Exception
-    globals()["scriptdir"] = scriptdir
-    fp = open(os.path.join(scriptdir, "dbsettings.json"))
+    fp = open(os.path.join(app.config["SCRIPTDIR"], "dbsettings.json"))
     dbsettings = json.load(fp)
     fp.close()
-    dbname = dbsettings["dbname"]
-    dbuser = dbsettings["username"]
-    dbpassword = dbsettings["password"]
+    for var in [
+        "DBNAME",
+        "DBUSER",
+        "DBPASSWORD",
+        "twilio-sid",
+        "twilio-auth-token",
+        "twilio-number",
+        "DEBUG_CALLBACKS",
+        "DEBUG_TARGET_NUMBER",
+        "DEBUG_PRINT_NOT_MESSAGE",
+        "DEBUG_SIGNOUT_OUTPUT",
+        "DEBUG_PAGES",
+    ]:
+        if var in dbsettings:
+            app.config[var] = dbsettings[var]
+        else:
+            print(f"Config missing setting '{var}'")
+        if os.environ.get(var):
+            e_val = os.environ.get(var)
+            dbg(f"Setting '{var}' to '{e_val}' based on environment variable")
+            app.config[var] = e_val
+    app.config["USERS"].update(dbsettings["USERS"])
 
 
 def get_db():
-    conn = psycopg2.connect(database=dbname, user=dbuser, password=dbpassword)
+    conn = psycopg2.connect(
+        database=app.config["DBNAME"],
+        user=app.config["DBUSER"],
+        password=app.config["DBPASSWORD"],
+    )
     return conn
 
 
@@ -314,8 +339,7 @@ def query():
                 ORDER BY completetime ASC"""
                 % (splitdate[2], splitdate[1], splitdate[0], typestring)
             )
-            if DEBUG_SIGNOUT_OUTPUT:
-                print(cur.query, file=sys.stderr)
+            dbg(cur.query)
         else:
             rangestring = "Showing signouts from %s to %s inclusive" % (
                 request.form["addtime_date"],
@@ -336,8 +360,7 @@ def query():
                 + """'
                 ORDER BY completetime ASC"""
             )
-            if DEBUG_SIGNOUT_OUTPUT:
-                print(cur.query, file=sys.stderr)
+            dbg(cur.query)
         signoutlog = [
             {
                 "intern_name": x[0],
@@ -449,9 +472,8 @@ def submission_weekend():
         cur = conn.cursor()
         if request.form.getlist("service") is None:
             return render_template("received.html")
-        if DEBUG_SIGNOUT_OUTPUT == 1:
-            pprint.pprint(request.form)
-            pprint.pprint(request.form.getlist("service"))
+        dbg(request.form)
+        dbg(request.form.getlist("service"))
         for serviceid in request.form.getlist("service"):
             cur.execute(
                 "INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp) \
@@ -616,9 +638,8 @@ def submission_weekday():
         if request.form.getlist("service") is None:
             # This should never happen
             return render_template("received.html")
-        if DEBUG_SIGNOUT_OUTPUT == 1:
-            pprint.pprint(request.form)
-            pprint.pprint(request.form.getlist("service"))
+        dbg(request.form)
+        dbg(request.form.getlist("service"))
         for serviceid in request.form.getlist("service"):
             cur.execute(
                 """
@@ -675,14 +696,14 @@ def submission_weekday():
 
 @app.route("/submission_weekday", methods=["GET", "POST"])
 def debug_submission_weekday():
-    if DEBUG_PAGES:
+    if app.config["DEBUG_PAGES"]:
         return submission_weekday()
     return "NOT IN DEBUG MODE"
 
 
 @app.route("/submission_weekend", methods=["GET", "POST"])
 def debug_submission_weekend():
-    if DEBUG_PAGES:
+    if app.config["DEBUG_PAGES"]:
         return submission_weekend()
     return "NOT IN DEBUG MODE"
 
@@ -694,8 +715,112 @@ def submission():
     return submission_weekday()
 
 
+@app.route("/servicelist")
+@auth.login_required
+def servicelist():
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        (SELECT id,
+                name,
+                type,
+                active,
+                (SELECT type AS othertype
+                 FROM   service
+                 WHERE  type != 'NF9132'
+                 LIMIT  1) AS othertype
+         FROM   service
+         WHERE  type = 'NF9132'
+         UNION
+         SELECT id,
+                name,
+                type,
+                active,
+                (SELECT type AS othertype
+                 FROM   service
+                 WHERE  type != 'NF9133'
+                 LIMIT  1) AS othertype
+         FROM   service
+         WHERE  type = 'NF9133')
+        ORDER  BY id ASC;"""
+    )
+    results = cur.fetchall()
+    slist = [
+        {"id": x[0], "name": x[1], "type": x[2], "active": x[3], "othertype": x[4]}
+        for x in results
+    ]
+    dbg(slist)
+    return render_template("servicelist.html", servicelist=slist)
+
+
+@app.route("/service")
+@auth.login_required
+def service():
+    if request.args.get("id") is None or request.args.get("action") is None:
+        dbg("MISSING ARGS")
+        return redirect(url_for("servicelist"))
+    else:
+        service_id = int(request.args.get("id"))
+        action = request.args.get("action")
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT id, name FROM service WHERE id=%s ORDER BY id ASC", (service_id,)
+    )
+    slist = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
+    service = slist[0]
+    if app.config["DEBUG_SIGNOUT_OUTPUT"]:
+        dbg(slist)
+    msg = f"Setting '{service['name']}' (id #{service['id']}) to"
+    if action == "activate":
+        cur.execute(
+            "UPDATE service set active = true where id = %s", (str(service_id),)
+        )
+        conn.commit()
+        msg += f" ACTIVE"
+    elif action == "deactivate":
+        cur.execute(
+            "UPDATE service set active = false where id = %s", (str(service_id),)
+        )
+        conn.commit()
+        msg += f" INACTIVE"
+    elif action == "set_type":
+        newtype = request.args.get("newtype")
+        cur.execute(
+            "UPDATE service set type = %s where id = %s", (newtype, str(service_id))
+        )
+        conn.commit()
+        msg += f" Night float list '{newtype}'"
+    dbg({"msg": msg, "service": service, "slist": slist})
+    cur.close()
+    conn.close()
+    return render_template("service.html", msg=msg, service=service)
+
+
+@app.route("/admin")
+@auth.login_required
+def admin():
+    return render_template("admin.html")
+
+
+@app.route("/addservice", methods=["GET", "POST"])
+@auth.login_required
+def addservice():
+    if request.method == "GET":
+        return render_template("addservice.html")
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO SERVICE (name, type) VALUES (%s, %s) RETURNING id",
+        (request.form["name"], request.form["nflist"]),
+    )
+    result = cur.fetchone()[0]
+    conn.commit()
+    conn.close()
+    return redirect(url_for("servicelist"))
+
+
 if __name__ == "__main__":
     load_db_settings()
-    load_settings()
-    get_db()
     app.run(host="0.0.0.0")
