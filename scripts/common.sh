@@ -17,6 +17,12 @@ if echo -- "$@" | grep -- ' -v'>/dev/null; then
     DEBUG_SCRIPT=1
   fi
 fi
+
+if echo -- "$@" | grep -- ' -vv'>/dev/null; then
+  if [ ${DEBUG_SCRIPT:-0} -lt 2 ]; then
+    set -v
+  fi
+fi
 #}}}
 
 #{{{ Basic logging and commands 
@@ -26,7 +32,7 @@ PRINTF="$($WHICH gprintf || $WHICH printf)"
 
 debuglog() {
   if [ ${DEBUG_SCRIPT:-0} -gt 0 ]; then
-    ($ECHO "$@" > /dev/stderr) || $ECHO "$ECHO "$@" > /dev/stderr"
+    ($ECHO "$@" > /dev/stderr) || $ECHO "$ECHO $* > /dev/stderr"
   fi
 }
 
@@ -39,7 +45,6 @@ debuglog() {
 #{{{ Load remainder of commands
 DIRNAME="$($WHICH gdirname || $WHICH dirname)" && debuglog "DIRNAME=$DIRNAME"
 BASENAME="$($WHICH gbasename || $WHICH basename)" && debuglog "BASENAME=$BASENAME"
-
 READLINK="$($WHICH greadlink || $WHICH readlink)" && debuglog "READLINK=$READLINK"
 DATE="$($WHICH gdate || $WHICH date)" && debuglog "DATE=$GDATE"
 MKTEMP="$($WHICH gmktemp || $WHICH mktemp)" && debuglog "MKTEMP=$MKTEMP"
@@ -50,13 +55,16 @@ SED="$($WHICH gsed || $WHICH sed)" && debuglog "SED=$SED"
 AWK="$($WHICH gawk || $WHICH awk)" && debuglog "AWK=$AWK"
 GZIP="$($WHICH gzip )" && debuglog "GZIP=$GZIP"
 GUNZIP="$($WHICH gunzip)" && debuglog "GZIP=$GZIP"
-JQ=$($WHICH jq)
+JQ=$($WHICH jq) && debuglog "JQ=$JQ"
 #SED="$($WHICH gsed || $WHICH sed)" && debuglog "SED=$SED"
 
 #}}}
 
 #{{{ Project settings
 WORKINGDIR="$($READLINK -f $($DIRNAME ${BASH_SOURCE[0]})/..)" && debuglog "WORKINGDIR=$WORKINGDIR"
+LOGFILE="$($MKTEMP)" && debuglog "LOGFILE=$LOGFILE"
+TMPFILE="$($MKTEMP)" && debuglog "TMPFILE=$TMPFILE"
+GIT_TAG="$($GIT describe --tags | tail -n1)" && debuglog "GIT_TAG=$GIT_TAG"
 
 if [ -z "$JQ" ]; then
   debuglog "not using jq"
@@ -69,9 +77,6 @@ else
   USER="$(cat $WORKINGDIR/dbsettings.json | jq -r '.DBUSER')" && debuglog "USER=$USER"
   DBNAME="$(cat $WORKINGDIR/dbsettings.json | jq -r '.DBNAME')" && debuglog "DBNAME=$DBNAME"
 fi
-LOGFILE="$($MKTEMP)" && debuglog "LOGFILE=$LOGFILE"
-TMPFILE="$($MKTEMP)" && debuglog "TMPFILE=$TMPFILE"
-GIT_TAG="$($GIT describe --tags | tail -n1)" && debuglog "GIT_TAG=$GIT_TAG"
 
 #}}}
 
