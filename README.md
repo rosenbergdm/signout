@@ -42,4 +42,4 @@
 - install required python3 packages `pip3 install twilio flask-HTTPAuth`
 - reload apache
 - Make sure everything works
-
+- ENSURE apache's mod\_wsgi uses python3: `ldd "/usr/lib/apache2/modules/*wsgi*"` .  It should reference python3
