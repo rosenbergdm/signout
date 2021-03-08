@@ -45,5 +45,5 @@
 * Add note to the 'add page' demonstrating the normal formatting of the list names
 * ? Add ability for NF to 'add lists' to the person currently signing out
 * ? Web interface for changing configuration values
-* Fix for the insertContact not putting in the right email address on some pages (ex: submission, works fine on query)
+* **COMPLETE** Fix for the insertContact not putting in the right email address on some pages (ex: submission, works fine on query) (aaa4519eaf660d1adfcf2c69a6afaeb34deac75c)
 
