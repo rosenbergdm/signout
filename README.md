@@ -1,8 +1,6 @@
 #Apache Config:
 
-
-`
-~~~~~~~~~~~~~~~~~~~~~~~
+.apacheconf~~~~~~~~~~~~~~~~~~~~~~
 <VirtualHost *:80>
 	ServerName signout.davidrosenberg.me
 	ServerAlias signout.localdomain
@@ -29,7 +27,7 @@
 	</Location>
 </VirtualHost>
 ~~~~~~~~~~~~~~~~~~~~~~~
-`
+
 
 # Upgrade from v0.3 -> v0.4
 - update dbsettings.json (some stuff changed case, lots new).  Look at dbsettings.json.test to see
@@ -39,6 +37,7 @@
 - backup the db again
 - install jq
 - install docopt (https://github.com/docopt/docopts)
+
 - install required python3 packages `pip3 install twilio flask-HTTPAuth`
 - reload apache
 - Make sure everything works
