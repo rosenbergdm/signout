@@ -1,7 +1,7 @@
 {
   "DBNAME": "signout",
-  "USERNAME": "signout",
-  "PASSWORD": "YOUR-PASSWORD-HERE",
+  "DBUSER": "signout",
+  "DBPASSWORD": "YOUR-PASSWORD-HERE",
   "twilio-sid": "",
   "twilio-auth-token": "",
   "twilio-number": "+19388882701",
