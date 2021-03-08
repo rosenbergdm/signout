@@ -18,13 +18,13 @@ var timesyncXhr = new XMLHttpRequest();
 //}}}
 
 //{{{ Helper functions
-insertContact = function() {
+var insertContact = function () {
   var contact = document.getElementById("contact");
   contact.href = "mailto:" + "support" + "@" + "davidrosenberg.me";
   contact.text = "support" + "@" + "davidrosenberg.me";
-}
+};
 
-checkIe = function() {
+var checkIe = function () {
   var ua = window.navigator["userAgent"];
   var is_msie = 0;
 
@@ -36,34 +36,34 @@ checkIe = function() {
     is_msie = 1;
   }
 
-  if (is_msie > 0 ) {
+  if (is_msie > 0) {
     alert("IS MSIE");
   }
   return ua;
-}
+};
 
 // 0 pad on the left to left
-padLeft = function(i) {
+var padLeft = function (i) {
   return ("0" + i).slice(-2);
-}
+};
 
 // 0 pad right
-padright = function(i) {
+var padright = function (i) {
   return (i + "000").substring(0, 3);
-}
+};
 
-function runTimesyncOnLoad() {
+var runTimesyncOnLoad = function () {
   displayTime();
   updateTimeSync();
   // Re-sync time and calc offset every 15 seconds
   setInterval(updateTimeSync, 15000);
-}
+};
 
 //}}}
 
 //{{{ Manage NF signout progression
 /* Limit action to the signout initiated by NF and make it visible */
-startsignout = function(internid) {
+var startsignout = function (internid) {
   var startSignout = new XMLHttpRequest();
   startSignout.addEventListener("load", function () {
     var response_message = JSON.parse(this.responseText);
@@ -82,13 +82,13 @@ startsignout = function(internid) {
   for (i = 0; i <= sbuttons.length - 1; i++) {
     sbuttons[i].disabled = true;
   }
-}
+};
 //}}}
 
 //{{{ Time syncing
 
 // Given a server-issued timestamp, update the timesync (offset) variable
-updateTimeOffset = function(timestring) {
+var updateTimeOffset = function (timestring) {
   var splittimestring = timestring.split(":");
   var splitms = splittimestring[2].split(".");
   var localtime = new Date(Date.now());
@@ -103,10 +103,10 @@ updateTimeOffset = function(timestring) {
   if (DEBUG_SIGNOUT_JS == 1) {
     console.log("time offset is " + timeoffset + " ms");
   }
-}
+};
 
 // Request the time from server, and update the timesync var with resposne
-updateTimeSync = function() {
+var updateTimeSync = function () {
   timesyncXhr = new XMLHttpRequest();
   timesyncXhr.addEventListener("load", function () {
     if (DEBUG_SIGNOUT_JS == 1) {
@@ -119,10 +119,10 @@ updateTimeSync = function() {
     "/synctime?cachefix=" + String(Math.random()).substr(2, 10)
   );
   timesyncXhr.send();
-}
+};
 
 // update the running clocks (top and each section) every 19 ms
-displayTime = function() {
+var displayTime = function () {
   var today = new Date(Date.now() + timeoffset);
   var h = today.getHours();
   var m = today.getMinutes();
@@ -147,13 +147,13 @@ displayTime = function() {
   for (i = 0; i < clocks.length; i++) {
     clocks[i].innerHTML = "Time: " + h + ":" + m + ":" + s + "." + ms;
   }
-}
+};
 //}}}
 
 //{{{ Execute submission
 
 // function submitSignout(on_call = false) {
-submitSignout = function(on_call) {
+var submitSignout = function (on_call) {
   var cutoff_time;
   var d = new Date(Date.now() + timeoffset);
   var date = new Date(
@@ -206,7 +206,7 @@ submitSignout = function(on_call) {
     );
     return false;
   }
-}
+};
 //}}}
 
 // vim: ft=javascript fenc=utf-8:
