@@ -1,5 +1,7 @@
 -- For v0.3 upgrade
+-- fix_service_active.sql
 -- Set which services are currently active as of 2/26/21
+-- Copyright (c) Thomas M. Butterworth 2020-2021 --
 
 -- Set which services are for which NF groups
 BEGIN TRANSACTION;

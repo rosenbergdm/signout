@@ -1,5 +1,22 @@
-#!/usr/bin/env bash
+#! /usr/bin/env bash
+# Copyright Thomas M. Butterworth
+# Distributed under terms of the MIT license.
+#
+# Usage: pre-commit
+#
+# Clean up code before pushing
+
+set +x
 set -o pipefail
+if [ ${DEBUG_SCRIPT:-0} -gt 1 ]; then
+  set -x
+fi
+if echo -- "$@" | grep -- ' -v'>/dev/null; then
+  echo "-v option passed, setting DEBUG_SCRIPT"
+  if [ ${DEBUG_SCRIPT:-0} -lt 2 ]; then
+    DEBUG_SCRIPT=1
+  fi
+fi
 
 WHICH=$(which gwhich || which which | head -n1)
 GITROOT=$(git rev-parse --show-toplevel)

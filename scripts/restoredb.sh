@@ -2,24 +2,25 @@
 # Copyright Thomas M. Butterworth
 # Distributed under terms of the MIT license.
 #
-# Usage: restoredb.sh [-vhq] BACKUPFILE [DBNAME]
+# Usage: restoredb.sh [-vhq] [--debug] [--dbname=<DBNAME>] BACKUPFILE
 #
 # restore the database backup BACKUPFILE to database DBNAME
 #
 # Arguments:
-#   DBNAME      Optional database name
 #   BACKUPFILE  SQL Backup File
 #
 # Options:
-#   -h --help
-#   -v       verbose mode
-#   -q       quiet mode
+#   -h --help           display usage
+#   -v --verbose        verbose mode
+#   -q --quiet          quiet mode
+#   --debug             debug this script
+#   --dbname=<DBNAME>   Database [default=signout]
 #
 
 set +x
 set -o pipefail
 if [ ${DEBUG_SCRIPT:-0} -gt 1 ]; then
-  set -x
+  echo "TODO"
 fi
 if echo -- "$@" | grep -- ' -v'>/dev/null; then
   echo "-v option passed, setting DEBUG_SCRIPT"
@@ -34,83 +35,85 @@ READLINK="$($WHICH greadlink || $WHICH readlink)"
 WORKINGDIR="$($READLINK -f $($DIRNAME ${BASH_SOURCE[0]})/..)"
 source "$WORKINGDIR/scripts/common.sh"
 trap - EXIT
-source "$WORKINGDIR/scripts/docopts.sh" --auto "$@"
-version=0.0.1
-helptext=$(docopt_get_help_string $0)
-usage=$(docopt_get_help_string "$0")
-eval "$(docopts -A ARGS -V "$VERSION" -h "$usage" : "$@")"
-if [[ "${ARGS[-v]}" == true ]]; then
+source $WORKINGDIR/scripts/docopts.sh --auto "$@"
+[[ ${ARGS[--debug]} == true ]] && docopt_print_ARGS
+if [[ "${ARGS[--verbose]}" == true ]]; then
   DEBUG_SCRIPT=${DEBUG_SCRIPT:-1}
 fi
 
-cleanup() {
-  errorcode=$1
-  errormessage="$2"
-  if [[ -z $errormessage ]]; then
-    $PRINTF "An unknown error occured.  Aborting.\n"
-    $PRINTF "$helptext\n"
-    trap - EXIT
-    exit $errorcode
-  fi
+if [ -z "${ARGS[--dbname]}" ]; then
+  targetdb=$DBNAME
+else
+  targetdb=${ARGS[--dbname]}
+fi
+
+
+failure() {
+  local lineno=$1
+  local msg=$2
+  echo "****Failed at ${BASH_SOURCE[0]}:$lineno: $msg******"
+  echo "ABORTING"
+  rm -f "$TMPFILE" "$LOGFILE"
+  exit 9
 }
-trap cleanup EXIT
+trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 
 [ ${DEBUG_SCRIPT:-0} -gt 0 ] && debuglog "WHICH=$WHICH" \
  && debuglog "DIRNAME=$DIRNAME" \
  && debuglog "READLINK=$READLINK" \
  && debuglog "WORKINGDIR=$WORKINGDIR"
 
-RESTORECMD="cat ${ARGS[BACKUPFILE]} | gunzip |"
 
-serial=$(date +%s)
-newbackup=$($READLINK -f ${ARGS[BACKUPFILE]} | perl -p -e "s/(sql.*)$/$serial.\\1/")
-if [ -e "$newbackup" ]; then 
-  echo "Backup file '$newbackup' already exists!  Aborting"
+serial=$($DATE +%N | sed -e 's/\(.\{6\}\).*$/\1/')
+_newbackup=$($READLINK -f ${ARGS[BACKUPFILE]} | perl -p -e "s/(\.sql(.gz)?$)$/.$serial\\1/")
+newbackup="$WORKINGDIR/backups/$($BASENAME $_newbackup  | sed -e "s/signout2\{0,1\}-/$targetdb-/g")"
+
+if [ -f "$newbackup" ]; then 
+  $PRINTF "Backup file '$newbackup' already exists!  Aborting\n"
   rm -f "$TMPFILE" "$LOGFILE"
   trap - EXIT
   exit 3
 fi
 
-$WORKINGDIR/scripts/backupdb.sh --target="$newbackup"
+$WORKINGDIR/scripts/backupdb.sh --target="$newbackup" --dbname="$targetdb"
 if [ $? -gt 0 ]; then
-  echo "Error storing the existing database.  Aborting" 
+  $ECHO "Error storing the existing database.  Aborting" 
   rm -f "$TMPFILE" "$LOGFILE"
   trap - EXIT
   exit 2
 fi
-debuglog "Backed up to '$newbackup'"
+debuglog "Backed '$targetdb' up to '$newbackup'"
 
-if [ -z "${ARGS[DBNAME]}" ]; then
-  targetdb=$DBNAME
-else
-  targetdb=${ARGS[DBNAME]}
-fi
 
-$PRINTF "Dropping tables from $targetdb as $USER\n"
-read -p "Press enter to continue" x
-echo " DROP TABLE IF EXISTS assignments CASCADE; \
-  DROP TABLE IF EXISTS nightfloat CASCADE; \
-  DROP TABLE IF EXISTS service CASCADE; \
-  DROP TABLE IF EXISTS signout CASCADE; " | \
-  PGPASSWORD=$PASSWD $PSQL -U $USER $targetdb >/dev/null 2>&1
-debuglog "clearing existing db"
 
 export PGPASSWORD=$PASSWD
-gunzip ${ARGS[BACKUPFILE]}
+$PRINTF "Dropping tables from $targetdb as $USER\n" || echo "MSG FAILED"
+read -p "Press enter to continue (THIS IS DESTRUCTIVE)" _z
+echo "DROP SCHEMA public CASCADE; CREATE SCHEMA public" | $PSQL -U $USER $targetdb
+if [ $? -gt 0 ]; then
+  failure ${LINENO} "Failed to drop schema in $targetdb"
+else
+  $PRINTF "SUCCESS Dropping tables\n\n"
+fi
 
-echo ${ARGS[BACKUPFILE]//.gz}
-cat ${ARGS[BACKUPFILE]//.gz}| $PSQL -U $USER $targetdb
+rawsqlfile=${ARGS[BACKUPFILE]//.gz}
+rezip=0
+if echo ${ARGS[BACKUPFILE]} | egrep '\.gz$' >/dev/null; then
+  rezip=1
+  gunzip ${ARGS[BACKUPFILE]}
+  debuglog "Unzipped backup to '$rawsqlfile'"
+fi
+
+debuglog "Executing '$rawsqlfile'... "
+cat $rawsqlfile | $PSQL -U $USER $targetdb
 
 if [ $? -gt 0 ]; then
-  echo "Error restoring database.  Aborting"
-  rm -f "$TMPFILE" "$LOGFILE"
-  trap - EXIT
-  exit 4
+  failure ${LINENO} "FAILED to execute $rawsqlfile on $targetdb"
 fi
-debuglog "Restored '$targetdb'"
-gzip ${ARGS[BACKUPFILE]//.gz}
+
+debuglog "Restored '${ARGS[BACKUPFILE]}' to '$targetdb'"
+[ $rezip -gt 0 ] && gzip ${ARGS[BACKUPFILE]//.gz}
 
 rm -f "$TMPFILE" "$LOGFILE"
 trap - EXIT
-
 exit 0

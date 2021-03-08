@@ -1,4 +1,6 @@
---- CREATE NF assignments table
+-- nf_assignments.sql
+-- Set which services are currently active as of 2/26/21
+-- Copyright (c) Thomas M. Butterworth 2020-2021 --
 BEGIN TRANSACTION;
   DROP TABLE IF EXISTS nightfloat CASCADE; 
   DROP TABLE IF EXISTS assignments CASCADE;

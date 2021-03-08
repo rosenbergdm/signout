@@ -68,34 +68,36 @@
     <h2 style="text-align:center">{{ rangestring }}</h2>
   </div>
 </div>
-<table class="sortable" style="width:90%;text-align:left;">
-  <thead>
-    <tr>
-      <th>Submittee name</th>
-      <th>Service</th>
-      <th>Night float</th>
-      <th>Date</th>
-      <th>Time submitted</th>
-      <th>Signout started</th>
-      <th>Signout complete</th>
-      <th>Signout duration</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for signout in signoutlog %}
-    <tr class="{{ loop.cycle('odd', 'even') }}">
-      <td>{{ signout.intern_name }}</td>
-      <td>{{ signout.name }}</td>
-      <td>{{ signout.type }}</td>
-      <td>{{ signout.adddate }}</td>
-      <td>{{ signout.addtime }}</td>
-      <td>{{ signout.starttime }}</td>
-      <td>{{ signout.completetime }}</td>
-      <td>{{ signout.elapsedtime }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div id="resulttable">
+  <table class="sortable" style="width:90%;text-align:left;">
+    <thead>
+      <tr>
+        <th>Submittee name</th>
+        <th>Service</th>
+        <th>Night float</th>
+        <th>Date</th>
+        <th>Time submitted</th>
+        <th>Signout started</th>
+        <th>Signout complete</th>
+        <th>Signout duration</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for signout in signoutlog %}
+      <tr class="{{ loop.cycle('odd', 'even') }}">
+        <td>{{ signout.intern_name }}</td>
+        <td>{{ signout.name }}</td>
+        <td>{{ signout.type }}</td>
+        <td>{{ signout.adddate }}</td>
+        <td>{{ signout.addtime }}</td>
+        <td>{{ signout.starttime }}</td>
+        <td>{{ signout.completetime }}</td>
+        <td>{{ signout.elapsedtime }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
 <br />
 <hr />
