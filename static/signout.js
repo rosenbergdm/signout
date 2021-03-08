@@ -18,19 +18,40 @@ var timesyncXhr = new XMLHttpRequest();
 //}}}
 
 //{{{ Helper functions
-function insertContact() {
+insertContact = function() {
   var contact = document.getElementById("contact");
   contact.href = "mailto:" + "support" + "@" + "davidrosenberg.me";
   contact.text = "support" + "@" + "davidrosenberg.me";
 }
 
+checkIe = function() {
+  var ua = window.navigator["userAgent"];
+  var is_msie = 0;
+
+  if (ua.indexOf("MSIE")) {
+    is_msie = 1;
+  if
+
+  if (ua.indexOf("Trident") > 0) {
+    is_msie = 1;
+  }
+
+  if (is_msie > 0 ) {
+    alert("IS MSIE");
+  }
+
+  alert("NOT")
+  }
+  return ua;
+}
+
 // 0 pad on the left to left
-function padLeft(i) {
+padLeft = function(i) {
   return ("0" + i).slice(-2);
 }
 
 // 0 pad right
-function padright(i) {
+padright = function(i) {
   return (i + "000").substring(0, 3);
 }
 
@@ -45,7 +66,7 @@ function runTimesyncOnLoad() {
 
 //{{{ Manage NF signout progression
 /* Limit action to the signout initiated by NF and make it visible */
-function startsignout(internid) {
+startsignout = function(internid) {
   var startSignout = new XMLHttpRequest();
   startSignout.addEventListener("load", function () {
     var response_message = JSON.parse(this.responseText);
@@ -70,7 +91,7 @@ function startsignout(internid) {
 //{{{ Time syncing
 
 // Given a server-issued timestamp, update the timesync (offset) variable
-function updateTimeOffset(timestring) {
+updateTimeOffset = function(timestring) {
   var splittimestring = timestring.split(":");
   var splitms = splittimestring[2].split(".");
   var localtime = new Date(Date.now());
@@ -88,7 +109,7 @@ function updateTimeOffset(timestring) {
 }
 
 // Request the time from server, and update the timesync var with resposne
-function updateTimeSync() {
+updateTimeSync = function() {
   timesyncXhr = new XMLHttpRequest();
   timesyncXhr.addEventListener("load", function () {
     if (DEBUG_SIGNOUT_JS == 1) {
@@ -104,7 +125,7 @@ function updateTimeSync() {
 }
 
 // update the running clocks (top and each section) every 19 ms
-function displayTime() {
+displayTime = function() {
   var today = new Date(Date.now() + timeoffset);
   var h = today.getHours();
   var m = today.getMinutes();
@@ -134,7 +155,8 @@ function displayTime() {
 
 //{{{ Execute submission
 
-function submitSignout(on_call = false) {
+// function submitSignout(on_call = false) {
+submitSignout = function(on_call) {
   var cutoff_time;
   var d = new Date(Date.now() + timeoffset);
   var date = new Date(

@@ -7,10 +7,10 @@
 <script>
   var old_onload = window.onload
   window.onload = function() {
-    old_onload()
-    insertContact()
+    old_onload();
+    insertContact();
   }
-  function confirmChange(actionmsg, url) {
+  confirmChange = function(actionmsg, url) {
     if (confirm(actionmsg)) {
       location.href = url;
     }

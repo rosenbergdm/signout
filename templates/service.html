@@ -1,10 +1,20 @@
 {% extends "base.html" %}
 {% block head %}
 {{ super() }}
-<meta http-equiv="refresh" content="3, url=/servicelist" />
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    alert("GOT HERE");
+    window.navigate("/servicelist");
+    location.href = "/servicelist" ;
+  });
+</script>
 {% endblock %}
 {% block title %}Service Update{% endblock %}
 {% block body %}
 <h1>Update NF Service List {{ service.name }}</h1>
 <p>{{ msg }}
+
 {% endblock %}
