@@ -30,7 +30,7 @@ checkIe = function() {
 
   if (ua.indexOf("MSIE")) {
     is_msie = 1;
-  if
+  }
 
   if (ua.indexOf("Trident") > 0) {
     is_msie = 1;
@@ -38,9 +38,6 @@ checkIe = function() {
 
   if (is_msie > 0 ) {
     alert("IS MSIE");
-  }
-
-  alert("NOT")
   }
   return ua;
 }
