@@ -91,7 +91,7 @@ failure() {
   if [ -z $TMPFILE ]; then
     rm -f "$TMPFILE"
   fi
-  trap $'failure ${LINENO} "COMMAND=\'$BASH_COMMAND\'"' ERR
+  # trap $'failure ${LINENO} "COMMAND=\'$BASH_COMMAND\'"' ERR
 }
 # trap $'failure ${LINENO} "COMMAND=\'$BASH_COMMAND\'"' ERR
 
