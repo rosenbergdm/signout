@@ -40,9 +40,9 @@
 * Fix to never display "too early" signouts **COMPLETE**
 
 # Post v0.4 upgrade
-* Nightfloat page should not refresh when an active signout is in progress
+* **COMPLETE** Nightfloat page should not refresh when an active signout is in progress (061b269c17fb9444c671ef6c3fa7dd923a5392ee)
 * **COMPLETE** There is no Lymphoma #3.  There is a Lymphoma green APP.
-* Add note to the 'add page' demonstrating the normal formatting of the list names (6ad8ec64dbf96291346596b80093fa3387622429)
+* **COMPLETE** Add note to the 'add page' demonstrating the normal formatting of the list names (6ad8ec64dbf96291346596b80093fa3387622429)
 * ? Add ability for NF to 'add lists' to the person currently signing out
 * ? Web interface for changing configuration values
 * **COMPLETE** Fix for the insertContact not putting in the right email address on some pages (ex: submission, works fine on query) (aaa4519eaf660d1adfcf2c69a6afaeb34deac75c)
