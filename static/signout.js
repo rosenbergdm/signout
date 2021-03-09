@@ -14,6 +14,7 @@ var DEBUG_SIGNOUT_JS = 0;
 // time difference in ms between client and server
 var timeoffset = 0;
 var timesyncXhr = new XMLHttpRequest();
+var signoutInProgress = false;
 
 //}}}
 
@@ -74,6 +75,7 @@ var startsignout = function (internid) {
   startSignout.open("GET", "/start_signout?id=" + internid);
   startSignout.send();
   var this_signout = document.getElementsByClassName("intern_" + internid)[0];
+  signoutInProgress = true;
   for (var i = this_signout.children.length - 1; i >= 0; i--) {
     this_signout.children[i].outerHTML =
       "<td style='color:blue;'>" + this_signout.children[i].innerText + "</td>";
@@ -83,6 +85,12 @@ var startsignout = function (internid) {
     sbuttons[i].disabled = true;
   }
 };
+
+var safe_refresh = function() {
+  if (!signoutInProgress) {
+    window.location.reload();
+  }
+}
 //}}}
 
 //{{{ Time syncing

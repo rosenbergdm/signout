@@ -1,12 +1,19 @@
 {% extends "base.html" %}
 {% block head %}
 {{ super() }}
-<meta http-equiv="refresh" content="60" />
+<!--meta http-equiv="refresh" content="60" / -->
 <link rel="stylesheet" href="/static/signout.css">
 <script src="/static/signout.js"></script>
 {% endblock %}
 {% block title %}Night Float call list for {{ type }} calls{% endblock %}
 {% block body %}
+  <script>
+    var old_onload = window.onload
+    window.onload = function() {
+      old_onload();
+      setTimeout(safe_refresh, 60000);
+    }
+    </script>
 <center>
   <h1>Call list for {{ type }} signouts</h1><br>
   <button onClick="location.href='/submission'">Return to submission form</button>
