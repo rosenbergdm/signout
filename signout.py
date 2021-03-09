@@ -334,7 +334,7 @@ def query():
                 ORDER BY completetime ASC"""
                 % (splitdate[2], splitdate[1], splitdate[0], typestring)
             )
-            dbg(cur.query)
+            # dbg(cur.query)
         else:
             rangestring = "Showing signouts from %s to %s inclusive" % (
                 request.form["addtime_date"],
@@ -355,7 +355,7 @@ def query():
                 + """'
                 ORDER BY completetime ASC"""
             )
-            dbg(cur.query)
+            # dbg(cur.query)
         signoutlog = [
             {
                 "intern_name": x[0],
@@ -467,8 +467,8 @@ def submission_weekend():
         cur = conn.cursor()
         if request.form.getlist("service") is None:
             return render_template("received.html")
-        dbg(request.form)
-        dbg(request.form.getlist("service"))
+        # dbg(request.form)
+        # dbg(request.form.getlist("service"))
         for serviceid in request.form.getlist("service"):
             cur.execute(
                 "INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp) \
@@ -633,8 +633,8 @@ def submission_weekday():
         if request.form.getlist("service") is None:
             # This should never happen
             return render_template("received.html")
-        dbg(request.form)
-        dbg(request.form.getlist("service"))
+        # dbg(request.form)
+        # dbg(request.form.getlist("service"))
         for serviceid in request.form.getlist("service"):
             cur.execute(
                 """
@@ -743,7 +743,7 @@ def servicelist():
         {"id": x[0], "name": x[1], "type": x[2], "active": x[3], "othertype": x[4]}
         for x in results
     ]
-    dbg(slist)
+    # dbg(slist)
     return render_template("servicelist.html", servicelist=slist)
 
 
@@ -751,7 +751,7 @@ def servicelist():
 @auth.login_required
 def service():
     if request.args.get("id") is None or request.args.get("action") is None:
-        dbg("MISSING ARGS")
+        # dbg("MISSING ARGS")
         return redirect(url_for("servicelist"))
     else:
         service_id = int(request.args.get("id"))
@@ -763,8 +763,7 @@ def service():
     )
     slist = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
     service = slist[0]
-    if app.config["DEBUG_SIGNOUT_OUTPUT"]:
-        dbg(slist)
+    # dbg(slist)
     msg = f"Setting '{service['name']}' (id #{service['id']}) to"
     if action == "activate":
         cur.execute(
@@ -785,7 +784,7 @@ def service():
         )
         conn.commit()
         msg += f" Night float list '{newtype}'"
-    dbg({"msg": msg, "service": service, "slist": slist})
+    # dbg({"msg": msg, "service": service, "slist": slist})
     cur.close()
     conn.close()
     return render_template("service.html", msg=msg, service=service)
@@ -910,7 +909,8 @@ def notify_missing_signouts(nflist):
                 + "'"
             )
             if app.config["DEBUG_PRINT_NOT_MESSAGE"]:
-                print(body)
+                reasonmsg = "DEBUG_PRINT: Printing to stdout instead of sending text message since DEBUG_PRINT_NOT_MESSAGE=1 for message: "
+                print(reasonmsg + body)
             else:
                 message = client.messages.create(
                     to=callback_number, from_=app.config["twilio-number"], body=body
@@ -986,7 +986,11 @@ def notify_late_signup(signout_id, notify=True):
     client = Client(app.config["twilio-sid"], app.config["twilio-auth-token"])
     body = f"Notifying that the list {results[1]} was added when all other callbacks were complete.  Please call back {results[0]} at {results[2]}"
     if app.config["DEBUG_PRINT_NOT_MESSAGE"] == 1 or notify == False:
-        print(body)
+        if notify:
+            reasonmsg = "DEBUG_PRINT: Printing to stdout instead of sending text message since notify=True for message: "
+        else:
+            reasonmsg = "DEBUG_PRINT: Printing to stdout instead of sending text message since DEBUG_PRINT_NOT_MESSAGE=1 for message: "
+        print(reasonmsg + body)
     else:
         body = client.messages.create(
             to=callback_number, from_=app.config["twilio-number"], body=body
