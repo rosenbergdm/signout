@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 #
 # common.sh
-# Copyright (C) 2020 Thomas Butterworth <dmr@davidrosenberg.me>
+# Copyright (C) 2020-2021 Thomas Butterworth <dmr@davidrosenberg.me>
 #
 # Distributed under terms of the MIT license.
 #
