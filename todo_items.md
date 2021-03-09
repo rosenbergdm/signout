@@ -48,4 +48,4 @@
 * ? Web interface for changing configuration values
 * **COMPLETE** Fix for the insertContact not putting in the right email address on some pages (ex: submission, works fine on query) (aaa4519eaf660d1adfcf2c69a6afaeb34deac75c)
 * **COMPLETE** UI and logging cleanup (2acc089a9bca2156b55abfc572cb0e4ae3aac62c)
-
+* ? Web interface for interrogating server state
