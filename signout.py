@@ -17,6 +17,7 @@ import pprint
 import sys
 
 from flask import (
+    jsonify,
     make_response,
     Flask,
     url_for,
@@ -113,26 +114,12 @@ def load_db_settings():
     fp = open(os.path.join(app.config["SCRIPTDIR"], "dbsettings.json"))
     dbsettings = json.load(fp)
     fp.close()
-    for var in [
-        "DBNAME",
-        "DBUSER",
-        "DBPASSWORD",
-        "twilio-sid",
-        "twilio-auth-token",
-        "twilio-number",
-        "DEBUG_CALLBACKS",
-        "DEBUG_TARGET_NUMBER",
-        "DEBUG_PRINT_NOT_MESSAGE",
-        "DEBUG_SIGNOUT_OUTPUT",
-        "DEBUG_PAGES",
-    ]:
-        if var in dbsettings:
-            app.config[var] = dbsettings[var]
-        if os.environ.get(var):
-            e_val = os.environ.get(var)
-            dbg(f"Setting '{var}' to '{e_val}' based on environment variable")
-            app.config[var] = e_val
-    app.config["USERS"].update(dbsettings["USERS"])
+    for k in dbsettings:
+        app.config[k] = dbsettings[k]
+        if os.environ.get(k):
+            e_val = os.environ.get(k)
+            dbg(f"Setting '{k}' to '{e_val}' based on environment variable")
+            app.config[k] = e_val
 
 
 def get_db():
@@ -488,7 +475,7 @@ def submission_weekend():
         cur.execute("SELECT type FROM service WHERE id = %s", (serviceid,))
         nflist = cur.fetchall()[0][0]
         cur.execute(
-            """ SELECT Count(service.id)
+            """ SELECT Count(distinct(hosttimestamp, intern_name))
                         FROM   signout
                                INNER JOIN service
                                        ON signout.service = service.id
@@ -667,7 +654,7 @@ def submission_weekday():
         cur.execute("SELECT type FROM service WHERE id = %s", (serviceid,))
         nflist = cur.fetchall()[0][0]
         cur.execute(
-            """ SELECT count(service.id)
+            """ SELECT count(distinct(hosttimestamp, intern_name))
                         FROM   signout
                                INNER JOIN service
                                        ON signout.service = service.id
@@ -816,30 +803,20 @@ def addservice():
     conn.close()
     return redirect(url_for("servicelist"))
 
+
 @app.route("/config", methods=["GET", "POST"])
 @auth.login_required
 def configpage():
     if request.method == "POST":
         return "NOT YET IMPLEMENTED"
-    configvars = [
-        "SCRIPTDIR",
-        "DBNAME",
-        "DBUSER",
-        "DBPASSWORD",
-        "twilio-sid",
-        "twilio-auth-token",
-        "twilio-number",
-        "DEBUG_CALLBACKS",
-        "DEBUG_TARGET_NUMBER",
-        "DEBUG_PRINT_NOT_MESSAGE",
-        "DEBUG_SIGNOUT_OUTPUT",
-        "DEBUG_PAGES"]
-    cfg = { x: app.config[x] for x in configvars }
-    cfg["DBPASSWORD"] = "*****"
-    cfg["twilio-auth-token"] = "*****"
-    resp = make_response(pprint.pformat(cfg))
-    resp.mimetype = "text/plain"
-    return resp
+    with open(os.path.join(app.config["SCRIPTDIR"], "dbsettings.json")) as fp:
+        dbconfig = json.load(fp)
+    cfg = {x: app.config[x] for x in dbconfig.keys()}
+    for k in ["DBPASSWORD", "SECRET_KEY", "twilio-sid", "twilio-auth-token"]:
+        cfg[k] = "******"
+    # resp = make_response(pprint.pformat(cfg))
+    # resp.mimetype = "text/plain"
+    return jsonify(cfg)
 
 
 def get_callback_number(nflist):
@@ -1017,11 +994,17 @@ def notify_late_signup(signout_id, notify=True):
     client = Client(app.config["twilio-sid"], app.config["twilio-auth-token"])
     body = f"Notifying that the list {results[1]} was added when all other callbacks were complete.  Please call back {results[0]} at {results[2]}"
     if app.config["DEBUG_PRINT_NOT_MESSAGE"] == 0 and notify:
-        msg = client.messages.create(to=callback_number, from_=app.config["twilio-number"], body=body)
+        msg = client.messages.create(
+            to=callback_number, from_=app.config["twilio-number"], body=body
+        )
     elif not notify:
-        print(f"DEBUG_PRINT: Since notify=True, printing message rather than sending: {body}")
+        print(
+            f"DEBUG_PRINT: Since notify=True, printing message rather than sending: {body}"
+        )
     else:
-        print(f"DEBUG_PRINT: Since DEBUG_PRINT_NOT_MESSAGE > 0, printing message rather than sending: {body}")
+        print(
+            f"DEBUG_PRINT: Since DEBUG_PRINT_NOT_MESSAGE > 0, printing message rather than sending: {body}"
+        )
     return
 
 
