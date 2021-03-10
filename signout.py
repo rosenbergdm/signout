@@ -812,6 +812,28 @@ def addservice():
     conn.close()
     return redirect(url_for("servicelist"))
 
+@app.route("/config", methods=["GET", "POST"])
+@auth.login_required
+def configpage():
+    if request.method == "POST":
+        return "NOT YET IMPLEMENTED"
+    configvars = [
+        "SCRIPTDIR",
+        "DBNAME",
+        "DBUSER",
+        "DBPASSWORD",
+        "twilio-sid",
+        "twilio-auth-token",
+        "twilio-number",
+        "DEBUG_CALLBACKS",
+        "DEBUG_TARGET_NUMBER",
+        "DEBUG_PRINT_NOT_MESSAGE",
+        "DEBUG_SIGNOUT_OUTPUT",
+        "DEBUG_PAGES"]
+    cfg = { x: app.config[x] for x in configvars }
+    return pprint.pformat(cfg)
+
+    
 
 def get_callback_number(nflist):
     """Get the phone number to text if there are missing signouts for a given list.
@@ -924,7 +946,8 @@ def notify_missing_signouts(nflist):
                 + "The following lists are not showing as submitted: "
             )
             if app.config["DEBUG_PRINT_NOT_MESSAGE"]:
-                print(body)
+                reasonmsg = "DEBUG_PRINT: Printing to stdout instead of sending text message since DEBUG_PRINT_NOT_MESSAGE=1 for message: "
+                print(reasonmsg + body)
             else:
                 message = client.messages.create(
                     to=callback_number, from_=app.config["twilio-number"], body=body
@@ -938,7 +961,8 @@ def notify_missing_signouts(nflist):
                     + "'"
                 )
                 if app.config["DEBUG_PRINT_NOT_MESSAGE"]:
-                    print(body)
+                    reasonmsg = "DEBUG_PRINT: Printing to stdout instead of sending text message since DEBUG_PRINT_NOT_MESSAGE=1 for message: "
+                    print(reasonmsg + body)
                 else:
                     message = client.messages.create(
                         to=callback_number, from_=app.config["twilio-number"], body=body
@@ -985,16 +1009,12 @@ def notify_late_signup(signout_id, notify=True):
     callback_number = get_callback_number(results[3])
     client = Client(app.config["twilio-sid"], app.config["twilio-auth-token"])
     body = f"Notifying that the list {results[1]} was added when all other callbacks were complete.  Please call back {results[0]} at {results[2]}"
-    if app.config["DEBUG_PRINT_NOT_MESSAGE"] == 1 or notify == False:
-        if notify:
-            reasonmsg = "DEBUG_PRINT: Printing to stdout instead of sending text message since notify=True for message: "
-        else:
-            reasonmsg = "DEBUG_PRINT: Printing to stdout instead of sending text message since DEBUG_PRINT_NOT_MESSAGE=1 for message: "
-        print(reasonmsg + body)
+    if app.config["DEBUG_PRINT_NOT_MESSAGE"] == 0 and notify:
+        msg = client.messages.create(to=callback_number, from_=app.config["twilio-number"], body=body)
+    elif not notify:
+        print(f"DEBUG_PRINT: Since notify=True, printing message rather than sending: {body}")
     else:
-        body = client.messages.create(
-            to=callback_number, from_=app.config["twilio-number"], body=body
-        )
+        print(f"DEBUG_PRINT: Since DEBUG_PRINT_NOT_MESSAGE > 0, printing message rather than sending: {body}")
     return
 
 
