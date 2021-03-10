@@ -18,7 +18,7 @@ import sys
 
 from flask import (
     jsonify,
-    make_response,
+    # make_response,
     Flask,
     url_for,
     render_template,
@@ -814,8 +814,9 @@ def configpage():
     cfg = {x: app.config[x] for x in dbconfig.keys()}
     for k in ["DBPASSWORD", "SECRET_KEY", "twilio-sid", "twilio-auth-token"]:
         cfg[k] = "******"
-    # resp = make_response(pprint.pformat(cfg))
-    # resp.mimetype = "text/plain"
+    if "USERS" in cfg:
+        for k in cfg["USERS"]:
+            cfg["USERS"][k] = "******"
     return jsonify(cfg)
 
 
