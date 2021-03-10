@@ -17,6 +17,7 @@ import pprint
 import sys
 
 from flask import (
+    make_response,
     Flask,
     url_for,
     render_template,
@@ -503,6 +504,9 @@ def submission_weekend():
         cur.close()
         conn.close()
         timenow = datetime.datetime.now()
+        # TODO: This actually doesn't trigger if multiple submissions occur at once. I think
+        #       that I can change the query to look for select count(distinct addtime) from...
+        #       Will address later.
         if count < 2:
             if (
                 (timenow.hour == 19 and timenow.minute > 30)
@@ -831,9 +835,12 @@ def configpage():
         "DEBUG_SIGNOUT_OUTPUT",
         "DEBUG_PAGES"]
     cfg = { x: app.config[x] for x in configvars }
-    return pprint.pformat(cfg)
+    cfg["DBPASSWORD"] = "*****"
+    cfg["twilio-auth-token"] = "*****"
+    resp = make_response(pprint.pformat(cfg))
+    resp.mimetype = "text/plain"
+    return resp
 
-    
 
 def get_callback_number(nflist):
     """Get the phone number to text if there are missing signouts for a given list.
