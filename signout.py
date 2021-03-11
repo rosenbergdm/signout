@@ -26,8 +26,8 @@ from flask import (
     request,
 )
 from flask_httpauth import HTTPBasicAuth
+from shutil import copyfile
 from werkzeug.security import check_password_hash
-from os import environ
 from time import sleep
 from twilio.rest import Client
 
@@ -800,12 +800,36 @@ def addservice():
     conn.close()
     return redirect(url_for("servicelist"))
 
+def update_config(cfgvar, value, write_file=True):
+    if write_file:
+        with open(os.path.join(app.config["SCRIPTDIR"], "dbsettings.json")) as fp:
+            dbconfig = json.load(fp)
+        if cfgvar in dbconfig.keys():
+            dbconfig[cfgvar] = value
+            bkupfile = os.path.join(app.config["SCRIPTDIR"], f"dbsettings.{datetime.datetime.now().strftime('%s')}.json")
+            copyfile(os.path.join(app.config["SCRIPTDIR"], "dbsettings.json"), bkupfile)
+            with open(bkupfile, 'w') as fp:
+                json.dump(dbconfig, fp, indent=2)
+    app.config[cfgvar] = value
+    return dbconfig
+
 
 @app.route("/config", methods=["GET", "POST"])
 @auth.login_required
 def configpage():
     if request.method == "POST":
-        return "NOT YET IMPLEMENTED"
+        if request.args.get("var") is None or request.args.get("val") is None:
+            return jsonify({'Success': False, 'message': 'var and val required'})
+        else:
+            var = request.args.get("var")
+            val = request.args.get("val")
+            if val.isnumeric():
+                val = int(val)
+            elif val.upper() == "TRUE":
+                val = True
+            elif val.upper() == "FALSE":
+                val = False
+        return jsonify(update_config(var, val))
     with open(os.path.join(app.config["SCRIPTDIR"], "dbsettings.json")) as fp:
         dbconfig = json.load(fp)
     cfg = {x: app.config[x] for x in dbconfig.keys()}
@@ -887,15 +911,16 @@ def get_missing_signouts(nflist):
     else:
         return [x[1] for x in results]
 
+
 @app.route("/notifynightfloat")
 def send_missing_signouts():
     if request.args.get("key") is None:
-        return {'Success': False, 'Message': 'key is required' }
+        return jsonify({'Success': False, 'Message': 'key is required' })
     if check_password_hash(request.args.get("key"), app.config["SECRET_KEY"]):
         notify_missing_signouts("NF9132")
         notify_missing_signouts("NF9133")
-        return {'Success': True }
-    return {'Success': False, 'Message': 'key mismatch' }
+        return jsonify({'Success': True })
+    return jsonify({'Success': False, 'Message': 'key mismatch' })
 
 
 def notify_missing_signouts(nflist):
