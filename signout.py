@@ -491,9 +491,6 @@ def submission_weekend():
         cur.close()
         conn.close()
         timenow = datetime.datetime.now()
-        # TODO: This actually doesn't trigger if multiple submissions occur at once. I think
-        #       that I can change the query to look for select count(distinct addtime) from...
-        #       Will address later.
         if count < 2:
             if (
                 (timenow.hour == 19 and timenow.minute > 30)
@@ -889,6 +886,16 @@ def get_missing_signouts(nflist):
         return None
     else:
         return [x[1] for x in results]
+
+@app.route("/notifynightfloat")
+def send_missing_signouts():
+    if request.args.get("key") is None:
+        return {'Success': False, 'Message': 'key is required' }
+    if check_password_hash(request.args.get("key"), app.config["SECRET_KEY"]):
+        notify_missing_signouts("NF9132")
+        notify_missing_signouts("NF9133")
+        return {'Success': True }
+    return {'Success': False, 'Message': 'key mismatch' }
 
 
 def notify_missing_signouts(nflist):
