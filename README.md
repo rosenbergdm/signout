@@ -42,3 +42,8 @@
 - reload apache
 - Make sure everything works
 - ENSURE apache's mod\_wsgi uses python3: `ldd "/usr/lib/apache2/modules/*wsgi*"` .  It should reference python3
+
+# CONFIGURATION SETTINGS
+
+DEBUG\_CALLBACKS: When set, sends notifications to the number given in DEBUG\_TARGET\_NUMBER
+DEBUG\_PRNIT\_NOT\_MESSAGE: When set, prints to stdout instead of sending notifications
