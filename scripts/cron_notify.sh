@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-# {{FFILE}}
+# cron_notify.sh
 # Copyright (C) 2021 Thomas Butterworth <dmr@davidrosenberg.me>
 # Distributed under terms of the MIT license.
 #
@@ -99,6 +99,7 @@ trap error ERR
 #}}}
 
 #{{{ docopt parsing of commandline
+PATH=/usr/local/bin:$PATH
 source $(which docopts.sh) --auto "$@"
 [[ ${ARGS[--debug]} == true ]] && docopt_print_ARGS
 if [[ "${ARGS[--verbose]}" == true ]]; then

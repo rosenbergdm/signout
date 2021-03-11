@@ -988,7 +988,7 @@ def notify_late_signup(signout_id, notify=True):
     conn = get_db()
     cur = conn.cursor()
     cur.execute(
-        """SELECT intern_name, service.name, intern_callback, type 
+        """SELECT intern_name, service.name, intern_callback, type
                     FROM signout
                     INNER JOIN service ON signout.service = service.id
                     WHERE signout.id = %s""",
