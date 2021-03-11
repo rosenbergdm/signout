@@ -2,13 +2,17 @@
   "DBNAME": "signout",
   "DBUSER": "signout",
   "DBPASSWORD": "YOUR-PASSWORD-HERE",
-  "twilio-sid": "",
-  "twilio-auth-token": "",
-  "twilio-number": "+19388882701",
+  "twilio-sid": "YOUR-SID-HERE",
+  "twilio-auth-token": "YOUR-TOKEN-HERE",
+  "twilio-number": "+0000000000",
   "DEBUG_CALLBACKS": 0,
-  "DEBUG_TARGET_NUMBER": "+13125551212",
+  "DEBUG_TARGET_NUMBER": "+0000000000",
   "DEBUG_PRINT_NOT_MESSAGE": 0,
   "DEBUG_SIGNOUT_OUTPUT": 0,
   "DEBUG_PAGES": 0,
-  "USERS": { "testuser": "hashed123"}
+  "USERS": { "user": "hashed-password"},
+  "SECRET_KEY": "YOUR-KEY-HERE",
+  "TEMPLATES_AUTO_RELOAD": true,
+  "JSONIFY_PRETTYPRINT_REGULAR": true
+
 }
