@@ -35,6 +35,7 @@ from flask_login import (
 )
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect, CSRFError
+from flask_talisman import Talisman
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, InputRequired
 from shutil import copyfile
@@ -54,6 +55,7 @@ import re
 
 
 app = Flask(__name__)
+Talisman(app, content_security_policy=None)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
