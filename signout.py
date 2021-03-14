@@ -1188,4 +1188,4 @@ def notify_late_signup(signout_id, notify=True):
 
 if __name__ == "__main__":
     load_db_settings()
-    app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0", debug=True)
