@@ -8,6 +8,14 @@
 {% block title %}Primary Teams Ready-To-Signout Submission{% endblock %}
 {% block bodyattributes %} onload="runTimesyncOnLoad();" {% endblock %}
 {% block body %}
+  <script>
+    var old_onload = window.onload
+    window.onload = function() {
+      old_onload();
+      runTimesyncOnLoad();
+    }
+  </script>
+
 <center>
   <a href='/nightfloat?list=NF9132' class="button"><button>Night float 9132 callback page</button></a>
   <a href='/nightfloat?list=NF9133' class="button"><button>Night float 9133 callback page</button></a>
