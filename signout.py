@@ -20,16 +20,28 @@ from flask import (
     jsonify,
     # make_response,
     Flask,
+    flash,
     url_for,
     render_template,
     redirect,
     request,
 )
-from flask_httpauth import HTTPBasicAuth
+from flask_login import (
+    LoginManager,
+    login_required,
+    login_user,
+    current_user,
+    logout_user,
+)
+from flask_wtf import FlaskForm
+from flask_wtf.csrf import CSRFProtect, CSRFError
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, InputRequired
 from shutil import copyfile
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from time import sleep
 from twilio.rest import Client
+from urllib.parse import urlparse, urljoin
 
 import datetime
 import json
@@ -38,40 +50,90 @@ import pdb
 import psycopg2
 import re
 
+# pdb.set_trace()
+
 
 app = Flask(__name__)
-auth = HTTPBasicAuth()
-
-app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
-if "__file__" in dir():
-    app.config["SCRIPTDIR"] = os.path.dirname(os.path.realpath(__file__))
-else:
-    if "SCRIPTDIR" in globals().keys():
-        app.config["SCRIPTDIR"] = globals()["SCRIPTDIR"]
-    if os.path.exists("/usr/local/src/signout/dbsettings.json"):
-        app.config["SCRIPTDIR"] = "/usr/local/src/signout"
-    elif os.path.exists(os.path.join(os.environ["HOME"], "src/signout")):
-        app.config["SCRIPTDIR"] = os.path.join(os.environ["HOME"], "src/signout")
-    else:
-        raise Exception
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
 
 
-CLEANUP_TIMESTAMP = re.compile(r"\.(..).*$")
-SHIFT_TIMES = re.compile(r"^(\d{1,2})(:59:59\.)(.*)$")
-app.config["USERS"] = dict()
+class LoginForm(FlaskForm):
+    user_name = StringField(
+        "Name: ", validators=[InputRequired("'Name' failed DataRequired")]
+    )
+    rawpw = PasswordField(
+        "Password: ", validators=[InputRequired("InputRequired failed for 'rawpw'")]
+    )
+
+    def __repr__(self):
+        return f"LoginForm (user_name = {self.user_name}, rawpw = {self.rawpw})"
 
 
-@auth.verify_password
-def verify_password(username, password):
-    if username in app.config["USERS"] and check_password_hash(
-        app.config["USERS"].get(username), password
-    ):
-        return username
+class User(object):
+    max_id = 0
+    names = []
+    users = []
 
+    @classmethod
+    def increment_id(cls):
+        cls.max_id += 1
+        return cls.max_id
 
-def dbg(msg):
-    if app.config["DEBUG_SIGNOUT_OUTPUT"]:
-        pprint.pprint(msg, stream=sys.stderr)
+    @classmethod
+    def get_num_ids(cls):
+        return cls.max_id
+
+    @classmethod
+    def get(cls, user_id):
+        if type(user_id) is str:
+            user_id = int(user_id)
+        return cls.users[user_id - 1]
+
+    @classmethod
+    def get_by_name(cls, username):
+        user_id = cls.names.index(username)
+        return cls.get(user_id + 1)
+
+    @classmethod
+    def check_password(cls, user_name, rawpw):
+        user = cls.get_by_name(user_name)
+        if user:
+            if check_password_hash(user.pwhash, rawpw):
+                return user
+        return None
+
+    def __init__(self, user_name, pwhash="", user_id=None):
+        if user_id is None:
+            user_id = User.increment_id()
+        self.user_id = user_id
+        self.user_name = user_name
+        self.pwhash = pwhash
+        self.authenticated = False
+
+        User.names.append(user_name)
+        if type(user_name) is not str:
+            raise Exception()
+        User.users.append(self)
+
+    def set_password(self, raw_password):
+        self.pwhash = generate_password_hash(raw_password)
+
+    def __repr__(self):
+        return f"User: (user_name = '{self.user_name}', pwhash = '******', user_id={self.user_id}, authenticated={self.authenticated})"
+
+    def is_authenticated(self):
+        return self.authenticated
+
+    def is_active(self):
+        return True
+
+    def is_anonymouse(self):
+        return False
+
+    def get_id(self):
+        return str(self.user_id)
 
 
 def gen_med_sorter(intern_list):
@@ -120,6 +182,9 @@ def load_db_settings():
             e_val = os.environ.get(k)
             dbg(f"Setting '{k}' to '{e_val}' based on environment variable")
             app.config[k] = e_val
+    for u in dbsettings["USERS"].keys():
+        val = dbsettings["USERS"][u]
+        User(u, dbsettings["USERS"][u])
 
 
 def get_db():
@@ -131,7 +196,80 @@ def get_db():
     return conn
 
 
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
+if "__file__" in dir():
+    app.config["SCRIPTDIR"] = os.path.dirname(os.path.realpath(__file__))
+else:
+    if "SCRIPTDIR" in globals().keys():
+        app.config["SCRIPTDIR"] = globals()["SCRIPTDIR"]
+    if os.path.exists("/usr/local/src/signout/dbsettings.json"):
+        app.config["SCRIPTDIR"] = "/usr/local/src/signout"
+    elif os.path.exists(os.path.join(os.environ["HOME"], "src/signout")):
+        app.config["SCRIPTDIR"] = os.path.join(os.environ["HOME"], "src/signout")
+    else:
+        raise Exception
+
+
+CLEANUP_TIMESTAMP = re.compile(r"\.(..).*$")
+SHIFT_TIMES = re.compile(r"^(\d{1,2})(:59:59\.)(.*)$")
+app.config["USERS"] = dict()
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    form = LoginForm(request.form, meta={"csrf": False})
+    if request.method == "POST":
+        if form.validate_on_submit():
+            user = User.get_by_name(form.user_name.data)
+            if user and User.check_password(user.user_name, form.rawpw.data):
+                login_user(user, remember=True)
+                flash("You were successfully logged in")
+                next = request.args.get("next")
+                if not is_safe_url(next):
+                    return abort(400)
+                return redirect(next or url_for("index"))
+        else:
+            raise Exception()
+            flash("Invalid credentials")
+    return render_template("login.html", form=form)
+
+
+@login_required
+@app.route("/logout", methods=["GET"])
+def logout():
+    user = current_user
+    user.authenticated = False
+    logout_user()
+    flash("Logout successful")
+    return redirect(url_for("index"))
+
+
+@login_required
+def verify_password(username, password):
+    if username in app.config["USERS"] and check_password_hash(
+        app.config["USERS"].get(username), password
+    ):
+        return username
+
+
+def dbg(msg):
+    if app.config["DEBUG_SIGNOUT_OUTPUT"]:
+        pprint.pprint(msg, stream=sys.stderr)
+
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
+
+
 @app.route("/")
+@app.route("/index")
 def index():
     return redirect(url_for("submission"))
 
@@ -678,13 +816,13 @@ def submission_weekday():
 
 
 @app.route("/submission_weekday", methods=["GET", "POST"])
-@auth.login_required
+@login_required
 def debug_submission_weekday():
     return submission_weekday()
 
 
 @app.route("/submission_weekend", methods=["GET", "POST"])
-@auth.login_required
+@login_required
 def debug_submission_weekend():
     return submission_weekend()
 
@@ -697,7 +835,7 @@ def submission():
 
 
 @app.route("/servicelist")
-@auth.login_required
+@login_required
 def servicelist():
     conn = get_db()
     cur = conn.cursor()
@@ -736,7 +874,7 @@ def servicelist():
 
 
 @app.route("/service")
-@auth.login_required
+@login_required
 def service():
     if request.args.get("id") is None or request.args.get("action") is None:
         # dbg("MISSING ARGS")
@@ -779,13 +917,13 @@ def service():
 
 
 @app.route("/admin")
-@auth.login_required
+@login_required
 def admin():
     return render_template("admin.html")
 
 
 @app.route("/addservice", methods=["GET", "POST"])
-@auth.login_required
+@login_required
 def addservice():
     if request.method == "GET":
         return render_template("addservice.html")
@@ -800,26 +938,30 @@ def addservice():
     conn.close()
     return redirect(url_for("servicelist"))
 
+
 def update_config(cfgvar, value, write_file=True):
     if write_file:
         with open(os.path.join(app.config["SCRIPTDIR"], "dbsettings.json")) as fp:
             dbconfig = json.load(fp)
         if cfgvar in dbconfig.keys():
             dbconfig[cfgvar] = value
-            bkupfile = os.path.join(app.config["SCRIPTDIR"], f"dbsettings.{datetime.datetime.now().strftime('%s')}.json")
+            bkupfile = os.path.join(
+                app.config["SCRIPTDIR"],
+                f"dbsettings.{datetime.datetime.now().strftime('%s')}.json",
+            )
             copyfile(os.path.join(app.config["SCRIPTDIR"], "dbsettings.json"), bkupfile)
-            with open(bkupfile, 'w') as fp:
+            with open(bkupfile, "w") as fp:
                 json.dump(dbconfig, fp, indent=2)
     app.config[cfgvar] = value
     return dbconfig
 
 
 @app.route("/config", methods=["GET", "POST"])
-@auth.login_required
+@login_required
 def configpage():
     if request.method == "POST":
         if request.args.get("var") is None or request.args.get("val") is None:
-            return jsonify({'Success': False, 'message': 'var and val required'})
+            return jsonify({"Success": False, "message": "var and val required"})
         else:
             var = request.args.get("var")
             val = request.args.get("val")
@@ -915,12 +1057,12 @@ def get_missing_signouts(nflist):
 @app.route("/notifynightfloat")
 def send_missing_signouts():
     if request.args.get("key") is None:
-        return jsonify({'Success': False, 'Message': 'key is required' })
+        return jsonify({"Success": False, "Message": "key is required"})
     if check_password_hash(request.args.get("key"), app.config["SECRET_KEY"]):
         notify_missing_signouts("NF9132")
         notify_missing_signouts("NF9133")
-        return jsonify({'Success': True })
-    return jsonify({'Success': False, 'Message': 'key mismatch' })
+        return jsonify({"Success": True})
+    return jsonify({"Success": False, "Message": "key mismatch"})
 
 
 def notify_missing_signouts(nflist):
