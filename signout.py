@@ -53,6 +53,7 @@ import re
 
 # pdb.set_trace()
 
+__version__ = "1.0.0rc0"
 
 app = Flask(__name__)
 Talisman(app, content_security_policy=None)
