@@ -3,105 +3,106 @@
 {{ super() }}
 <link rel="stylesheet" href="/static/signout.css">
 <script src="/static/signout.js"></script>
-  <script type="text/javascript">
-    var datefield=document.createElement("input")
+<script type="text/javascript">
+    var datefield = document.createElement("input")
     datefield.setAttribute("type", "date")
-    if (datefield.type!="date") {
-      document.write('<link href="/static/jquery-ui.css" rel="stylesheet" type="text/css" />\n')
-      document.write('<script src="/static/jquery.min.js"><\/script>\n')
-      document.write('<script src="/static/jquery-ui.min.js"><\/script>\n')
+    if (datefield.type != "date") {
+        document.write('<link href="/static/jquery-ui.css" rel="stylesheet" type="text/css" />\n')
+        document.write('<script src="/static/jquery.min.js"><\/script>\n')
+        document.write('<script src="/static/jquery-ui.min.js"><\/script>\n')
     }
-  </script>
+</script>
 
-  <script>
-    if (datefield.type!="date"){
-      jQuery(function($) {
-        $('#addtime_date').datepicker();
-        $('#addtime_date2').datepicker();
-      })
+<script>
+    if (datefield.type != "date") {
+        jQuery(function ($) {
+            $('#addtime_date').datepicker();
+            $('#addtime_date2').datepicker();
+        })
     }
-  </script>
+</script>
 {% endblock %}
 {% block title %}MSKCC Signout Log Query{% endblock %}
 {% block body %}
 <script src="/static/sorttable.js"></script>
-  <script>
+<script>
     var old_onload = window.onload
-    window.onload = function() {
-      old_onload()
-      insertContact()
+    window.onload = function () {
+        old_onload()
+        insertContact()
     }
-    </script>
+</script>
 <center>
-  <h1>MSKCC Signout Log</h1>
-  <h3>Default is showing the previous day's signouts.</h3>
-  <button onClick="location.href='/submission'">Return to submission form</button>
-  <br>
+    <h1>MSKCC Signout Log</h1>
+    <h3>Default is showing the previous day's signouts.</h3>
+    <button onClick="location.href='/submission'">Return to submission form</button>
+    <br>
 </center>
-<p>For querying a different day, use the form below.  When searching a range of days use both date selectors.  To search a single day leave the second date selector blank
+<p>For querying a different day, use the form below. When searching a range of days use both date selectors. To search a
+    single day leave the second date selector blank
 <p>Results can be sorted by clicking the column heading
-<br>
+    <br>
 <hr>
 <div class="flex-container">
-  <div class="submissionform">
-    <form id="queryselect" action="" method="POST">
-      <fieldset>
-        <input name="addtime_date" id="addtime_date" type="date" placeholder="From Date" required>
-        <label for="addtime_date">Start date</label><br>
-      </fieldset>
-      <fieldset>
-        <input name="addtime_date2" id="addtime_date2" type="date" placeholder="To Date" label="To date">
-        <label for="addtime_date2">End date (leave blank for single day search)</label><br>
-      <fieldset>
-        <p>Night Float Lists<br>
-        <input type="checkbox" id="NF9132" name="NF9132" value="NF9132" checked="true">
-        <label for="NF9132">NF 9132</label></br>
-        <input type="checkbox" id="NF9133" name="NF9133" value="NF9133" checked="true">
-        <label for="NF9133">NF 9133</label></br>
-      </fieldset>
-      <fieldset>
-        <button name="submit" type="submit" id="submit">Submit</button>
-      </fieldset>
-    </form>
-  </div>
-  <div class="currentlist">
-    <h2 style="text-align:center">{{ rangestring }}</h2>
-  </div>
+    <div class="submissionform">
+        <form id="queryselect" action="" method="POST">
+            <fieldset>
+                <input name="addtime_date" id="addtime_date" type="date" placeholder="From Date" required>
+                <label for="addtime_date">Start date</label><br>
+            </fieldset>
+            <fieldset>
+                <input name="addtime_date2" id="addtime_date2" type="date" placeholder="To Date" label="To date">
+                <label for="addtime_date2">End date (leave blank for single day search)</label><br>
+                <fieldset>
+                    <p>Night Float Lists<br>
+                        <input type="checkbox" id="NF9132" name="NF9132" value="NF9132" checked="true">
+                        <label for="NF9132">NF 9132</label></br>
+                        <input type="checkbox" id="NF9133" name="NF9133" value="NF9133" checked="true">
+                        <label for="NF9133">NF 9133</label></br>
+                </fieldset>
+                <fieldset>
+                    <button name="submit" type="submit" id="submit">Submit</button>
+                </fieldset>
+        </form>
+    </div>
+    <div class="currentlist">
+        <h2 style="text-align:center">{{ rangestring }}</h2>
+    </div>
 </div>
 <div id="resulttable">
-  <table class="sortable" style="width:90%;text-align:left;">
-    <thead>
-      <tr>
-        <th>Submittee name</th>
-        <th>Service</th>
-        <th>Night float</th>
-        <th>Date</th>
-        <th>Time submitted</th>
-        <th>Signout started</th>
-        <th>Signout complete</th>
-        <th>Signout duration</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for signout in signoutlog %}
-      <tr class="{{ loop.cycle('odd', 'even') }}">
-        <td>{{ signout.intern_name }}</td>
-        <td>{{ signout.name }}</td>
-        <td>{{ signout.type }}</td>
-        <td>{{ signout.adddate }}</td>
-        <td>{{ signout.addtime }}</td>
-        <td>{{ signout.starttime }}</td>
-        <td>{{ signout.completetime }}</td>
-        <td>{{ signout.elapsedtime }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <table class="sortable" style="width:90%;text-align:left;">
+        <thead>
+        <tr>
+            <th>Submittee name</th>
+            <th>Service</th>
+            <th>Night float</th>
+            <th>Date</th>
+            <th>Time submitted</th>
+            <th>Signout started</th>
+            <th>Signout complete</th>
+            <th>Signout duration</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for signout in signoutlog %}
+        <tr class="{{ loop.cycle('odd', 'even') }}">
+            <td>{{ signout.intern_name }}</td>
+            <td>{{ signout.name }}</td>
+            <td>{{ signout.type }}</td>
+            <td>{{ signout.adddate }}</td>
+            <td>{{ signout.addtime }}</td>
+            <td>{{ signout.starttime }}</td>
+            <td>{{ signout.completetime }}</td>
+            <td>{{ signout.elapsedtime }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
 
-<br />
-<hr />
-<br />
+<br/>
+<hr/>
+<br/>
 {% endblock %}
 
 <!-- vim: ft=htmldjango

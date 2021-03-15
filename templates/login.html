@@ -7,11 +7,11 @@
 {% from "_formhelpers.html" import render_field %}
 <h1>Login to continue:</h1>
 <form method=post>
-  <dl>
-    {{ render_field(form.user_name) }}
-    {{ render_field(form.rawpw) }}
-    <input type=hidden value="{{ next or '' }}" name=next>
-    <input type="submit" value="Login"></input>
-  </dl>
+    <dl>
+        {{ render_field(form.user_name) }}
+        {{ render_field(form.rawpw) }}
+        <input type=hidden value="{{ next or '' }}" name=next>
+        <input type="submit" value="Login"></input>
+    </dl>
 </form>
 {% endblock %}

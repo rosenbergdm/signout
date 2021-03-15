@@ -119,6 +119,21 @@ for fname in $(find . -name "*.sh" | grep -v .venv); do
   fi
 done
 
+if grep '.html$' <( ($ECHO $MOD_FILES) ) >/dev/null; then
+  $ECHO "Running format-htmldjango.sh on html files"
+  $GITROOT/scripts/format-htmldjango.sh $(grep '.html$' <( ($ECHO $MOD_FILES) ) )
+  ((_error+=$?))
+  if [ $_error -gt 0 ]; then
+    $ECHO " ERROR. format-htmldjango.sh failed"
+    $ECHO "Aborting"
+    exit 255
+  else
+    $ECHO " Success."
+    git add $(grep '.html$' <( ($ECHO $MOD_FILES) ) )
+  fi
+else
+  $ECHO "No html files modified.  Skipping format-htmldjango.sh"
+fi
 
 popd
 trap - EXIT

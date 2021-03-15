@@ -7,62 +7,66 @@
 {% endblock %}
 {% block title %}Night Float call list for {{ type }} calls{% endblock %}
 {% block body %}
-  <script>
+<script>
     var old_onload = window.onload
-    window.onload = function() {
-      old_onload();
-      setTimeout(safe_refresh, 60000);
+    window.onload = function () {
+        old_onload();
+        setTimeout(safe_refresh, 60000);
     }
-    </script>
+</script>
 <center>
-  <h1>Call list for {{ type }} signouts</h1><br>
-  <button onClick="location.href='/submission'">Return to submission form</button>
-  <br><hr>
+    <h1>Call list for {{ type }} signouts</h1><br>
+    <button onClick="location.href='/submission'">Return to submission form</button>
+    <br>
+    <hr>
 </center>
 <div class="flex-container">
-  <div class="waitinglist" style="flex: 0 0 500px">
-	  <h4>Waiting to sign out</h4>
-    <table style="width:100%;text-align:left;">
-      <tr>
-        <th>Intern/Resident/APP</th>
-        <th>Service</th>
-        <th>Callback number</th>
-      </tr>
-      {% for intern in waiting_interns %}
-      <tr class="intern_{{ intern.id }}">
-        <td>{{ intern.intern_name|striptags }}</td>
-        <td>{{ intern.name|striptags }}</td>
-        <td><strong>{{ intern.intern_callback|striptags }}</strong></td>
-      </tr>
-      <tr>
-        <td colspan="3">
-	      <form id="{{ intern.id }}" name="{{ intern.id }}" action="" method="POST">
-          <input type="hidden" name="signout.id" value="{{ intern.id }}">
-          <button class="startbutton" name="start" type="button" onclick="{%- if not(loop.first) -%} confirm('This is not the first person on the list.  Do you really want to do this?') && {%- endif -%} startsignout({{ intern.id }})">Start</button>
-          <button name="submit" type="submit" id="submit">Remove</button>
-        </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
-  </div>
-  <div class="completelist" style="flex: 0 0 500px">
-	  <h4>Sign out already complete</h4>
-    <table style="width:100%;text-align:left;">
-      <tr>
-        <th>Intern/Resident/APP</th>
-        <th>Name</th>
-        <th>Callback number</th>
-      </tr>
-      {% for intern in completed_interns %}
-      <tr>
-        <td>{{ intern.intern_name|striptags }}</td>
-        <td>{{ intern.name|striptags }}</td>
-        <td>{{ intern.intern_callback|striptags }}</td>
-      </tr>
-      {% endfor %}
-    </table>
-  </div>
+    <div class="waitinglist" style="flex: 0 0 500px">
+        <h4>Waiting to sign out</h4>
+        <table style="width:100%;text-align:left;">
+            <tr>
+                <th>Intern/Resident/APP</th>
+                <th>Service</th>
+                <th>Callback number</th>
+            </tr>
+            {% for intern in waiting_interns %}
+            <tr class="intern_{{ intern.id }}">
+                <td>{{ intern.intern_name|striptags }}</td>
+                <td>{{ intern.name|striptags }}</td>
+                <td><strong>{{ intern.intern_callback|striptags }}</strong></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <form id="{{ intern.id }}" name="{{ intern.id }}" action="" method="POST">
+                        <input type="hidden" name="signout.id" value="{{ intern.id }}">
+                        <button class="startbutton" name="start" type="button"
+                                onclick="{%- if not(loop.first) -%} confirm('This is not the first person on the list.  Do you really want to do this?') && {%- endif -%} startsignout({{ intern.id }})">
+                            Start
+                        </button>
+                        <button name="submit" type="submit" id="submit">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="completelist" style="flex: 0 0 500px">
+        <h4>Sign out already complete</h4>
+        <table style="width:100%;text-align:left;">
+            <tr>
+                <th>Intern/Resident/APP</th>
+                <th>Name</th>
+                <th>Callback number</th>
+            </tr>
+            {% for intern in completed_interns %}
+            <tr>
+                <td>{{ intern.intern_name|striptags }}</td>
+                <td>{{ intern.name|striptags }}</td>
+                <td>{{ intern.intern_callback|striptags }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
 {% endblock %}
 

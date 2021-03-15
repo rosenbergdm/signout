@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% block head %}
 {{ super() }}
-<link href="/static/jquery-ui.css" rel="stylesheet" type="text/css" />
+<link href="/static/jquery-ui.css" rel="stylesheet" type="text/css"/>
 <script src="/static/jquery.min.js"></script>
 <script src="/static/jquery-ui.min.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() {
-    window.location.href = "/servicelist" ;
-  });
+    $(document).ready(function () {
+        window.location.href = "/servicelist";
+    });
 </script>
 {% endblock %}
 {% block title %}Service Update{% endblock %}
@@ -15,4 +15,4 @@
 <h1>Update NF Service List {{ service.name }}</h1>
 <p>{{ msg }}
 
-{% endblock %}
+    {% endblock %}

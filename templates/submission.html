@@ -8,248 +8,266 @@
 {% block title %}Primary Teams Ready-To-Signout Submission{% endblock %}
 {% block bodyattributes %} onload="runTimesyncOnLoad();" {% endblock %}
 {% block body %}
-  <script>
+<script>
     var old_onload = window.onload
-    window.onload = function() {
-      old_onload();
-      runTimesyncOnLoad();
+    window.onload = function () {
+        old_onload();
+        runTimesyncOnLoad();
     }
-  </script>
+</script>
 
 <center>
-  <a href='/nightfloat?list=NF9132' class="button"><button>Night float 9132 callback page</button></a>
-  <a href='/nightfloat?list=NF9133' class="button"><button>Night float 9133 callback page</button></a>
-  <br>
-  <a href='/query' class="button"><button>Query the signout log</button></a>
-  <br>
-  <a href='/admin' class="button"><button>Admin interface</button></a>
-  <br>
+    <a href='/nightfloat?list=NF9132' class="button">
+        <button>Night float 9132 callback page</button>
+    </a>
+    <a href='/nightfloat?list=NF9133' class="button">
+        <button>Night float 9133 callback page</button>
+    </a>
+    <br>
+    <a href='/query' class="button">
+        <button>Query the signout log</button>
+    </a>
+    <br>
+    <a href='/admin' class="button">
+        <button>Admin interface</button>
+    </a>
+    <br>
 </center>
 
 <div id="wrapclock">
-  <ul style="list-style-type:none;">
-    <li style="text-align:left;" id="runningclock"></li>
-  </ul>
+    <ul style="list-style-type:none;">
+        <li style="text-align:left;" id="runningclock"></li>
+    </ul>
 </div>
 
 <br>
 <hr>
 <h3>Important signout information.</h3>
 <ul>
-  <li><strong>WARNING: This site works best using Google Chrome or Firefox.  Internet explorer (IE) is buggy and not recommended.</strong></li>
-  <li>If you are putting your name down after 7:30 pm, it is possible that nightfloat might not see your name being added to the list.  Please page the night float number (9132 or 9133) to let them know you've added yourself to the list</li>
-  <li>Oral signouts should follow the modified <strong>IPASS</strong> format, available <a href="/static/mskcc_ipass.pdf">here</a></li>
-  <li>Before adding your name, please ensure that you've done all pre-signout requirements, listed <a href="/static/pre_signout_checklist.pdf">here</a></li>
-  <li>If you are signing out multiple lists, you can select multiple lists in the forms below</li>
+    <li><strong>WARNING: This site works best using Google Chrome or Firefox. Internet explorer (IE) is buggy and not
+        recommended.</strong></li>
+    <li>If you are putting your name down after 7:30 pm, it is possible that nightfloat might not see your name being
+        added to the list. Please page the night float number (9132 or 9133) to let them know you've added yourself to
+        the list
+    </li>
+    <li>Oral signouts should follow the modified <strong>IPASS</strong> format, available <a
+            href="/static/mskcc_ipass.pdf">here</a></li>
+    <li>Before adding your name, please ensure that you've done all pre-signout requirements, listed <a
+            href="/static/pre_signout_checklist.pdf">here</a></li>
+    <li>If you are signing out multiple lists, you can select multiple lists in the forms below</li>
 </ul>
 <hr>
 <br>
 
-  <!-- NON-CALL SOLID TUMOR -->
-  <center><h1>Non-Call NF 9132 (GI/Breast/STR)</h1></center><br>
-    <div class="flex-container">
+<!-- NON-CALL SOLID TUMOR -->
+<center><h1>Non-Call NF 9132 (GI/Breast/STR)</h1></center><br>
+<div class="flex-container">
     <div class="submissionform">
-      <form id="signoutready" action="" method="POST">
-        <h3>Primary Team Ready-To-Signout</h3>
-        <h4>Do not complete until you are ready to signout</h4>
-        <fieldset>
-          <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
-        </fieldset>
-        <fieldset>
-          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" pattern=".*[0-9]{4}.*" maxlength=15 required>
-        </fieldset>
-        <fieldset>
-          <select multiple id="service" name="service" required>
-            {% for service in solid_services %}
-            <option value="{{ service.id }}">{{ service.name }}</option>
-            {% endfor %}
-          </select>
-        </fieldset>
-        <input type="hidden" id="oncall" name="oncall" value="FALSE">
-        <input type="hidden" id="hosttimestamp" name="hosttimestamp" value="">
-        <fieldset>
-          <button name="submit" type="submit" id="submit" onclick="return submitSignout(false)">Submit</button>
-        </fieldset>
-        <fieldset>
-          <div style="text-align:left;" class="runningclock"></div>
-        </fieldset>
-      </form>
+        <form id="signoutready" action="" method="POST">
+            <h3>Primary Team Ready-To-Signout</h3>
+            <h4>Do not complete until you are ready to signout</h4>
+            <fieldset>
+                <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
+            </fieldset>
+            <fieldset>
+                <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel"
+                       pattern=".*[0-9]{4}.*" maxlength=15 required>
+            </fieldset>
+            <fieldset>
+                <select multiple id="service" name="service" required>
+                    {% for service in solid_services %}
+                    <option value="{{ service.id }}">{{ service.name }}</option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+            <input type="hidden" id="oncall" name="oncall" value="FALSE">
+            <input type="hidden" id="hosttimestamp" name="hosttimestamp" value="">
+            <fieldset>
+                <button name="submit" type="submit" id="submit" onclick="return submitSignout(false)">Submit</button>
+            </fieldset>
+            <fieldset>
+                <div style="text-align:left;" class="runningclock"></div>
+            </fieldset>
+        </form>
     </div>
     <div class="currentlist" style="flex: 0 0 600px">
-      <h3>Primary teams signed up</h3>
-      <table style="width:100%;text-align:left;">
-        <tr>
-          <th>Intern/Resident/APP</th>
-          <th>Service</th>
-          <th>Time marked ready</th>
-          <!-- <th>Signout duration</th> -->
-        </tr>
-        {% for intern in noncall_solid_interns %}
-        <tr style="color:{{ intern.fgcolor }}">
-          <td>{{ intern.intern_name|striptags }}</td>
-          <td>{{ intern.name }}</td>
-          <td>{{ intern.addtime }}</td>
-          <!-- <td>{{ intern.elapsedtime }}</td> -->
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-  </div>
-
-  <!-- NON-CALL LIQUID TUMOR / Gen Med -->
-  <center><h1>Non-Call NF 9133 (Leukemia, Lymphoma, Gen Med)</h1></center><br>
-  <div class="flex-container">
-    <div class="submissionform">
-      <form id="signoutready" action="" method="POST">
-        <h3>Primary Team Ready-To-Signout</h3>
-        <h4>Do not complete until you are ready to signout</h4>
-        <fieldset>
-          <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
-        </fieldset>
-        <fieldset>
-          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" pattern=".*[0-9]{4}.*" maxlength=15 required>
-        </fieldset>
-        <fieldset>
-          <select multiple id="service" name="service" required>
-            {% for service in liquid_services %}
-            <option value="{{ service.id }}">{{ service.name }}</option>
+        <h3>Primary teams signed up</h3>
+        <table style="width:100%;text-align:left;">
+            <tr>
+                <th>Intern/Resident/APP</th>
+                <th>Service</th>
+                <th>Time marked ready</th>
+                <!-- <th>Signout duration</th> -->
+            </tr>
+            {% for intern in noncall_solid_interns %}
+            <tr style="color:{{ intern.fgcolor }}">
+                <td>{{ intern.intern_name|striptags }}</td>
+                <td>{{ intern.name }}</td>
+                <td>{{ intern.addtime }}</td>
+                <!-- <td>{{ intern.elapsedtime }}</td> -->
+            </tr>
             {% endfor %}
-          </select>
-        </fieldset>
-        <input type="hidden" id="oncall" name="oncall" value="FALSE">
-        <input type="hidden" id="hosttimestamp" name="hosttimestamp" value="">
-        <fieldset>
-          <button name="submit" type="submit" id="submit" onclick="return submitSignout(false)">Submit</button>
-        </fieldset>
-        <fieldset>
-          <div style="text-align:left;" class="runningclock"></div>
-        </fieldset>
-      </form>
+        </table>
+    </div>
+</div>
+
+<!-- NON-CALL LIQUID TUMOR / Gen Med -->
+<center><h1>Non-Call NF 9133 (Leukemia, Lymphoma, Gen Med)</h1></center><br>
+<div class="flex-container">
+    <div class="submissionform">
+        <form id="signoutready" action="" method="POST">
+            <h3>Primary Team Ready-To-Signout</h3>
+            <h4>Do not complete until you are ready to signout</h4>
+            <fieldset>
+                <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
+            </fieldset>
+            <fieldset>
+                <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel"
+                       pattern=".*[0-9]{4}.*" maxlength=15 required>
+            </fieldset>
+            <fieldset>
+                <select multiple id="service" name="service" required>
+                    {% for service in liquid_services %}
+                    <option value="{{ service.id }}">{{ service.name }}</option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+            <input type="hidden" id="oncall" name="oncall" value="FALSE">
+            <input type="hidden" id="hosttimestamp" name="hosttimestamp" value="">
+            <fieldset>
+                <button name="submit" type="submit" id="submit" onclick="return submitSignout(false)">Submit</button>
+            </fieldset>
+            <fieldset>
+                <div style="text-align:left;" class="runningclock"></div>
+            </fieldset>
+        </form>
     </div>
     <div class="currentlist" style="flex: 0 0 600px">
-      <h3>Primary teams signed up</h3>
-      <table style="width:100%;text-align:left;">
-        <tr>
-          <th>Intern/Resident/APP</th>
-          <th>Service</th>
-          <th>Time marked ready</th>
-          <!-- <th>Signout duration</th> -->
-        </tr>
-        {% for intern in noncall_liquid_interns %}
-        <tr style="color:{{ intern.fgcolor }}">
-          <td>{{ intern.intern_name|striptags }}</td>
-          <td>{{ intern.name }}</td>
-          <td>{{ intern.addtime }}</td>
-          <!-- <td>{{ intern.elapsedtime }}</td> -->
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-  </div>
-
-
-  <!-- CALL SOLID TUMOR -->
-  <center><h1>On-Call NF 9132 (GI/Breast/STR)</h1></center><br>
-  <div class="flex-container">
-    <div class="submissionform">
-      <form id="signoutready" action="" method="POST">
-        <h3>Primary Team Ready-To-Signout</h3>
-        <h4>Do not complete until you are ready to signout</h4>
-        <fieldset>
-          <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
-        </fieldset>
-        <fieldset>
-          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" pattern=".*[0-9]{4}.*" maxlength=15 required>
-        </fieldset>
-        <fieldset>
-          <select multiple id="service" name="service" required>
-            {% for service in solid_services %}
-            <option value="{{ service.id }}">{{ service.name }}</option>
+        <h3>Primary teams signed up</h3>
+        <table style="width:100%;text-align:left;">
+            <tr>
+                <th>Intern/Resident/APP</th>
+                <th>Service</th>
+                <th>Time marked ready</th>
+                <!-- <th>Signout duration</th> -->
+            </tr>
+            {% for intern in noncall_liquid_interns %}
+            <tr style="color:{{ intern.fgcolor }}">
+                <td>{{ intern.intern_name|striptags }}</td>
+                <td>{{ intern.name }}</td>
+                <td>{{ intern.addtime }}</td>
+                <!-- <td>{{ intern.elapsedtime }}</td> -->
+            </tr>
             {% endfor %}
-          </select>
-        </fieldset>
-        <input type="hidden" id="oncall" name="oncall" value="TRUE">
-        <input type="hidden" id="hosttimestamp" name="hosttimestamp" value="">
-        <fieldset>
-          <button name="submit" type="submit" id="submit" onclick="return submitSignout(true)">Submit</button>
-        </fieldset>
-        <fieldset>
-          <div style="text-align:left;" class="runningclock"></div>
-        </fieldset>
-      </form>
+        </table>
+    </div>
+</div>
+
+
+<!-- CALL SOLID TUMOR -->
+<center><h1>On-Call NF 9132 (GI/Breast/STR)</h1></center><br>
+<div class="flex-container">
+    <div class="submissionform">
+        <form id="signoutready" action="" method="POST">
+            <h3>Primary Team Ready-To-Signout</h3>
+            <h4>Do not complete until you are ready to signout</h4>
+            <fieldset>
+                <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
+            </fieldset>
+            <fieldset>
+                <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel"
+                       pattern=".*[0-9]{4}.*" maxlength=15 required>
+            </fieldset>
+            <fieldset>
+                <select multiple id="service" name="service" required>
+                    {% for service in solid_services %}
+                    <option value="{{ service.id }}">{{ service.name }}</option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+            <input type="hidden" id="oncall" name="oncall" value="TRUE">
+            <input type="hidden" id="hosttimestamp" name="hosttimestamp" value="">
+            <fieldset>
+                <button name="submit" type="submit" id="submit" onclick="return submitSignout(true)">Submit</button>
+            </fieldset>
+            <fieldset>
+                <div style="text-align:left;" class="runningclock"></div>
+            </fieldset>
+        </form>
     </div>
     <div class="currentlist" style="flex: 0 0 600px">
-      <h3>Primary teams signed up</h3>
-      <table style="width:100%;text-align:left;">
-        <tr>
-          <th>Intern/Resident/APP</th>
-          <th>Service</th>
-          <th>Time marked ready</th>
-          <!-- <th>Signout duration</th> -->
-        </tr>
-        {% for intern in call_solid_interns %}
-        <tr style="color:{{ intern.fgcolor }}">
-          <td>{{ intern.intern_name|striptags }}</td>
-          <td>{{ intern.name }}</td>
-          <td>{{ intern.addtime }}</td>
-          <!-- <td>{{ intern.elapsedtime }}</td> -->
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-  </div>
-
-    <!-- CALL LIQUID TUMOR / Gen Med -->
-
-  <h1 align="center">On-Call NF 9133 (Leukemia, Lymphoma, Gen Med)</h1><br>
-  <div class="flex-container">
-    <div class="submissionform">
-      <form id="signoutready" action="" method="POST">
-        <h3>Primary Team Ready-To-Signout</h3>
-        <h4>Do not complete until you are ready to signout</h4>
-        <fieldset>
-          <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
-        </fieldset>
-        <fieldset>
-          <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel" pattern=".*[0-9]{4}.*" maxlength=15 required>
-        </fieldset>
-        <fieldset>
-          <select multiple id="service" name="service" required>
-            {% for service in liquid_services %}
-            <option value="{{ service.id }}">{{ service.name }}</option>
+        <h3>Primary teams signed up</h3>
+        <table style="width:100%;text-align:left;">
+            <tr>
+                <th>Intern/Resident/APP</th>
+                <th>Service</th>
+                <th>Time marked ready</th>
+                <!-- <th>Signout duration</th> -->
+            </tr>
+            {% for intern in call_solid_interns %}
+            <tr style="color:{{ intern.fgcolor }}">
+                <td>{{ intern.intern_name|striptags }}</td>
+                <td>{{ intern.name }}</td>
+                <td>{{ intern.addtime }}</td>
+                <!-- <td>{{ intern.elapsedtime }}</td> -->
+            </tr>
             {% endfor %}
-          </select>
-        </fieldset>
-        <input type="hidden" id="oncall" name="oncall" value="TRUE">
-        <input type="hidden" id="hosttimestamp" name="hosttimestamp" value="">
-        <fieldset>
-          <button name="submit" type="submit" id="submit" onclick="return submitSignout(true)">Submit</button>
-        </fieldset>
-        <fieldset>
-          <div style="text-align:left;" class="runningclock"></div>
-        </fieldset>
-      </form>
+        </table>
+    </div>
+</div>
+
+<!-- CALL LIQUID TUMOR / Gen Med -->
+
+<h1 align="center">On-Call NF 9133 (Leukemia, Lymphoma, Gen Med)</h1><br>
+<div class="flex-container">
+    <div class="submissionform">
+        <form id="signoutready" action="" method="POST">
+            <h3>Primary Team Ready-To-Signout</h3>
+            <h4>Do not complete until you are ready to signout</h4>
+            <fieldset>
+                <input name="intern_name" id="intern_name" placeholder="Your name" type="text" required>
+            </fieldset>
+            <fieldset>
+                <input name="intern_callback" id="intern_callback" placeholder="Your contact number" type="tel"
+                       pattern=".*[0-9]{4}.*" maxlength=15 required>
+            </fieldset>
+            <fieldset>
+                <select multiple id="service" name="service" required>
+                    {% for service in liquid_services %}
+                    <option value="{{ service.id }}">{{ service.name }}</option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+            <input type="hidden" id="oncall" name="oncall" value="TRUE">
+            <input type="hidden" id="hosttimestamp" name="hosttimestamp" value="">
+            <fieldset>
+                <button name="submit" type="submit" id="submit" onclick="return submitSignout(true)">Submit</button>
+            </fieldset>
+            <fieldset>
+                <div style="text-align:left;" class="runningclock"></div>
+            </fieldset>
+        </form>
     </div>
     <div class="currentlist" style="flex: 0 0 600px">
-      <h3>Primary teams signed up</h3>
-      <table style="width:100%;text-align:left;">
-        <tr>
-          <th>Intern/Resident/APP</th>
-          <th>Service</th>
-          <th>Time marked ready</th>
-          <!-- <th>Signout duration</th> -->
-        </tr>
-        {% for intern in call_liquid_interns %}
-        <tr style="color:{{ intern.fgcolor }}">
-          <td>{{ intern.intern_name|striptags }}</td>
-          <td>{{ intern.name }}</td>
-          <td>{{ intern.addtime }}</td>
-          <!-- <td>{{ intern.elapsedtime }}</td> -->
-        </tr>
-        {% endfor %}
-      </table>
+        <h3>Primary teams signed up</h3>
+        <table style="width:100%;text-align:left;">
+            <tr>
+                <th>Intern/Resident/APP</th>
+                <th>Service</th>
+                <th>Time marked ready</th>
+                <!-- <th>Signout duration</th> -->
+            </tr>
+            {% for intern in call_liquid_interns %}
+            <tr style="color:{{ intern.fgcolor }}">
+                <td>{{ intern.intern_name|striptags }}</td>
+                <td>{{ intern.name }}</td>
+                <td>{{ intern.addtime }}</td>
+                <!-- <td>{{ intern.elapsedtime }}</td> -->
+            </tr>
+            {% endfor %}
+        </table>
     </div>
-  </div>
+</div>
 
 {% endblock %}
 

@@ -112,17 +112,25 @@ for i in $(seq 0 $(("${ARGS[<FILE>,#]}"-1)) ); do
 done
 
 formatter="/Applications/PyCharm.app/Contents/MacOS/pycharm" && debuglog "formatter='$formatter'"
-debuglog "files=( ${files[@]} )"
 
-cmdline="$formatter format ${files[@]} "
-if [[ ${ARGS[--quiet]} == true ]]; then
-  cmdline="$cmdline >/dev/null 2>&1"
-elif [[ ${ARGS[--verbose]} == false ]]; then
-  cmdline="$cmdline 2>&1 | grep '^Formatting'"
+if [ -f "$formatter" ]; then
+
+  debuglog "files=( ${files[@]} )"
+
+  cmdline="$formatter format ${files[@]} "
+  if [[ ${ARGS[--quiet]} == true ]]; then
+    cmdline="$cmdline >/dev/null 2>&1"
+  elif [[ ${ARGS[--verbose]} == false ]]; then
+    cmdline="$cmdline 2>&1 | grep '^Formatting'"
+  fi
+
+  eval "$cmdline"
+  errcode=$?
+else
+  echo "PyCharm not found.  No files formatted"
+  errcode=0
 fi
 
-eval "$cmdline"
-errcode=$?
 trap - ERR
 exit $errcode
 

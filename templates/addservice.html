@@ -7,36 +7,36 @@
 {% block title %}MSKCC Signout Admin{% endblock %}
 {% block body %}
 <center>
-  <h1>Add new Signout List</h1>
-  <button onClick="location.href='/submission'">Return to submission form</button>
-  <br>
-  <br>
-  <h3>Formatting Note</h3>
-  <p>Service names are typically written as<br>
-  <em>'Service, Intern #x'</em><br>
-  for example<br>
-  <strong><em>'Leukemia A, Intern #2'</em></strong><br>
+    <h1>Add new Signout List</h1>
+    <button onClick="location.href='/submission'">Return to submission form</button>
+    <br>
+    <br>
+    <h3>Formatting Note</h3>
+    <p>Service names are typically written as<br>
+        <em>'Service, Intern #x'</em><br>
+        for example<br>
+        <strong><em>'Leukemia A, Intern #2'</em></strong><br>
 
-  <div class="flex-container" id="addnew" name="addnew">
-    <div class="submissionform" name="addform" id="addform" align="center">
-      <form id="queryselect" action="" method="POST">
-        <fieldset>
-          <input name="name" id="name" type="text" placeholder="Service Name" required>
-          <label for="name">Service Name</label><br>
-        </fieldset>
-        <fieldset>
-          <select name="nflist" id="nflist" required>
-          <option value="NF9132">NF9132</option>
-          <option value="NF9133">NF9133</option>
-          </select>
-          <label for="nflist">Night float list</label><br>
-        </fieldset>
-        <fieldset>
-          <button name="submit" type="submit" id="submit">Submit</button>
-        </fieldset>
-      </form>
+    <div class="flex-container" id="addnew" name="addnew">
+        <div class="submissionform" name="addform" id="addform" align="center">
+            <form id="queryselect" action="" method="POST">
+                <fieldset>
+                    <input name="name" id="name" type="text" placeholder="Service Name" required>
+                    <label for="name">Service Name</label><br>
+                </fieldset>
+                <fieldset>
+                    <select name="nflist" id="nflist" required>
+                        <option value="NF9132">NF9132</option>
+                        <option value="NF9133">NF9133</option>
+                    </select>
+                    <label for="nflist">Night float list</label><br>
+                </fieldset>
+                <fieldset>
+                    <button name="submit" type="submit" id="submit">Submit</button>
+                </fieldset>
+            </form>
+        </div>
     </div>
-  </div>
 </center>
 {% endblock %}
 
