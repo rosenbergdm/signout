@@ -13,8 +13,8 @@ Program to run the MSKCC intern signout page
 
 """
 
-import pprint
-import sys
+from auth import *
+from helpers import *
 
 from flask import (
     jsonify,
@@ -26,23 +26,12 @@ from flask import (
     redirect,
     request,
 )
-from flask_login import (
-    LoginManager,
-    login_required,
-    login_user,
-    current_user,
-    logout_user,
-)
-from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_talisman import Talisman
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, InputRequired
+from functools import wraps
 from shutil import copyfile
-from werkzeug.security import check_password_hash, generate_password_hash
 from time import sleep
 from twilio.rest import Client
-from urllib.parse import urlparse, urljoin
 
 import datetime
 import json
@@ -50,6 +39,7 @@ import os
 import pdb
 import psycopg2
 import re
+import sys
 
 # pdb.set_trace()
 
@@ -62,117 +52,9 @@ login_manager.init_app(app)
 login_manager.login_view = "login"
 
 
-class LoginForm(FlaskForm):
-    user_name = StringField(
-        "Name: ", validators=[InputRequired("'Name' failed DataRequired")]
-    )
-    rawpw = PasswordField(
-        "Password: ", validators=[InputRequired("InputRequired failed for 'rawpw'")]
-    )
-
-    def __repr__(self):
-        return f"LoginForm (user_name = {self.user_name}, rawpw = {self.rawpw})"
-
-
-class User(object):
-    max_id = 0
-    names = []
-    users = []
-
-    @classmethod
-    def increment_id(cls):
-        cls.max_id += 1
-        return cls.max_id
-
-    @classmethod
-    def get_num_ids(cls):
-        return cls.max_id
-
-    @classmethod
-    def get(cls, user_id):
-        if type(user_id) is str:
-            user_id = int(user_id)
-        return cls.users[user_id - 1]
-
-    @classmethod
-    def get_by_name(cls, username):
-        user_id = cls.names.index(username)
-        return cls.get(user_id + 1)
-
-    @classmethod
-    def check_password(cls, user_name, rawpw):
-        user = cls.get_by_name(user_name)
-        if user:
-            if check_password_hash(user.pwhash, rawpw):
-                return user
-        return None
-
-    def __init__(self, user_name, pwhash="", user_id=None):
-        if user_id is None:
-            user_id = User.increment_id()
-        self.user_id = user_id
-        self.user_name = user_name
-        self.pwhash = pwhash
-        self.authenticated = False
-
-        User.names.append(user_name)
-        if type(user_name) is not str:
-            raise Exception()
-        User.users.append(self)
-
-    def set_password(self, raw_password):
-        self.pwhash = generate_password_hash(raw_password)
-
-    def __repr__(self):
-        return f"User: (user_name = '{self.user_name}', pwhash = '******', user_id={self.user_id}, authenticated={self.authenticated})"
-
-    def is_authenticated(self):
-        return self.authenticated
-
-    def is_active(self):
-        return True
-
-    def is_anonymouse(self):
-        return False
-
-    def get_id(self):
-        return str(self.user_id)
-
-
-def gen_med_sorter(intern_list):
-    gen_med = []
-    non_gen_med = []
-    for i in intern_list:
-        if i["name"][0:7] == "Gen Med":
-            gen_med.append(i)
-        else:
-            non_gen_med.append(i)
-    gen_med.extend(non_gen_med)
-    return gen_med
-
-
-def format_timestamp(ts):
-    if ts == "None":
-        return ""
-    else:
-        return CLEANUP_TIMESTAMP.sub(".\\1", ts)
-
-
-def fix_earlytimes(ts):
-    if SHIFT_TIMES.match(ts):
-        hour = str(int(SHIFT_TIMES.sub("\\1", ts)) + 1).zfill(2)
-        return str(hour) + SHIFT_TIMES.sub(":00:00.\\3", ts)
-    else:
-        return ts
-
-
-def cleanup_date_input(ds):
-    if "-" in ds:
-        return ds
-    else:
-        parts = ds.split("/")
-        ds = "-".join([parts[2], parts[0], parts[1]])
-        return ds
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
 
 
 def load_db_settings():
@@ -210,17 +92,10 @@ else:
     elif os.path.exists(os.path.join(os.environ["HOME"], "src/signout")):
         app.config["SCRIPTDIR"] = os.path.join(os.environ["HOME"], "src/signout")
     else:
+        # TODO: This should never happen
         raise Exception
 
-
-CLEANUP_TIMESTAMP = re.compile(r"\.(..).*$")
-SHIFT_TIMES = re.compile(r"^(\d{1,2})(:59:59\.)(.*)$")
 app.config["USERS"] = dict()
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.get(user_id)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -258,17 +133,6 @@ def verify_password(username, password):
         app.config["USERS"].get(username), password
     ):
         return username
-
-
-def dbg(msg):
-    if app.config["DEBUG_SIGNOUT_OUTPUT"]:
-        pprint.pprint(msg, stream=sys.stderr)
-
-
-def is_safe_url(target):
-    ref_url = urlparse(request.host_url)
-    test_url = urlparse(urljoin(request.host_url, target))
-    return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
 
 
 @app.route("/")
@@ -365,13 +229,6 @@ def nightfloat():
         cur.close()
         conn.close()
         return render_template("removed.html", type=listtype)
-
-
-def get_foreground_color(activestate):
-    if activestate:
-        return "#000000"
-    else:
-        return "#999999"
 
 
 @app.route("/synctime")
@@ -572,17 +429,19 @@ def submission_weekend():
                 and type = 'NF9133' 
             ORDER BY addtime ASC"""
         )
-        noncall_liquid_interns = [
-            {
-                "intern_name": x[0],
-                "name": x[1],
-                "addtime": fix_earlytimes(CLEANUP_TIMESTAMP.sub(".\\1", str(x[2]))),
-                "active": x[3],
-                "fgcolor": get_foreground_color(x[3]),
-                "elapsedtime": format_timestamp(str(x[4])),
-            }
-            for x in cur.fetchall()
-        ]
+        noncall_liquid_interns = gen_med_sorter(
+            [
+                {
+                    "intern_name": x[0],
+                    "name": x[1],
+                    "addtime": fix_earlytimes(CLEANUP_TIMESTAMP.sub(".\\1", str(x[2]))),
+                    "active": x[3],
+                    "fgcolor": get_foreground_color(x[3]),
+                    "elapsedtime": format_timestamp(str(x[4])),
+                }
+                for x in cur.fetchall()
+            ]
+        )
         cur.close()
         conn.close()
         return render_template(
@@ -712,17 +571,19 @@ def submission_weekday():
                 and type = 'NF9133' 
             ORDER BY addtime ASC"""
         )
-        noncall_liquid_interns = [
-            {
-                "intern_name": x[0],
-                "name": x[1],
-                "addtime": fix_earlytimes(CLEANUP_TIMESTAMP.sub(".\\1", str(x[2]))),
-                "active": x[3],
-                "fgcolor": get_foreground_color(x[3]),
-                "elapsedtime": format_timestamp(str(x[4])),
-            }
-            for x in cur.fetchall()
-        ]
+        noncall_liquid_interns = gen_med_sorter(
+            [
+                {
+                    "intern_name": x[0],
+                    "name": x[1],
+                    "addtime": fix_earlytimes(CLEANUP_TIMESTAMP.sub(".\\1", str(x[2]))),
+                    "active": x[3],
+                    "fgcolor": get_foreground_color(x[3]),
+                    "elapsedtime": format_timestamp(str(x[4])),
+                }
+                for x in cur.fetchall()
+            ]
+        )
         cur.execute(
             """
             SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active, completetime - starttime as elapsedtime
@@ -872,7 +733,6 @@ def servicelist():
         {"id": x[0], "name": x[1], "type": x[2], "active": x[3], "othertype": x[4]}
         for x in results
     ]
-    # dbg(slist)
     return render_template("servicelist.html", servicelist=slist)
 
 
@@ -1133,17 +993,17 @@ def notify_missing_signouts(nflist):
     return nmessages
 
 
-def notifier_main():
-    """
-    Run the notifier script.
+# def notifier_main():
+#     """
+#     Run the notifier script.
 
-    """
-    nflists = ["NF9132", "NF9133"]
-    total_messages = 0
-    for nflist in nflists:
-        total_messages += notify_missing_signouts(nflist)
-    print("%s total SMS messages sent" % str(total_messages))
-    return
+#     """
+#     nflists = ["NF9132", "NF9133"]
+#     total_messages = 0
+#     for nflist in nflists:
+#         total_messages += notify_missing_signouts(nflist)
+#     print("%s total SMS messages sent" % str(total_messages))
+#     return
 
 
 def notify_late_signup(signout_id, notify=True):

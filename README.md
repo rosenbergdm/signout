@@ -14,6 +14,7 @@
     - Black python linter
     - eslint
     - Prettier
+    - GNU parallel
 - Python modules
   - python3 is required
   - Deployment - use `requirements.txt`
