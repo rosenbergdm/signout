@@ -26,6 +26,7 @@ from auth import (
 )
 from helpers import *
 
+
 from flask import (
     abort,
     jsonify,
@@ -37,6 +38,9 @@ from flask import (
     redirect,
     request,
 )
+import os
+
+from db import load_db_settings, get_db
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_talisman import Talisman
 
@@ -47,7 +51,6 @@ from twilio.rest import Client
 
 import datetime
 import json
-import os
 import pdb
 import psycopg2
 import re
@@ -57,7 +60,14 @@ import sys
 
 __version__ = "1.0.0rc0"
 
+# if "app" in globals() or "app" in dir():
+#     print("app exists")
+# else:
+#     print("app not defined")
+
+SCRIPTDIR = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__)
+app.config["SCRIPTDIR"] = SCRIPTDIR
 Talisman(app, content_security_policy=None)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -67,47 +77,6 @@ login_manager.login_view = "login"
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
-
-
-def load_db_settings():
-    fp = open(os.path.join(app.config["SCRIPTDIR"], "dbsettings.json"))
-    dbsettings = json.load(fp)
-    fp.close()
-    for k in dbsettings:
-        app.config[k] = dbsettings[k]
-        if os.environ.get(k):
-            e_val = os.environ.get(k)
-            dbg(f"Setting '{k}' to '{e_val}' based on environment variable")
-            app.config[k] = e_val
-    for u in dbsettings["USERS"].keys():
-        val = dbsettings["USERS"][u]
-        User(u, dbsettings["USERS"][u])
-
-
-def get_db():
-    conn = psycopg2.connect(
-        database=app.config["DBNAME"],
-        user=app.config["DBUSER"],
-        password=app.config["DBPASSWORD"],
-    )
-    return conn
-
-
-app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
-if "__file__" in dir():
-    app.config["SCRIPTDIR"] = os.path.dirname(os.path.realpath(__file__))
-else:
-    if "SCRIPTDIR" in globals().keys():
-        app.config["SCRIPTDIR"] = globals()["SCRIPTDIR"]
-    if os.path.exists("/usr/local/src/signout/dbsettings.json"):
-        app.config["SCRIPTDIR"] = "/usr/local/src/signout"
-    elif os.path.exists(os.path.join(os.environ["HOME"], "src/signout")):
-        app.config["SCRIPTDIR"] = os.path.join(os.environ["HOME"], "src/signout")
-    else:
-        # TODO: This should never happen
-        raise Exception
-
-app.config["USERS"] = dict()
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -124,7 +93,6 @@ def login():
                     return abort(400)
                 return redirect(next or url_for("index"))
         else:
-            raise Exception()
             flash("Invalid credentials")
     return render_template("login.html", form=form)
 
@@ -160,7 +128,7 @@ def start_signout():
         return "ERROR: Tried to start signout without an id query parameter for which signout db entry"
     try:
         signout_id = request.args.get("id")
-        conn = get_db()
+        conn = get_db(app)
         cur = conn.cursor()
         cur.execute(
             "UPDATE signout set starttime=current_timestamp where id=%s"
@@ -181,7 +149,7 @@ def nightfloat():
     else:
         listtype = request.args.get("list")
         # TODO: This is sort of dangerous.  Should do differently
-    conn = get_db()
+    conn = get_db(app)
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute(
@@ -250,7 +218,7 @@ def synctime():
 
 @app.route("/query", methods=["GET", "POST"])
 def query():
-    conn = get_db()
+    conn = get_db(app)
     if request.method == "GET":
         cur = conn.cursor()
         rangestring = "Showing signouts for %s" % (
@@ -397,7 +365,7 @@ def query():
 
 
 def submission_weekend():
-    conn = get_db()
+    conn = get_db(app)
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute(
@@ -514,7 +482,7 @@ def submission_weekend():
 
 
 def submission_weekday():
-    conn = get_db()
+    conn = get_db(app)
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute(
@@ -713,7 +681,7 @@ def submission():
 @app.route("/servicelist")
 @login_required
 def servicelist():
-    conn = get_db()
+    conn = get_db(app)
     cur = conn.cursor()
     cur.execute(
         """
@@ -757,7 +725,7 @@ def service():
     else:
         service_id = int(request.args.get("id"))
         action = request.args.get("action")
-    conn = get_db()
+    conn = get_db(app)
     cur = conn.cursor()
     cur.execute(
         "SELECT id, name FROM service WHERE id=%s ORDER BY id ASC", (service_id,)
@@ -802,7 +770,7 @@ def admin():
 def addservice():
     if request.method == "GET":
         return render_template("addservice.html")
-    conn = get_db()
+    conn = get_db(app)
     cur = conn.cursor()
     cur.execute(
         "INSERT INTO SERVICE (name, type) VALUES (%s, %s) RETURNING id",
@@ -867,7 +835,7 @@ def get_callback_number(nflist):
     :rtype: str
     """
 
-    conn = get_db()
+    conn = get_db(app)
     cur = conn.cursor()
     dayofyear = datetime.datetime.today().timetuple().tm_yday
     cur.execute(
@@ -901,7 +869,7 @@ def get_missing_signouts(nflist):
     :rtype: [str]
 
     """
-    conn = get_db()
+    conn = get_db(app)
     cur = conn.cursor()
     cur.execute(
         """
@@ -1027,7 +995,7 @@ def notify_late_signup(signout_id, notify=True):
     :returns: none
 
     """
-    conn = get_db()
+    conn = get_db(app)
     cur = conn.cursor()
     cur.execute(
         """SELECT intern_name, service.name, intern_callback, type
@@ -1059,5 +1027,5 @@ def notify_late_signup(signout_id, notify=True):
 
 
 if __name__ == "__main__":
-    load_db_settings()
+    load_db_settings(app)
     app.run(host="0.0.0.0", debug=True)
