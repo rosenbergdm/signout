@@ -105,7 +105,7 @@ done
 $ECHO "Running shellcheck on shell files"
 for fname in $(find . -name "*.sh" | grep -v .venv); do
   ff="$($READLINK -f $fname)"
-  if $(grep "$($BASENAME $ff)" <( ($ECHO $MOD_FILES | perl -p -e 's/ /\n/g' ) ) >/dev/null); then
+  if $(grep "$($BASENAME $ff)" <( ($ECHO $MOD_FILES | grep -v htmldjango | perl -p -e 's/ /\n/g' ) ) >/dev/null); then
     $ECHO -n "Checking '$ff'..."
     /usr/local/bin/shellcheck -S error "$ff" >/dev/null 2>&1
     ((_error+=$?))
