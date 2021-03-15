@@ -1,6 +1,6 @@
 # For 1.0.0 release:
 
-- Sort Gen med for both lists
+- **COMPLETE** Sort Gen med for both lists
 - Better documentation
   - Setup / install process
   - Usage instructions on main page
