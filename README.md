@@ -1,49 +1,61 @@
-#Apache Config:
+# signout.py README.md
 
-.apacheconf~~~~~~~~~~~~~~~~~~~~~~
+## Required programs
+
+- External programs
+  - Deployment
+    - Apache with mod_wsgi referencing python3
+    - [Docopts](https://github.com/docopt/docopts) shell command-line argument parser
+    - PostgreSQL database with a database and user configured in settings file.
+    - Bash > 4 for script execution
+    - [jq](https://stedolan.github.io/jq/) is recommended but not required for json file management
+  - Development
+    - [Shellcheck](http://www.shellcheck.net) shell script linter
+    - Black python linter
+    - eslint
+    - Prettier
+- Python modules
+  - python3 is required
+  - Deployment - use `requirements.txt`
+  - Development - use `requirements.dev.txt`
+- Other requirements
+  - SSL Certs in place
+  - DNS pointing url at apache
+
+## Apache Config:
+
+```
 <VirtualHost *:80>
-	ServerName signout.davidrosenberg.me
-	ServerAlias signout.localdomain
-	ServerAlias signout
-	ServerAdmin dmr@davidrosenberg.me
+ServerName signout.davidrosenberg.me
+ServerAlias signout.localdomain
+ServerAlias signout
+ServerAdmin dmr@davidrosenberg.me
 
-	WSGIDaemonProcess signout user=www-data group=www-data threads=15
-	WSGIProcessGroup signout
-	WSGIScriptAlias / /usr/local/src/signout/signout.wsgi
-  WSGIPassAuthorization On
-	Alias /static/ /usr/local/src/signout/static/
+    WSGIDaemonProcess signout user=www-data group=www-data threads=15
+    WSGIProcessGroup signout
+    WSGIScriptAlias / /usr/local/src/signout/signout.wsgi
 
-	ErrorLog /var/log/apache2/error.signout.log
-	CustomLog /var/log/apache2/access.signout.log combined
+WSGIPassAuthorization On
+Alias /static/ /usr/local/src/signout/static/
 
-	<Files /usr/local/src/signout/signout.wsgi>
-		Require all granted
-	</Files>
-	<Directory /usr/local/src/signout/static>
-		Require all granted
-	</Directory>
-	<Location />
-		Require all granted
-	</Location>
+    ErrorLog /var/log/apache2/error.signout.log
+    CustomLog /var/log/apache2/access.signout.log combined
+
+    <Files /usr/local/src/signout/signout.wsgi>
+    	Require all granted
+    </Files>
+    <Directory /usr/local/src/signout/static>
+    	Require all granted
+    </Directory>
+    <Location />
+    	Require all granted
+    </Location>
+
 </VirtualHost>
-~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 
-# Upgrade from v0.3 -> v0.4
-- update dbsettings.json (some stuff changed case, lots new).  Look at dbsettings.json.test to see
-- Ensure WSGIPassAuthorization is on in apache conf
-- backup the db
-- install the updates `cat ./scripts/{nf_assignments,fix_service_active}.sql | psql -U signout signout`
-- backup the db again
-- install jq
-- install docopt (https://github.com/docopt/docopts)
+## CONFIGURATION SETTINGS
 
-- install required python3 packages `pip3 install twilio flask-HTTPAuth`
-- reload apache
-- Make sure everything works
-- ENSURE apache's mod\_wsgi uses python3: `ldd "/usr/lib/apache2/modules/*wsgi*"` .  It should reference python3
-
-# CONFIGURATION SETTINGS
-
-DEBUG\_CALLBACKS: When set, sends notifications to the number given in DEBUG\_TARGET\_NUMBER
-DEBUG\_PRNIT\_NOT\_MESSAGE: When set, prints to stdout instead of sending notifications
+DEBUG_CALLBACKS: When set, sends notifications to the number given in DEBUG_TARGET_NUMBER
+DEBUG_PRNIT_NOT_MESSAGE: When set, prints to stdout instead of sending notifications
