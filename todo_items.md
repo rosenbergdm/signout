@@ -1,7 +1,23 @@
-# Items for signout program
+# For 1.0.0 release:
+* Sort Gen med for both lists
+* Better documentation
+* Better centering for time clock
+* Actual setup scripts
+* Interface for modifying callback numbers
 
+# Post v0.4 upgrade
+
+* **COMPLETE** Nightfloat page should not refresh when an active signout is in progress (061b269c17fb9444c671ef6c3fa7dd923a5392ee)
+* **COMPLETE** There is no Lymphoma #3.  There is a Lymphoma green APP.
+* **COMPLETE** Add note to the 'add page' demonstrating the normal formatting of the list names (6ad8ec64dbf96291346596b80093fa3387622429)
+* ? Add ability for NF to 'add lists' to the person currently signing out
+* ? Web interface for changing configuration values
+* **COMPLETE** Fix for the insertContact not putting in the right email address on some pages (ex: submission, works fine on query) (aaa4519eaf660d1adfcf2c69a6afaeb34deac75c)
+* **COMPLETE** UI and logging cleanup (2acc089a9bca2156b55abfc572cb0e4ae3aac62c)
+* ? Web interface for interrogating server state
 * **COMPLETE** Admin interface for changing service lists: (3a21e20102042741c27116403a3e0be60fa6f3b5)
 * **COMPLETE** Millisecond timing for system clock sync (75fb038334290b13b34d6a2963d07e5d76e6195e)
+
 
 # TODO for v0.3 release
 
@@ -39,13 +55,3 @@
 * Instructions for late sign ups **COMPLETE**
 * Fix to never display "too early" signouts **COMPLETE**
 
-# Post v0.4 upgrade
-
-* **COMPLETE** Nightfloat page should not refresh when an active signout is in progress (061b269c17fb9444c671ef6c3fa7dd923a5392ee)
-* **COMPLETE** There is no Lymphoma #3.  There is a Lymphoma green APP.
-* **COMPLETE** Add note to the 'add page' demonstrating the normal formatting of the list names (6ad8ec64dbf96291346596b80093fa3387622429)
-* ? Add ability for NF to 'add lists' to the person currently signing out
-* ? Web interface for changing configuration values
-* **COMPLETE** Fix for the insertContact not putting in the right email address on some pages (ex: submission, works fine on query) (aaa4519eaf660d1adfcf2c69a6afaeb34deac75c)
-* **COMPLETE** UI and logging cleanup (2acc089a9bca2156b55abfc572cb0e4ae3aac62c)
-* ? Web interface for interrogating server state
