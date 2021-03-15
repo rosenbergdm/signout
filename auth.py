@@ -15,15 +15,15 @@ Authorization setup and configuration for MSKCC signout program
 
 from flask_login import (
     LoginManager,
+    current_user,
     login_required,
     login_user,
-    current_user,
     logout_user,
 )
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import InputRequired
 from werkzeug.security import check_password_hash, generate_password_hash
+from wtforms import PasswordField, StringField, SubmitField
+from wtforms.validators import InputRequired
 
 
 class LoginForm(FlaskForm):
