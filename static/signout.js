@@ -86,11 +86,11 @@ var startsignout = function (internid) {
   }
 };
 
-var safe_refresh = function() {
+var safe_refresh = function () {
   if (!signoutInProgress) {
     window.location.reload();
   }
-}
+};
 //}}}
 
 //{{{ Time syncing
@@ -124,7 +124,8 @@ var updateTimeSync = function () {
   });
   timesyncXhr.open(
     "GET",
-    "/synctime?cachefix=" + String(Math.random()).substr(2, 10)
+    // "/synctime?cachefix=" + String(Math.random()).substr(2, 10)
+    "/synctime"
   );
   timesyncXhr.send();
 };

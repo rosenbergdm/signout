@@ -20,6 +20,7 @@ from flask import Flask, current_app
 
 from auth import User
 from helpers import dbg
+from app import application as app
 
 
 def load_db_settings(app):
@@ -38,7 +39,7 @@ def load_db_settings(app):
     app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
 
-def get_db(app):
+def get_db():
     conn = psycopg2.connect(
         database=app.config["DBNAME"],
         user=app.config["DBUSER"],

@@ -25,13 +25,13 @@ from auth import (
     generate_password_hash,
 )
 from helpers import *
-
+from db import load_db_settings, get_db
+from app import application as app
 
 from flask import (
     abort,
     jsonify,
-    # make_response,
-    Flask,
+    make_response,
     flash,
     url_for,
     render_template,
@@ -40,11 +40,7 @@ from flask import (
 )
 import os
 
-from db import load_db_settings, get_db
 from flask_wtf.csrf import CSRFProtect, CSRFError
-from flask_talisman import Talisman
-
-# from functools import wraps
 from shutil import copyfile
 from time import sleep
 from twilio.rest import Client
@@ -58,17 +54,9 @@ import sys
 
 # pdb.set_trace()
 
-__version__ = "1.0.0rc0"
-
-# if "app" in globals() or "app" in dir():
-#     print("app exists")
-# else:
-#     print("app not defined")
+__version__ = "0.9.9"
 
 SCRIPTDIR = os.path.dirname(os.path.realpath(__file__))
-app = Flask(__name__)
-app.config["SCRIPTDIR"] = SCRIPTDIR
-Talisman(app, content_security_policy=None)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
@@ -128,7 +116,7 @@ def start_signout():
         return "ERROR: Tried to start signout without an id query parameter for which signout db entry"
     try:
         signout_id = request.args.get("id")
-        conn = get_db(app)
+        conn = get_db()
         cur = conn.cursor()
         cur.execute(
             "UPDATE signout set starttime=current_timestamp where id=%s"
@@ -149,7 +137,7 @@ def nightfloat():
     else:
         listtype = request.args.get("list")
         # TODO: This is sort of dangerous.  Should do differently
-    conn = get_db(app)
+    conn = get_db()
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute(
@@ -213,12 +201,15 @@ def nightfloat():
 
 @app.route("/synctime")
 def synctime():
-    return datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3]
+    response = make_response(datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3])
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    return response
 
 
 @app.route("/query", methods=["GET", "POST"])
 def query():
-    conn = get_db(app)
+    conn = get_db()
     if request.method == "GET":
         cur = conn.cursor()
         rangestring = "Showing signouts for %s" % (
@@ -365,7 +356,7 @@ def query():
 
 
 def submission_weekend():
-    conn = get_db(app)
+    conn = get_db()
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute(
@@ -482,7 +473,7 @@ def submission_weekend():
 
 
 def submission_weekday():
-    conn = get_db(app)
+    conn = get_db()
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute(
@@ -681,7 +672,7 @@ def submission():
 @app.route("/servicelist")
 @login_required
 def servicelist():
-    conn = get_db(app)
+    conn = get_db()
     cur = conn.cursor()
     cur.execute(
         """
@@ -725,7 +716,7 @@ def service():
     else:
         service_id = int(request.args.get("id"))
         action = request.args.get("action")
-    conn = get_db(app)
+    conn = get_db()
     cur = conn.cursor()
     cur.execute(
         "SELECT id, name FROM service WHERE id=%s ORDER BY id ASC", (service_id,)
@@ -770,7 +761,7 @@ def admin():
 def addservice():
     if request.method == "GET":
         return render_template("addservice.html")
-    conn = get_db(app)
+    conn = get_db()
     cur = conn.cursor()
     cur.execute(
         "INSERT INTO SERVICE (name, type) VALUES (%s, %s) RETURNING id",
@@ -817,7 +808,13 @@ def configpage():
         return jsonify(update_config(var, val))
     with open(os.path.join(app.config["SCRIPTDIR"], "dbsettings.json")) as fp:
         dbconfig = json.load(fp)
-    cfg = {x: app.config[x] for x in dbconfig.keys()}
+    if request.args.get("full") is None or request.args.get("full").upper() != "TRUE":
+        cfg = {x: app.config[x] for x in dbconfig.keys()}
+    else:
+        cfg = dict(app.config)
+    for k in ["PERMANENT_SESSION_LIFETIME", "SEND_FILE_MAX_AGE_DEFAULT"]:
+        if k in cfg and isinstance(cfg[k], datetime.timedelta):
+            cfg[k] = str(cfg[k])
     for k in ["DBPASSWORD", "SECRET_KEY", "twilio-sid", "twilio-auth-token"]:
         cfg[k] = "******"
     if "USERS" in cfg:
@@ -835,7 +832,7 @@ def get_callback_number(nflist):
     :rtype: str
     """
 
-    conn = get_db(app)
+    conn = get_db()
     cur = conn.cursor()
     dayofyear = datetime.datetime.today().timetuple().tm_yday
     cur.execute(
@@ -869,7 +866,7 @@ def get_missing_signouts(nflist):
     :rtype: [str]
 
     """
-    conn = get_db(app)
+    conn = get_db()
     cur = conn.cursor()
     cur.execute(
         """
@@ -995,7 +992,7 @@ def notify_late_signup(signout_id, notify=True):
     :returns: none
 
     """
-    conn = get_db(app)
+    conn = get_db()
     cur = conn.cursor()
     cur.execute(
         """SELECT intern_name, service.name, intern_callback, type
