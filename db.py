@@ -13,13 +13,10 @@ MSKCC signout program database and configuration management
 """
 import json
 import os
-import pprint
 
 import psycopg2
-from flask import Flask, current_app
 
 from signout.auth import User
-from signout.helpers import dbg
 from signout.app import application as app
 
 
@@ -30,9 +27,7 @@ def load_db_settings(app):
     for k in dbsettings:
         app.config[k] = dbsettings[k]
         if os.environ.get(k):
-            e_val = os.environ.get(k)
-            dbg(f"Setting '{k}' to '{e_val}' based on environment variable")
-            app.config[k] = e_val
+            app.config[k] = os.environ.get(k)
     for u in dbsettings["USERS"].keys():
         User(u, dbsettings["USERS"][u])
     app.config["SETTINGS_LOADED"] = 1

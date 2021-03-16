@@ -12,12 +12,21 @@ MSKCC signout application app factory
 
 """
 import os
+from typing import Optional
 
 from flask import Flask
 from flask_talisman import Talisman
 
 
-def create_app(appdir=None):
+def create_app(appdir: Optional[str]=None):
+    """
+    Factory function to create the signout flask app.
+
+    :param Optional[str]: Directory where the application is located
+
+    :return: Flask application, secured with Talisman
+    :rtype: flask.app.Flask
+    """
     if appdir is None:
         appdir = os.path.dirname(os.path.realpath(__file__))
     app = Flask("signout")

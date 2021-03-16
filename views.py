@@ -27,15 +27,17 @@ from flask import (
     request,
     url_for,
 )
-
-from signout.auth import (
-    LoginForm,
-    User,
+from flask_login import (
     login_required,
     login_user,
     current_user,
     logout_user,
-    check_password_hash,
+)
+from werkzeug.security import check_password_hash
+
+from signout.auth import (
+    LoginForm,
+    User,
 )
 from signout.app import application as app
 from signout.db import get_db

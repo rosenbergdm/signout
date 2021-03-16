@@ -57,7 +57,7 @@ Alias /static/ /usr/local/src/signout/static/
 
 ## CONFIGURATION SETTINGS
 
-- Modifying config values using CURL:
+- Modifying config values using CURL: (also copies the current dbsettings.json to a backup file and writes the updated file to dbsettings.json)
 
 ```
 > curl -X POST -c cookie.txt -d "user_name=dmr" -d "rawpw=$PASSWORD" http://localhost:5000/login
@@ -67,6 +67,7 @@ Alias /static/ /usr/local/src/signout/static/
 > #uses the cookie file to authenticate
 ```
 
+- Viewing the full configuration: `http://localhost:5000/config?full=true`
 - Configuration flags
   - `DEBUG_CALLBACKS`: When set, sends notifications to the number given in `DEBUG_TARGET_NUMBER`
   - `DEBUG_PRNIT_NOT_MESSAGE:` When set, prints to stdout instead of sending notifications

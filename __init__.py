@@ -18,47 +18,22 @@ __version__ = "0.9.9"
 import os
 import pdb
 
-# from flask import (
-#     request,
+# from signout.auth import (
+#     User,
+#     LoginManager,
 # )
-# from twilio.rest import Client
-
-from signout.auth import (
-    User,
-    LoginManager,
-)
 from signout.app import application as app
-from signout.db import load_db_settings
 from signout.helpers import dbg
-from signout.views import (
-    login,
-    logout,
-    verify_password,
-    index,
-    start_signout,
-    nightfloat,
-    synctime,
-    query,
-    submission_weekend,
-    submission_weekday,
-    debug_submission_weekday,
-    debug_submission_weekend,
-    submission,
-    servicelist,
-    service,
-    admin,
-    addservice,
-)
-
+import signout.views
 # pdb.set_trace()
 
 
-SCRIPTDIR = os.path.dirname(os.path.realpath(__file__))
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = "login"
+# SCRIPTDIR = os.path.dirname(os.path.realpath(__file__))
+# login_manager = LoginManager()
+# login_manager.init_app(app)
+# login_manager.login_view = "login"
 
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.get(user_id)
+# @login_manager.user_loader
+# def load_user(user_id):
+#     return User.get(user_id)

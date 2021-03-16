@@ -13,18 +13,13 @@ Authorization setup and configuration for MSKCC signout program
 
 """
 
-from flask_login import (
-    LoginManager,
-    current_user,
-    login_required,
-    login_user,
-    logout_user,
-)
+from flask_login import LoginManager
 from flask_wtf import FlaskForm
 from werkzeug.security import check_password_hash, generate_password_hash
-from wtforms import PasswordField, StringField, SubmitField
+from wtforms import PasswordField, StringField
 from wtforms.validators import InputRequired
 
+from signout.app import application as app
 
 class LoginForm(FlaskForm):
     user_name = StringField(
@@ -108,6 +103,15 @@ class User(object):
 
     def get_id(self):
         return str(self.user_id)
+
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
 
 
 if __name__ == "__main__":
