@@ -17,7 +17,6 @@ Run this as `> python3 -m signout`
 from signout.app import application as app
 from signout.db import load_db_settings
 
-# from signout.helpers import dbg
 
 if __name__ == "__main__":
     load_db_settings(app)

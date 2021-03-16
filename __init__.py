@@ -18,22 +18,10 @@ __version__ = "0.9.9"
 import os
 import pdb
 
-# from signout.auth import (
-#     User,
-#     LoginManager,
-# )
 from signout.app import application as app
+from signout.db import load_db_settings
 from signout.helpers import dbg
 import signout.views
+
 # pdb.set_trace()
 
-
-# SCRIPTDIR = os.path.dirname(os.path.realpath(__file__))
-# login_manager = LoginManager()
-# login_manager.init_app(app)
-# login_manager.login_view = "login"
-
-
-# @login_manager.user_loader
-# def load_user(user_id):
-#     return User.get(user_id)
