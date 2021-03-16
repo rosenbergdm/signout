@@ -18,9 +18,9 @@ import pprint
 import psycopg2
 from flask import Flask, current_app
 
-from auth import User
-from helpers import dbg
-from app import application as app
+from signout.auth import User
+from signout.helpers import dbg
+from signout.app import application as app
 
 
 def load_db_settings(app):

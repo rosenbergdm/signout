@@ -20,6 +20,8 @@ from urllib.parse import urljoin, urlparse
 
 from flask import request
 
+from signout.app import application as app
+
 CLEANUP_TIMESTAMP = re.compile(r"\.(..).*$")
 SHIFT_TIMES = re.compile(r"^(\d{1,2})(:59:59\.)(.*)$")
 
@@ -36,35 +38,34 @@ def gen_med_sorter(intern_list):
     return gen_med
 
 
-def format_timestamp(ts):
-    if ts == "None":
+def format_timestamp(tstamp):
+    if tstamp == "None":
         return ""
-    return CLEANUP_TIMESTAMP.sub(".\\1", ts)
+    return CLEANUP_TIMESTAMP.sub(".\\1", tstamp)
 
 
-def fix_earlytimes(ts):
-    if SHIFT_TIMES.match(ts):
-        hour = str(int(SHIFT_TIMES.sub("\\1", ts)) + 1).zfill(2)
-        return str(hour) + SHIFT_TIMES.sub(":00:00.\\3", ts)
-    return ts
+def fix_earlytimes(tstamp):
+    if SHIFT_TIMES.match(tstamp):
+        hour = str(int(SHIFT_TIMES.sub("\\1", tstamp)) + 1).zfill(2)
+        return str(hour) + SHIFT_TIMES.sub(":00:00.\\3", tstamp)
+    return tstamp
 
 
-def cleanup_date_input(ds):
-    if "-" in ds:
-        return ds
-    parts = ds.split("/")
-    ds = "-".join([parts[2], parts[0], parts[1]])
-    return ds
+def cleanup_date_input(dstamp):
+    if "-" in dstamp:
+        return dstamp
+    parts = dstamp.split("/")
+    dstamp = "-".join([parts[2], parts[0], parts[1]])
+    return dstamp
 
 
 def dbg(msg):
-    global app
-    if "app" in globals() and app.config["DEBUG_SIGNOUT_OUTPUT"]:
+    if app.config["DEBUG_SIGNOUT_OUTPUT"]:
         pprint.pprint(msg, stream=sys.stderr)
 
 
 def is_safe_url(target):
-    global request
+    # global request
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc

@@ -10,3 +10,5 @@ backups/
 .venv
 .pylintrc
 .vim/
+*.bak
+dbsettings.*.json
