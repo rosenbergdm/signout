@@ -23,7 +23,7 @@
   - SSL Certs in place
   - DNS pointing url at apache
 
-## Apache Config:
+## Apache Config
 
 ```
 <VirtualHost *:80>
@@ -43,22 +43,22 @@ Alias /static/ /usr/local/src/signout/static/
     CustomLog /var/log/apache2/access.signout.log combined
 
     <Files /usr/local/src/signout/signout.wsgi>
-    	Require all granted
+     Require all granted
     </Files>
     <Directory /usr/local/src/signout/static>
-    	Require all granted
+     Require all granted
     </Directory>
     <Location />
-    	Require all granted
+     Require all granted
     </Location>
 
 </VirtualHost>
 ```
 
-
 ## CONFIGURATION SETTINGS
 
-* Modifying config values using CURL: 
+- Modifying config values using CURL:
+
 ```
 > curl -X POST -c cookie.txt -d "user_name=dmr" -d "rawpw=$PASSWORD" http://localhost:5000/login
 > #creates the file cookie.txt
@@ -67,6 +67,6 @@ Alias /static/ /usr/local/src/signout/static/
 > #uses the cookie file to authenticate
 ```
 
-* Configuration flags
-  * `DEBUG_CALLBACKS`: When set, sends notifications to the number given in `DEBUG_TARGET_NUMBER`
-  * `DEBUG_PRNIT_NOT_MESSAGE:` When set, prints to stdout instead of sending notifications
+- Configuration flags
+  - `DEBUG_CALLBACKS`: When set, sends notifications to the number given in `DEBUG_TARGET_NUMBER`
+  - `DEBUG_PRNIT_NOT_MESSAGE:` When set, prints to stdout instead of sending notifications
