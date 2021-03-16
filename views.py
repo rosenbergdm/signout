@@ -52,7 +52,6 @@ from signout.helpers import (
 from signout.notifier import notify_late_signup, notify_missing_signouts
 
 
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm(request.form, meta={"csrf": False})
@@ -665,12 +664,12 @@ def update_config(cfgvar, value, write_file=True):
                 f"dbsettings.{datetime.datetime.now().strftime('%s')}.json",
             )
             copyfile(os.path.join(app.config["SCRIPTDIR"], "dbsettings.json"), bkupfile)
-            with open(os.path.join(app.config["SCRIPTDIR"], "dbsettings.json"),  "w") as fp:
+            with open(
+                os.path.join(app.config["SCRIPTDIR"], "dbsettings.json"), "w"
+            ) as fp:
                 json.dump(dbconfig, fp, indent=2)
     app.config[cfgvar] = value
     return dbconfig
-
-
 
 
 @app.route("/servicelist")

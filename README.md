@@ -58,6 +58,15 @@ Alias /static/ /usr/local/src/signout/static/
 
 ## CONFIGURATION SETTINGS
 
-DEBUG_CALLBACKS: When set, sends notifications to the number given in DEBUG_TARGET_NUMBER
-DEBUG_PRNIT_NOT_MESSAGE: When set, prints to stdout instead of sending notifications
-curl -X POST -c cookie -d "user_name=dmr" -d "rawpw=" http://localhost:5000/login && curl -X POST -b cookie 'http://localhost:5000/config?var=DEBUG_PAGES&val=1'
+* Modifying config values using CURL: 
+```
+> curl -X POST -c cookie.txt -d "user_name=dmr" -d "rawpw=$PASSWORD" http://localhost:5000/login
+> #creates the file cookie.txt
+>
+> curl -X POST -b cookie.txt 'http://localhost:5000/config?var=DEBUG_PAGES&val=1'
+> #uses the cookie file to authenticate
+```
+
+* Configuration flags
+  * `DEBUG_CALLBACKS`: When set, sends notifications to the number given in `DEBUG_TARGET_NUMBER`
+  * `DEBUG_PRNIT_NOT_MESSAGE:` When set, prints to stdout instead of sending notifications

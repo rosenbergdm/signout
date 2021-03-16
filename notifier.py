@@ -21,7 +21,6 @@ from signout.app import application as app
 from signout.db import get_db
 
 
-
 def get_callback_number(nflist):
     """Get the phone number to text if there are missing signouts for a given list.
 
@@ -209,6 +208,7 @@ def notify_late_signup(signout_id, notify=True):
             f"DEBUG_PRINT: Since DEBUG_PRINT_NOT_MESSAGE > 0, printing message rather than sending: {body}"
         )
     return
+
 
 if __name__ == "__main__":
     pass
