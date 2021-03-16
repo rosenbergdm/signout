@@ -3,10 +3,10 @@
 import sys
 import logging
 logging.basicConfig(stream=sys.stderr)
-sys.path.insert(0, '/usr/local/src/signout/')
+sys.path.insert(0, '/usr/local/src')
 
-from signout import app as application
-from signout import load_db_settings
+from signout.app import application
+from signout.db import load_db_settings
 load_db_settings(application)
 # application = create_app()
 
