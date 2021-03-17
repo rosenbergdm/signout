@@ -137,7 +137,7 @@ fi
 
 if grep '.html$' <( ($ECHO $MOD_FILES | tr ' ' "\n") ) >/dev/null; then
   $ECHO "Running format-htmldjango.sh on html files"
-  $GITROOT/scripts/format-htmldjango.sh $(grep '.html$' <( ($ECHO $MOD_FILES | tr ' ' "\n") ) )
+  $GITROOT/src/signout/scripts/format-htmldjango.sh $(grep '.html$' <( ($ECHO $MOD_FILES | tr ' ' "\n") ) )
   ((_error+=$?))
   if [ $_error -gt 0 ]; then
     $ECHO " ERROR. format-htmldjango.sh failed"

@@ -13,3 +13,4 @@ backups/
 *.bak
 dbsettings.*.json
 src/signout.egg-info*
+build/
