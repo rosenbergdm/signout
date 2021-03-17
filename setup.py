@@ -56,7 +56,6 @@ class ConfigureCommand(distutils.cmd.Command):
         self.twilio_sid = ""
         self.twilio_auth_token = ""
         self.twilio_number = ""
-        atexit.register(post_install)
 
     def finalize_options(self):
         global config_options
@@ -134,6 +133,7 @@ class InstallCommand(setuptools.command.install.install):
         self.twilio_sid = ""
         self.twilio_auth_token = ""
         self.twilio_number = ""
+        atexit.register(post_install)
 
     def finalize_options(self):
         global config_options

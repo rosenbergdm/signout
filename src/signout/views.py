@@ -127,11 +127,12 @@ def nightfloat():
     conn = get_db()
     if request.method == "GET":
         cur = conn.cursor()
-        cur.execute(
-            """ FROM signout SELECT signout.id,
+        cur.execute("""
+                      SELECT signout.id,
                              intern_name,
                              name,
                              intern_callback
+                        FROM signout
                         LEFT JOIN service
                           ON signout.service = service.id
                        WHERE signout.active IS TRUE

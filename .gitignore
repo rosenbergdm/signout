@@ -12,3 +12,4 @@ backups/
 .vim/
 *.bak
 dbsettings.*.json
+src/signout.egg-info*
