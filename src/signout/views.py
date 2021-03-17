@@ -127,7 +127,8 @@ def nightfloat():
     conn = get_db()
     if request.method == "GET":
         cur = conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
                       SELECT signout.id,
                              intern_name,
                              name,
