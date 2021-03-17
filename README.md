@@ -71,3 +71,4 @@ Alias /static/ /usr/local/src/signout/static/
 - Configuration flags
   - `DEBUG_CALLBACKS`: When set, sends notifications to the number given in `DEBUG_TARGET_NUMBER`
   - `DEBUG_PRNIT_NOT_MESSAGE:` When set, prints to stdout instead of sending notifications
+
