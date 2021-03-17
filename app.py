@@ -18,7 +18,7 @@ from flask import Flask
 from flask_talisman import Talisman
 
 
-def create_app(appdir: Optional[str]=None):
+def create_app(appdir: Optional[str] = None):
     """
     Factory function to create the signout flask app.
 

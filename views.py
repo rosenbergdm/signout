@@ -128,17 +128,18 @@ def nightfloat():
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute(
-            """
-                    SELECT signout.id, intern_name, name, intern_callback
-                    FROM signout LEFT JOIN service
-                        ON signout.service = service.id
-                    WHERE signout.active is TRUE
-                        AND type = '%s'
-                        AND date_part('day', addtime) = date_part('day', current_timestamp)
-                        and date_part('month', addtime) = date_part('month', current_timestamp)
-                        and date_part('year', addtime) = date_part('year', current_timestamp)
-                    ORDER BY addtime ASC
-                    """
+            """ FROM signout SELECT signout.id,
+                             intern_name,
+                             name,
+                             intern_callback
+                        LEFT JOIN service
+                          ON signout.service = service.id
+                       WHERE signout.active IS TRUE
+                         AND TYPE = '%s'
+                         AND date_part('day', addtime) = date_part('day', CURRENT_TIMESTAMP)
+                         AND date_part('month', addtime) = date_part('month', CURRENT_TIMESTAMP)
+                         AND date_part('year', addtime) = date_part('year', CURRENT_TIMESTAMP)
+                       ORDER BY addtime ASC"""
             % listtype.upper()
         )
         waiting_interns = gen_med_sorter(
@@ -149,15 +150,18 @@ def nightfloat():
         )
         cur.execute(
             """
-                    SELECT intern_name, name, intern_callback
-                    FROM signout LEFT JOIN service
+                    SELECT intern_name,
+                           name,
+                           intern_callback
+                      FROM signout
+                      LEFT JOIN service
                         ON signout.service = service.id
-                    WHERE signout.active is FALSE
-                        AND type = '%s'
-                        AND date_part('day', addtime) = date_part('day', current_timestamp)
-                        and date_part('month', addtime) = date_part('month', current_timestamp)
-                        and date_part('year', addtime) = date_part('year', current_timestamp)
-                    ORDER BY completetime ASC
+                     WHERE signout.active IS FALSE
+                       AND TYPE = '%s'
+                       AND date_part('day', addtime) = date_part('day', CURRENT_TIMESTAMP)
+                       AND date_part('month', addtime) = date_part('month', CURRENT_TIMESTAMP)
+                       AND date_part('year', addtime) = date_part('year', CURRENT_TIMESTAMP)
+                     ORDER BY completetime ASC
                     """
             % listtype.upper()
         )
@@ -176,7 +180,11 @@ def nightfloat():
         )
     cur = conn.cursor()
     cur.execute(
-        "UPDATE signout SET active = FALSE, completetime = current_timestamp WHERE id = %s"
+        """
+        UPDATE signout
+           SET active = FALSE,
+               completetime = CURRENT_TIMESTAMP
+         WHERE id = %s"""
         % request.form["signout.id"]
     )
     conn.commit()
@@ -203,13 +211,20 @@ def query():
         ).strftime("%m-%d-%Y")
         cur.execute(
             """
-            SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, starttime::TIMESTAMP, completetime::TIMESTAMP, addtime::TIMESTAMP::DATE as adddate
-            FROM signout LEFT JOIN service
+            SELECT intern_name,
+                   name,
+                   TYPE,
+                   addtime::TIMESTAMP::TIME,
+                   starttime::TIMESTAMP,
+                   completetime::TIMESTAMP,
+                   addtime::TIMESTAMP::DATE AS adddate
+              FROM signout
+              LEFT JOIN service
                 ON signout.service = service.id
-            WHERE date_part('day', addtime) = date_part('day', current_timestamp - interval '1 day')
-                and date_part('month', addtime) = date_part('month', current_timestamp)
-                and date_part('year', addtime) = date_part('year', current_timestamp)
-            ORDER BY completetime ASC"""
+             WHERE date_part('day', addtime) = date_part('day', CURRENT_TIMESTAMP - interval '1 day')
+               AND date_part('month', addtime) = date_part('month', CURRENT_TIMESTAMP)
+               AND date_part('year', addtime) = date_part('year', CURRENT_TIMESTAMP)
+             ORDER BY completetime ASC"""
         )
         signoutlog = [
             {
@@ -267,14 +282,21 @@ def query():
             splitdate = cleanup_date_input(request.form["addtime_date"]).split("-")
             cur.execute(
                 """
-                SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, starttime::TIMESTAMP, completetime::TIMESTAMP, addtime::TIMESTAMP::DATE as adddate
-                FROM signout LEFT JOIN service
+                SELECT intern_name,
+                       name,
+                       TYPE,
+                       addtime::TIMESTAMP::TIME,
+                       starttime::TIMESTAMP,
+                       completetime::TIMESTAMP,
+                       addtime::TIMESTAMP::DATE AS adddate
+                  FROM signout
+                  LEFT JOIN service
                     ON signout.service = service.id
-                WHERE date_part('day', addtime) = %s
-                    and date_part('month', addtime) = %s
-                    and date_part('year', addtime) = %s
-                    %s
-                ORDER BY completetime ASC"""
+                 WHERE date_part('day', addtime) = %s
+                   AND date_part('month', addtime) = %s
+                   AND date_part('year', addtime) = %s %s
+                 ORDER BY completetime ASC
+                """
                 % (splitdate[2], splitdate[1], splitdate[0], typestring)
             )
             # dbg(cur.query)
@@ -287,11 +309,17 @@ def query():
             splitenddate = cleanup_date_input(request.form["addtime_date2"]).split("-")
             cur.execute(
                 """
-                SELECT intern_name, name, type, addtime::TIMESTAMP::TIME, starttime::TIMESTAMP, completetime::TIMESTAMP, addtime::TIMESTAMP::DATE as adddate
-                FROM signout LEFT JOIN service
+                SELECT intern_name,
+                       name,
+                       TYPE,
+                       addtime::TIMESTAMP::TIME,
+                       starttime::TIMESTAMP,
+                       completetime::TIMESTAMP,
+                       addtime::TIMESTAMP::DATE AS adddate
+                  FROM signout
+                  LEFT JOIN service
                     ON signout.service = service.id
-                WHERE addtime BETWEEN
-                    '"""
+                 WHERE addtime BETWEEN '"""
                 + "-".join(splitdate)
                 + """' and '"""
                 + "-".join(splitenddate)
@@ -355,14 +383,20 @@ def submission_weekend():
         liquid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active, completetime - starttime as elapsedtime
-            FROM signout LEFT JOIN service
+            SELECT intern_name,
+                   name,
+                   addtime::TIMESTAMP::TIME,
+                   signout.active,
+                   completetime - starttime AS elapsedtime
+              FROM signout
+              LEFT JOIN service
                 ON signout.service = service.id
-            WHERE date_part('day', addtime) = date_part('day', current_timestamp)
-                and date_part('month', addtime) = date_part('month', current_timestamp)
-                and date_part('year', addtime) = date_part('year', current_timestamp)
-                and type = 'NF9132'
-            ORDER BY addtime ASC"""
+             WHERE date_part('day', addtime) = date_part('day', CURRENT_TIMESTAMP)
+               AND date_part('month', addtime) = date_part('month', CURRENT_TIMESTAMP)
+               AND date_part('year', addtime) = date_part('year', CURRENT_TIMESTAMP)
+               AND TYPE = 'NF9132'
+             ORDER BY addtime ASC
+            """
         )
         noncall_solid_interns = [
             {
@@ -377,14 +411,20 @@ def submission_weekend():
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active, completetime - starttime as elapsedtime
-            FROM signout LEFT JOIN service
+            SELECT intern_name,
+                   name,
+                   addtime::TIMESTAMP::TIME,
+                   signout.active,
+                   completetime - starttime AS elapsedtime
+              FROM signout
+              LEFT JOIN service
                 ON signout.service = service.id
-            WHERE date_part('day', addtime) = date_part('day', current_timestamp)
-                and date_part('month', addtime) = date_part('month', current_timestamp)
-                and date_part('year', addtime) = date_part('year', current_timestamp)
-                and type = 'NF9133'
-            ORDER BY addtime ASC"""
+             WHERE date_part('day', addtime) = date_part('day', CURRENT_TIMESTAMP)
+               AND date_part('month', addtime) = date_part('month', CURRENT_TIMESTAMP)
+               AND date_part('year', addtime) = date_part('year', CURRENT_TIMESTAMP)
+               AND TYPE = 'NF9133'
+             ORDER BY addtime ASC
+            """
         )
         noncall_liquid_interns = gen_med_sorter(
             [
@@ -416,8 +456,10 @@ def submission_weekend():
         # dbg(request.form.getlist("service"))
         for serviceid in request.form.getlist("service"):
             cur.execute(
-                "INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp) \
-                        VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
+                """
+                INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp)
+                VALUES (%s, %s, %s, %s, %s, %s) RETURNING id
+                """,
                 (
                     request.form["intern_name"],
                     request.form["intern_callback"],
@@ -432,18 +474,18 @@ def submission_weekend():
         cur.execute("SELECT type FROM service WHERE id = %s", (serviceid,))
         nflist = cur.fetchall()[0][0]
         cur.execute(
-            """ SELECT Count(distinct(hosttimestamp, intern_name))
-                        FROM   signout
-                               INNER JOIN service
-                                       ON signout.service = service.id
-                        WHERE  Date_part('day', addtime) = Date_part('day', CURRENT_TIMESTAMP)
-                               AND Date_part('month', addtime) = Date_part('month', CURRENT_TIMESTAMP)
-                               AND Date_part('year', addtime) = Date_part('year', CURRENT_TIMESTAMP)
-                               AND signout.active = 't'
-                               AND service.type = %s;""",
+            """
+            SELECT count(distinct(hosttimestamp, intern_name))
+              FROM signout
+             INNER JOIN service
+                ON signout.service = service.id
+             WHERE date_part('day', addtime) = date_part('day', CURRENT_TIMESTAMP)
+               AND date_part('month', addtime) = date_part('month', CURRENT_TIMESTAMP)
+               AND date_part('year', addtime) = date_part('year', CURRENT_TIMESTAMP)
+               AND signout.active = 't'
+               AND service.type = %s; """,
             (nflist,),
         )
-
         count = cur.fetchall()[0][0]
         cur.close()
         conn.close()
@@ -463,24 +505,42 @@ def submission_weekday():
     if request.method == "GET":
         cur = conn.cursor()
         cur.execute(
-            "SELECT id, name FROM service where type='NF9132' AND active='t' ORDER BY name ASC"
+            """
+            SELECT id,
+                   name
+              FROM service
+             WHERE TYPE='NF9132'
+               AND active='t'
+             ORDER BY name ASC
+            """
         )
         solid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
         cur.execute(
-            "SELECT id, name FROM service where type='NF9133' AND active='t' ORDER BY name ASC"
+            """
+            SELECT id,
+                   name
+              FROM service
+             WHERE TYPE='NF9133'
+               AND active='t'
+             ORDER BY name ASC"""
         )
         liquid_services = [{"id": x[0], "name": x[1]} for x in cur.fetchall()]
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active, completetime - starttime as elapsedtime
-            FROM signout LEFT JOIN service
+            SELECT intern_name,
+                   name,
+                   addtime::TIMESTAMP::TIME,
+                   signout.active,
+                   completetime - starttime AS elapsedtime
+              FROM signout
+              LEFT JOIN service
                 ON signout.service = service.id
-            WHERE date_part('day', addtime) = date_part('day', current_timestamp)
-                and date_part('month', addtime) = date_part('month', current_timestamp)
-                and date_part('year', addtime) = date_part('year', current_timestamp)
-                AND oncall is FALSE
-                and type = 'NF9132'
-            ORDER BY addtime ASC"""
+             WHERE date_part('day', addtime) = date_part('day', CURRENT_TIMESTAMP)
+               AND date_part('month', addtime) = date_part('month', CURRENT_TIMESTAMP)
+               AND date_part('year', addtime) = date_part('year', CURRENT_TIMESTAMP)
+               AND oncall IS FALSE
+               AND TYPE = 'NF9132'
+             ORDER BY addtime ASC"""
         )
         noncall_solid_interns = [
             {
@@ -495,15 +555,20 @@ def submission_weekday():
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active, completetime - starttime as elapsedtime
-            FROM signout LEFT JOIN service
+            SELECT intern_name,
+                   name,
+                   addtime::TIMESTAMP::TIME,
+                   signout.active,
+                   completetime - starttime AS elapsedtime
+              FROM signout
+              LEFT JOIN service
                 ON signout.service = service.id
-            WHERE date_part('day', addtime) = date_part('day', current_timestamp)
-                and date_part('month', addtime) = date_part('month', current_timestamp)
-                and date_part('year', addtime) = date_part('year', current_timestamp)
-                AND oncall is TRUE
-                and type = 'NF9132'
-            ORDER BY addtime ASC"""
+             WHERE date_part('day', addtime) = date_part('day', CURRENT_TIMESTAMP)
+               AND date_part('month', addtime) = date_part('month', CURRENT_TIMESTAMP)
+               AND date_part('year', addtime) = date_part('year', CURRENT_TIMESTAMP)
+               AND oncall IS TRUE
+               AND TYPE = 'NF9132'
+             ORDER BY addtime ASC"""
         )
         call_solid_interns = [
             {
@@ -518,15 +583,20 @@ def submission_weekday():
         ]
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active, completetime - starttime as elapsedtime
-            FROM signout LEFT JOIN service
+            SELECT intern_name,
+                   name,
+                   addtime::TIMESTAMP::TIME,
+                   signout.active,
+                   completetime - starttime AS elapsedtime
+              FROM signout
+              LEFT JOIN service
                 ON signout.service = service.id
-            WHERE date_part('day', addtime) = date_part('day', current_timestamp)
-                and date_part('month', addtime) = date_part('month', current_timestamp)
-                and date_part('year', addtime) = date_part('year', current_timestamp)
-                AND oncall is FALSE
-                and type = 'NF9133'
-            ORDER BY addtime ASC"""
+             WHERE date_part('day', addtime) = date_part('day', CURRENT_TIMESTAMP)
+               AND date_part('month', addtime) = date_part('month', CURRENT_TIMESTAMP)
+               AND date_part('year', addtime) = date_part('year', CURRENT_TIMESTAMP)
+               AND oncall IS FALSE
+               AND TYPE = 'NF9133'
+             ORDER BY addtime ASC"""
         )
         noncall_liquid_interns = gen_med_sorter(
             [
@@ -543,15 +613,20 @@ def submission_weekday():
         )
         cur.execute(
             """
-            SELECT intern_name, name, addtime::TIMESTAMP::TIME, signout.active, completetime - starttime as elapsedtime
-            FROM signout LEFT JOIN service
+            SELECT intern_name,
+                   name,
+                   addtime::TIMESTAMP::TIME,
+                   signout.active,
+                   completetime - starttime AS elapsedtime
+              FROM signout
+              LEFT JOIN service
                 ON signout.service = service.id
-            WHERE date_part('day', addtime) = date_part('day', current_timestamp)
-                and date_part('month', addtime) = date_part('month', current_timestamp)
-                and date_part('year', addtime) = date_part('year', current_timestamp)
-                AND oncall is TRUE
-                and type = 'NF9133'
-            ORDER BY addtime ASC"""
+             WHERE date_part('day', addtime) = date_part('day', CURRENT_TIMESTAMP)
+               AND date_part('month', addtime) = date_part('month', CURRENT_TIMESTAMP)
+               AND date_part('year', addtime) = date_part('year', CURRENT_TIMESTAMP)
+               AND oncall IS TRUE
+               AND TYPE = 'NF9133'
+             ORDER BY addtime ASC"""
         )
         call_liquid_interns = [
             {
@@ -585,17 +660,8 @@ def submission_weekday():
         for serviceid in request.form.getlist("service"):
             cur.execute(
                 """
-                INSERT INTO
-                  signout (
-                    intern_name,
-                    intern_callback,
-                    service,
-                    oncall,
-                    ipaddress,
-                    hosttimestamp
-                  )
-                VALUES
-                  (%s, %s, %s, %s, %s, %s) RETURNING id;""",
+                INSERT INTO signout (intern_name, intern_callback, service, oncall, ipaddress, hosttimestamp)
+                VALUES (%s, %s, %s, %s, %s, %s) RETURNING id;""",
                 (
                     request.form["intern_name"],
                     request.form["intern_callback"],
@@ -610,18 +676,18 @@ def submission_weekday():
         cur.execute("SELECT type FROM service WHERE id = %s", (serviceid,))
         nflist = cur.fetchall()[0][0]
         cur.execute(
-            """ SELECT count(distinct(hosttimestamp, intern_name))
-                        FROM   signout
-                               INNER JOIN service
-                                       ON signout.service = service.id
-                        WHERE  Date_part('day', addtime) = Date_part('day', CURRENT_TIMESTAMP)
-                               AND Date_part('month', addtime) = Date_part('month', CURRENT_TIMESTAMP)
-                               AND Date_part('year', addtime) = Date_part('year', CURRENT_TIMESTAMP)
-                               AND signout.active = 't'
-                               AND service.type = %s;""",
+            """
+            SELECT count(distinct(hosttimestamp, intern_name))
+              FROM signout
+             INNER JOIN service
+                ON signout.service = service.id
+             WHERE date_part('day', addtime) = date_part('day', CURRENT_TIMESTAMP)
+               AND date_part('month', addtime) = date_part('month', CURRENT_TIMESTAMP)
+               AND date_part('year', addtime) = date_part('year', CURRENT_TIMESTAMP)
+               AND signout.active = 't'
+               AND service.type = %s;""",
             (nflist,),
         )
-
         count = cur.fetchall()[0][0]
         cur.close()
         conn.close()
@@ -735,13 +801,13 @@ def service():
             "UPDATE service set active = true where id = %s", (str(service_id),)
         )
         conn.commit()
-        msg += f" ACTIVE"
+        msg += " ACTIVE"
     elif action == "deactivate":
         cur.execute(
             "UPDATE service set active = false where id = %s", (str(service_id),)
         )
         conn.commit()
-        msg += f" INACTIVE"
+        msg += " INACTIVE"
     elif action == "set_type":
         newtype = request.args.get("newtype")
         cur.execute(
@@ -772,7 +838,7 @@ def addservice():
         "INSERT INTO SERVICE (name, type) VALUES (%s, %s) RETURNING id",
         (request.form["name"], request.form["nflist"]),
     )
-    result = cur.fetchone()[0]
+    cur.fetchone()[0]
     conn.commit()
     conn.close()
     return redirect(url_for("servicelist"))

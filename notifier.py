@@ -34,7 +34,12 @@ def get_callback_number(nflist):
     cur = conn.cursor()
     dayofyear = datetime.datetime.today().timetuple().tm_yday
     cur.execute(
-        """ SELECT callback FROM assignments INNER JOIN nightfloat ON assignments.nightfloat = nightfloat.id WHERE dayofyear = %s AND type = %s """,
+        """ SELECT callback
+              FROM assignments
+             INNER JOIN nightfloat
+                ON assignments.nightfloat = nightfloat.id
+             WHERE dayofyear = %s
+               AND type = %s""",
         (dayofyear, nflist),
     )
     callback = cur.fetchall()
@@ -69,18 +74,19 @@ def get_missing_signouts(nflist):
     cur.execute(
         """
         SELECT id, name
-        FROM service
-        WHERE active IS true
-          AND type = %s
-          AND id NOT IN (
-            SELECT service
-            FROM signout
-              INNER JOIN service
-                ON signout.service = service.id
-            WHERE date_part('day', addtime) = date_part('day', current_timestamp)
-              AND date_part('month', addtime) = date_part('month', current_timestamp)
-              AND date_part('year', addtime) = date_part('year', current_timestamp)
-              AND type = %s);""",
+          FROM service
+         WHERE active IS true
+           AND type = %s
+           AND id NOT IN (
+                SELECT service
+                  FROM signout
+                 INNER JOIN service
+                    ON signout.service = service.id
+                 WHERE date_part('day', addtime) = date_part('day', current_timestamp)
+                   AND date_part('month', addtime) = date_part('month', current_timestamp)
+                   AND date_part('year', addtime) = date_part('year', current_timestamp)
+                   AND type = %s
+               );""",
         (nflist, nflist),
     )
     results = cur.fetchall()
@@ -88,8 +94,7 @@ def get_missing_signouts(nflist):
     conn.close()
     if len(results) == 0:
         return None
-    else:
-        return [x[1] for x in results]
+    return [x[1] for x in results]
 
 
 def notify_missing_signouts(nflist):
@@ -117,10 +122,12 @@ def notify_missing_signouts(nflist):
                 + "'"
             )
             if app.config["DEBUG_PRINT_NOT_MESSAGE"]:
-                reasonmsg = "DEBUG_PRINT: Printing to stdout instead of sending text message since DEBUG_PRINT_NOT_MESSAGE=1 for message: "
-                print(reasonmsg + body)
+                print(
+                    "DEBUG_PRINT: Printing to stdout instead of sending text "
+                    + "message since DEBUG_PRINT_NOT_MESSAGE=1 for message: "
+                )
             else:
-                message = client.messages.create(
+                client.messages.create(
                     to=callback_number, from_=app.config["twilio-number"], body=body
                 )
         else:
@@ -132,10 +139,12 @@ def notify_missing_signouts(nflist):
                 + "The following lists are not showing as submitted: "
             )
             if app.config["DEBUG_PRINT_NOT_MESSAGE"]:
-                reasonmsg = "DEBUG_PRINT: Printing to stdout instead of sending text message since DEBUG_PRINT_NOT_MESSAGE=1 for message: "
-                print(reasonmsg + body)
+                print(
+                    "DEBUG_PRINT: Printing to stdout instead of sending "
+                    + f"text message since DEBUG_PRINT_NOT_MESSAGE=1 for message: '{body}'"
+                )
             else:
-                message = client.messages.create(
+                client.messages.create(
                     to=callback_number, from_=app.config["twilio-number"], body=body
                 )
             for i in range(nmessages - 1):
@@ -147,27 +156,28 @@ def notify_missing_signouts(nflist):
                     + "'"
                 )
                 if app.config["DEBUG_PRINT_NOT_MESSAGE"]:
-                    reasonmsg = "DEBUG_PRINT: Printing to stdout instead of sending text message since DEBUG_PRINT_NOT_MESSAGE=1 for message: "
-                    print(reasonmsg + body)
+                    print(
+                        "DEBUG_PRINT: Printing to stdout instead of sending "
+                        + f"text message since DEBUG_PRINT_NOT_MESSAGE=1 for message: '{body}'"
+                    )
                 else:
-                    message = client.messages.create(
+                    client.messages.create(
                         to=callback_number, from_=app.config["twilio-number"], body=body
                     )
     sleep(1)
     return nmessages
 
 
-# def notifier_main():
-#     """
-#     Run the notifier script.
+def notifier_main():
+    """
+    Run the notifier script.
 
-#     """
-#     nflists = ["NF9132", "NF9133"]
-#     total_messages = 0
-#     for nflist in nflists:
-#         total_messages += notify_missing_signouts(nflist)
-#     print("%s total SMS messages sent" % str(total_messages))
-#     return
+    """
+    nflists = ["NF9132", "NF9133"]
+    total_messages = 0
+    for nflist in nflists:
+        total_messages += notify_missing_signouts(nflist)
+    print("%s total SMS messages sent" % str(total_messages))
 
 
 def notify_late_signup(signout_id, notify=True):
@@ -182,10 +192,15 @@ def notify_late_signup(signout_id, notify=True):
     conn = get_db()
     cur = conn.cursor()
     cur.execute(
-        """SELECT intern_name, service.name, intern_callback, type
-                    FROM signout
-                    INNER JOIN service ON signout.service = service.id
-                    WHERE signout.id = %s""",
+        """
+        SELECT intern_name,
+               service.name,
+               intern_callback,
+               TYPE
+          FROM signout
+         INNER JOIN service
+            ON signout.service = service.id
+         WHERE signout.id = %s """,
         (signout_id,),
     )
     results = cur.fetchall()[0]
@@ -194,9 +209,12 @@ def notify_late_signup(signout_id, notify=True):
 
     callback_number = get_callback_number(results[3])
     client = Client(app.config["twilio-sid"], app.config["twilio-auth-token"])
-    body = f"Notifying that the list {results[1]} was added when all other callbacks were complete.  Please call back {results[0]} at {results[2]}"
+    body = (
+        f"Notifying that the list {results[1]} was added when all other "
+        + f"callbacks were complete.  Please call back {results[0]} at {results[2]}"
+    )
     if app.config["DEBUG_PRINT_NOT_MESSAGE"] == 0 and notify:
-        msg = client.messages.create(
+        client.messages.create(
             to=callback_number, from_=app.config["twilio-number"], body=body
         )
     elif not notify:
@@ -207,8 +225,7 @@ def notify_late_signup(signout_id, notify=True):
         print(
             f"DEBUG_PRINT: Since DEBUG_PRINT_NOT_MESSAGE > 0, printing message rather than sending: {body}"
         )
-    return
 
 
 if __name__ == "__main__":
-    pass
+    notifier_main
