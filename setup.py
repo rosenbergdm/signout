@@ -40,7 +40,7 @@ def populate_database():
     conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
     cur = conn.cursor()
     cur.execute(
-        "SELECT datname FROM pg_database where datname=%s", (config_options["dbname"], )
+        "SELECT datname FROM pg_database where datname=%s", (config_options["dbname"],)
     )
     if cur.fetchall() == []:
         cur.execute("CREATE DATABASE %s" % config_options["dbname"])
