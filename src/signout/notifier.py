@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:enc=utf-8
 #
-# Copyright © 2020-2021 David M. Rosenberg <dmr@davidrosenberg.me>
+# Copyright © 2020-2021 David Rosenberg <dmr@davidrosenberg.me>
 #
 # Distributed under terms of the MIT license.
 
@@ -18,7 +18,7 @@ from time import sleep
 from twilio.rest import Client
 
 from signout.app import application as app
-from signout.db import get_db
+from signout.db import load_db_settings, get_db
 
 
 def get_callback_number(nflist):
@@ -26,7 +26,7 @@ def get_callback_number(nflist):
 
     :param str nflist: the night float list to get the callback number for (ex: "NF9132")
 
-    :returns: The twilio-formatted callback to text (ex: '+13128675309')
+    :returns: The twilio_formatted callback to text (ex: '+13128675309')
     :rtype: str
     """
 
@@ -46,7 +46,7 @@ def get_callback_number(nflist):
     if len(callback) > 0:
         callback = callback[0][0]
     else:
-        callback = "+13125551212"
+        callback = "+17732403395"
     cur.close()
     conn.close()
     if app.config["DEBUG_CALLBACKS"]:
@@ -107,6 +107,16 @@ def notify_missing_signouts(nflist):
     :returns: Number of messages sent
     :rtype: int
     """
+
+    if (
+        app.config["twilio_sid"] == ""
+        or app.config["twilio_auth_token"] == ""
+        or app.config["twilio_number"] == "+"
+    ):
+        print(
+            "Skipping notifications as twilio configuration not set in dbsettings.json"
+        )
+        return 0
 
     missing_signouts = get_missing_signouts(nflist)
     if missing_signouts is not None:
@@ -207,6 +217,16 @@ def notify_late_signup(signout_id, notify=True):
     cur.close()
     conn.close()
 
+    if (
+        app.config["twilio_sid"] == ""
+        or app.config["twilio_auth_token"] == ""
+        or app.config["twilio_number"] == "+"
+    ):
+        print(
+            "Skipping notifications as twilio configuration not set in dbsettings.json"
+        )
+        return
+
     callback_number = get_callback_number(results[3])
     client = Client(app.config["twilio_sid"], app.config["twilio_auth_token"])
     body = (
@@ -228,4 +248,5 @@ def notify_late_signup(signout_id, notify=True):
 
 
 if __name__ == "__main__":
-    notifier_main
+    load_db_settings(app)
+    notifier_main()

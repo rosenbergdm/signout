@@ -1,0 +1,9 @@
+include requirements*txt
+include src/signout/templates/*.html
+include src/signout/static/*.png
+include src/signout/static/*.css
+include src/signout/static/*.js
+include src/signout/scripts/*.sh
+include src/signout/scripts/*.py
+include src/signout/dbsettings.json
+global-exclude *.pyc

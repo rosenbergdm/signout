@@ -1,0 +1,22 @@
+{
+  "DBNAME": "{{ dbname }}",
+  "DBUSER": "{{ dbuser }}",
+  "DBPASSWORD": "{{ dbpass }}",
+  "DEBUG": true,
+  "twilio-sid": "{{ twilio_sid }}",
+  "twilio-auth-token": "{{ twilio_auth_token }}",
+  "twilio-number": "+{{ twilio_number }}",
+  "DEBUG_CALLBACKS": 1,
+  "DEBUG_TARGET_NUMBER": "+{{ twilio_number }}",
+  "DEBUG_PRINT_NOT_MESSAGE": 1,
+  "DEBUG_SIGNOUT_OUTPUT": 1,
+  "DEBUG_PAGES": 1,
+  "USERS": {
+    "signout": "pbkdf2:sha256:150000$drJ7rAtk$5ca6605f43f44c027c19b1b09222729b67f17d216f47675bbfa4baf2d8d704ff"
+  },
+  "SECRET_KEY": "{{ secret_key }}",
+  "TEMPLATES_AUTO_RELOAD": true,
+  "JSONIFY_PRETTYPRINT_REGULAR": true,
+  "ENV": "development",
+  "SEND_FILE_MAX_AGE_DEFAULT": 0
+}
