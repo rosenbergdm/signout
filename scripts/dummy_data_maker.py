@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 #
-# Copyright © 2020 Thomas Butterworth <dmr@davidrosenberg.me>
+# Copyright © 2020 David M. Rosenberg <dmr@davidrosenberg.me>
 #
 # Distributed under terms of the MIT license.
 

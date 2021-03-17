@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 # format-htmldjango.sh
-# Copyright (C) 2021 Thomas Butterworth <dmr@davidrosenberg.me>
+# Copyright (C) 2021 David M. Rosenberg <dmr@davidrosenberg.me>
 # Distributed under terms of the MIT license.
 #
 # Usage: format-htmldjango [-vhq] [--debug] <FILE>...

@@ -1,7 +1,7 @@
 /*
  * signout.update.sql
  * Update the postgres schema for v0.2 of signout program
- * Copyright (C) 2020-2021 Thomas Butterworth <dmr@davidrosenberg.me>
+ * Copyright (C) 2020-2021 David M. Rosenberg <dmr@davidrosenberg.me>
  *
  * Distributed under terms of the MIT license.
  */

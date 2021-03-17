@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-# Copyright Thomas M. Butterworth
+# Copyright David M. Rosenberg
 # Distributed under terms of the MIT license.
 #
 # Usage: restoredb.sh [-vhq] [--debug] [--dbname=<DBNAME>] BACKUPFILE

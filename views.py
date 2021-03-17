@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:enc=utf-8
 #
-# Copyright © 2020-2021 Thomas Butterworth <dmr@davidrosenberg.me>
+# Copyright © 2020-2021 David M. Rosenberg <dmr@davidrosenberg.me>
 #
 # Distributed under terms of the MIT license.
 
@@ -869,7 +869,7 @@ def configpage():
     for k in ["PERMANENT_SESSION_LIFETIME", "SEND_FILE_MAX_AGE_DEFAULT"]:
         if k in cfg and isinstance(cfg[k], datetime.timedelta):
             cfg[k] = str(cfg[k])
-    for k in ["DBPASSWORD", "SECRET_KEY", "twilio-sid", "twilio-auth-token"]:
+    for k in ["DBPASSWORD", "SECRET_KEY", "twilio_sid", "twilio_auth_token"]:
         cfg[k] = "******"
     if "USERS" in cfg:
         for k in cfg["USERS"]:

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:enc=utf-8
 #
-# Copyright © 2020-2021 Thomas Butterworth <dmr@davidrosenberg.me>
+# Copyright © 2020-2021 David M. Rosenberg <dmr@davidrosenberg.me>
 #
 # Distributed under terms of the MIT license.
 
@@ -111,7 +111,7 @@ def notify_missing_signouts(nflist):
     missing_signouts = get_missing_signouts(nflist)
     if missing_signouts is not None:
         callback_number = get_callback_number(nflist)
-        client = Client(app.config["twilio-sid"], app.config["twilio-auth-token"])
+        client = Client(app.config["twilio_sid"], app.config["twilio_auth_token"])
 
         if len(missing_signouts) <= 3:
             body = (
@@ -128,7 +128,7 @@ def notify_missing_signouts(nflist):
                 )
             else:
                 client.messages.create(
-                    to=callback_number, from_=app.config["twilio-number"], body=body
+                    to=callback_number, from_=app.config["twilio_number"], body=body
                 )
         else:
             nmessages = int(len(missing_signouts) / 4) + 2
@@ -145,7 +145,7 @@ def notify_missing_signouts(nflist):
                 )
             else:
                 client.messages.create(
-                    to=callback_number, from_=app.config["twilio-number"], body=body
+                    to=callback_number, from_=app.config["twilio_number"], body=body
                 )
             for i in range(nmessages - 1):
                 sleep(1)
@@ -162,7 +162,7 @@ def notify_missing_signouts(nflist):
                     )
                 else:
                     client.messages.create(
-                        to=callback_number, from_=app.config["twilio-number"], body=body
+                        to=callback_number, from_=app.config["twilio_number"], body=body
                     )
     sleep(1)
     return nmessages
@@ -208,14 +208,14 @@ def notify_late_signup(signout_id, notify=True):
     conn.close()
 
     callback_number = get_callback_number(results[3])
-    client = Client(app.config["twilio-sid"], app.config["twilio-auth-token"])
+    client = Client(app.config["twilio_sid"], app.config["twilio_auth_token"])
     body = (
         f"Notifying that the list {results[1]} was added when all other "
         + f"callbacks were complete.  Please call back {results[0]} at {results[2]}"
     )
     if app.config["DEBUG_PRINT_NOT_MESSAGE"] == 0 and notify:
         client.messages.create(
-            to=callback_number, from_=app.config["twilio-number"], body=body
+            to=callback_number, from_=app.config["twilio_number"], body=body
         )
     elif not notify:
         print(

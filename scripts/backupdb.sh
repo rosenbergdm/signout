@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 #
 # backupdb.sh
-# Copyright (C) 2020-2021 Thomas Butterworth <dmr@davidrosenberg.me>
+# Copyright (C) 2020-2021 David M. Rosenberg <dmr@davidrosenberg.me>
 #
 # Usage: backupdb.sh [-vhq] [--target=<TARGETFILE>] [--dbname=<DBNAME>]
 #
