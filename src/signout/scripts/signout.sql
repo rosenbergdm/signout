@@ -6,10 +6,10 @@
 -- Distributed under terms of the MIT license.
 --
 
-DROP TABLE IF EXISTS signout;
-DROP TABLE IF EXISTS service;
-DROP TABLE IF EXISTS nightfloat;
-DROP TABLE IF EXISTS assignments;
+DROP TABLE IF EXISTS assignments CASCADE;
+DROP TABLE IF EXISTS nightfloat CASCADE;
+DROP TABLE IF EXISTS signout CASCADE;
+DROP TABLE IF EXISTS service CASCADE;
 
 CREATE TABLE service (
   id SERIAL PRIMARY KEY NOT NULL,
@@ -58,6 +58,7 @@ INSERT INTO service (name, type) VALUES ('GI A, Intern #3', 'NF9132');
 INSERT INTO service (name, type) VALUES ('GI B, Intern #1', 'NF9132');
 INSERT INTO service (name, type) VALUES ('GI B, Intern #2', 'NF9132');
 INSERT INTO service (name, type) VALUES ('GI B, Intern #3', 'NF9132');
+INSERT INTO service (name, type) VALUES ('GI A, Sub-Intern', 'NF9132');
 INSERT INTO service (name, type) VALUES ('GI B, Sub-Intern', 'NF9132');
 INSERT INTO service (name, type) VALUES ('STR, Intern #1', 'NF9133');
 INSERT INTO service (name, type) VALUES ('STR, Intern #2', 'NF9133');
@@ -79,6 +80,7 @@ INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #1', 'NF9133');
 INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #2', 'NF9133');
 INSERT INTO service (name, type) VALUES ('Lymphoma Green, Intern #3', 'NF9133');
 INSERT INTO service (name, type) VALUES ('Lymphoma Green, Sub-Intern', 'NF9133');
+INSERT INTO service (name, type) VALUES ('Lymphoma Green, APP', 'NF9133');
 INSERT INTO service (name, type) VALUES ('GI C, APP #1', 'NF9132');
 INSERT INTO service (name, type) VALUES ('GI C, APP #2', 'NF9132');
 INSERT INTO service (name, type) VALUES ('GI C, APP #3', 'NF9132');
@@ -87,8 +89,6 @@ INSERT INTO service (name, type) VALUES ('GI D, APP #1', 'NF9132');
 INSERT INTO service (name, type) VALUES ('GI D, APP #2', 'NF9132');
 INSERT INTO service (name, type) VALUES ('GI D, APP #3', 'NF9132');
 INSERT INTO service (name, type) VALUES ('GI D, APP #4', 'NF9132');
-INSERT INTO service (name, type) VALUES ('GI A, Sub-Intern', 'NF9132');
-INSERT INTO service (name, type) VALUES ('Lymphoma Green, APP', 'NF9133');
 
 
 -- Nightfloat callback numbers 2020-2021 {{{
@@ -482,12 +482,12 @@ INSERT INTO assignments (dayofyear, type, nightfloat) VALUES (171, 'NF9133', (SE
 
 --- }}}
 
-UPDATE SERVICE SET active = FALSE;
-UPDATE SERVICE SET active = TRUE where id in (42,  38,  37,  34,  33,  30,  29,  28,  25,  24,  23,  21,  20,  19,  17,  16,  13,  12,  11,  10,   9,   8,   7,   6,   5,   4,   2,   1);
+UPDATE service
+   SET active = FALSE;
 
+UPDATE service
+   SET active = TRUE
+ WHERE id IN (42, 38, 37, 34, 33, 30, 29, 28, 25, 24, 23, 21, 20, 19, 17, 16, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 2, 1);
 
-
--- DUMMY VALUES FOR TESTING
--- INSERT INTO signout (intern_name, intern_callback, service, oncall, addtime) VALUES ('Nancie Hogg', 'x3002', '5', FALSE, current_timestamp + interval '51 minutes' + interval '4 seconds');
 
 -- vim: ft=sql :

@@ -1,3 +1,12 @@
+#! /usr/bin/env python3
+# -*- coding: utf-8 -*-
+# vim:enc=utf-8
+#
+# Copyright © 2020-2021 David M. Rosenberg <dmr@davidrosenberg.me>
+#
+# Distributed under terms of the MIT license.
+
+
 import atexit
 import distutils.cmd
 import distutils.log
@@ -10,6 +19,7 @@ import setuptools
 import setuptools.command.build_py
 import setuptools.command.install
 import jinja2
+import psycopg2
 
 config_options = {}
 config_opt_names = [
@@ -20,6 +30,48 @@ config_opt_names = [
     "twilio_auth_token",
     "twilio_number",
 ]
+
+
+def populate_database():
+    global config_options
+    conn = psycopg2.connect(
+        user=config_options["dbuser"], password=config_options["dbpass"]
+    )
+    conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT datname FROM pg_database where datname=%s", (config_options["dbname"], )
+    )
+    if cur.fetchall() == []:
+        cur.execute("CREATE DATABASE %s" % config_options["dbname"])
+    else:
+        conn.close()
+        conn = psycopg2.connect(
+            user=config_options["dbuser"],
+            password=config_options["dbpass"],
+            dbname=config_options["dbname"],
+        )
+        cur = conn.cursor()
+        cur.execute(
+            """SELECT ( SELECT count(id) FROM signout) + ( SELECT count(id) FROM assignments)"""
+        )
+        if cur.fetchall()[0][0] != 362:
+            # I.E. not an empty database
+            conn.close()
+            raise Exception(f"{config_options['dbname']} IS NOT EMPTY")
+    conn.close()
+    conn = psycopg2.connect(
+        user=config_options["dbuser"],
+        password=config_options["dbpass"],
+        dbname=config_options["dbname"],
+    )
+    cur = conn.cursor()
+    with open(
+        os.path.join(os.path.dirname("setup.py"), "src/signout/scripts/signout.sql")
+    ) as fp:
+        cur.execute(fp.read())
+    conn.commit()
+    conn.close()
 
 
 def complete_template(src, dst, template_dict):
@@ -82,6 +134,7 @@ class ConfigureCommand(distutils.cmd.Command):
 
         for tmpl in tmpl_files:
             complete_template(tmpl[0], tmpl[1], tmpldict)
+        populate_database()
 
 
 class BuildCommand(distutils.command.build.build):

@@ -15,46 +15,61 @@ and manipulate
 import random
 
 names = [
-    "Kara Thrace",
-    "Nancie Hogg",
-    "Jeri Sherrard",
-    "Moises Newsom",
-    "Gearldine Foxworth",
-    "Serina Lacomb",
-    "Obdulia Delorenzo",
-    "Meghan Beatson",
-    "Lavada Golay",
-    "Marnie Frith",
-    "Trena Cressey",
-    "Hermelinda Mullikin",
-    "Cherly Caso",
-    "Ola Torres",
-    "Jacalyn Crews",
-    "Piper Rolan-Adeyemi",
-    "Lezlie Judd",
-    "Marchelle Goode",
-    "Evonne Granda",
-    "Arlie Ditzler",
-    "Frances Steed",
-    "Emerita McMillian",
-    "Marg Brazelton",
-    "Ericka Billups",
-    "Claudia Philips",
-    "Thomas Butterworth",
-    "Dawna Cost",
-    "Willodean Delafuente",
-    "Youlanda Zajicek",
-    "Gwenn Arnold",
+    "Yuri Youngren",
+    "Agripina Abboud",
+    "Delois Dahle",
+    "Brynn Beal",
+    "Youlanda Yates",
+    "Elene Erby",
+    "Armandina Aquilino",
+    "Lakeisha London",
+    "Nina Norsworthy",
+    "Dina Donaldson",
+    "Nadine Newson",
+    "Anisha Andersen",
+    "Karon Kinkel",
+    "Luetta Luedke",
+    "Tracy Tseng",
+    "Marquis Moldenhauer",
+    "Marisol Montelongo",
+    "Antonina Andre",
+    "Hilma Harps",
+    "Linnea Loftus",
+    "Alexa Antley",
+    "Annelle Arreola",
+    "Ghislaine Guadalupe",
+    "Alysa Appling",
+    "Jacinta Joynes",
+    "Maragret Muncy",
+    "Mel Munguia",
+    "Holley Hillard",
+    "Tamie Tootle",
+    "Wally Wingler",
+    "Boyd Blalock",
+    "Sherryl Silvis",
+    "Penny Parrilla",
+    "Myrta Mund",
+    "Kanesha Karls",
+    "Doyle Dobyns",
+    "Rubi Rehberg",
+    "Deon Dona",
+    "Shalanda Salais",
+    "Mara Mascarenas",
+    "Monserrate Moreles",
+    "Kaley Knouse",
+    "Babara Brogan",
+    "Naoma Neale",
+    "Lenard Lukasiewicz",
+    "Nanci Nagler",
+    "Marianna Mcgough",
+    "Nichol Nickles",
+    "Diana Deborde",
+    "Elaine Easterling",
 ]
 
 
 def build_entry(oncall=False):
-    """build a randomly timed db entry from the names set above
-
-    :function: TODO
-    :returns: TODO
-
-    """
+    global names
     entryname = random.choice(names)
     names.remove(entryname)
     entrycallback = "x" + str(random.randrange(1000, 9999))
@@ -67,20 +82,23 @@ def build_entry(oncall=False):
     if oncall:
         entryoncall = "TRUE"
         entryaddtime = entryaddtime + " + interval '1 hour'"
-    querystring = """\
-        INSERT INTO signout (intern_name, intern_callback, service, oncall, addtime)\
-        VALUES ('%s', '%s', '%s', %s, %s);""" % (
+    querystring = """
+        INSERT INTO signout (intern_name, intern_callback, service, oncall, addtime)
+        VALUES ('%s', '%s', '%s', %s, %s);
+        """ % (
         entryname,
         entrycallback,
         entryservice,
         entryoncall,
         entryaddtime,
     )
-    print(querystring)
+    if __name__ == "__main__":
+        print(querystring)
+    return querystring
 
 
 if __name__ == "__main__":
     for x in range(13):
         build_entry()
     for x in range(7):
-        build_entry(True)
+        build_entry(oncall=True)
