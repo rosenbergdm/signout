@@ -28,9 +28,9 @@ from flask import (
     url_for,
 )
 from flask_login import (
+    current_user,
     login_required,
     login_user,
-    current_user,
     logout_user,
 )
 from werkzeug.security import check_password_hash

@@ -5,20 +5,18 @@
 #
 # Distributed under terms of the MIT license.
 
-
 import atexit
 import distutils.cmd
-import distutils.log
 import distutils.command.build
+import distutils.log
 import os
-
 import uuid
 
+import jinja2
+import psycopg2
 import setuptools
 import setuptools.command.build_py
 import setuptools.command.install
-import jinja2
-import psycopg2
 
 config_options = {}
 config_opt_names = [

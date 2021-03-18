@@ -18,7 +18,7 @@ from time import sleep
 from twilio.rest import Client
 
 from signout.app import application as app
-from signout.db import load_db_settings, get_db
+from signout.db import get_db, load_db_settings
 
 
 def get_callback_number(nflist):
