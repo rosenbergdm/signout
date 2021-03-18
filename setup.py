@@ -1,4 +1,3 @@
-#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim:enc=utf-8
 #
@@ -120,7 +119,6 @@ class ConfigureCommand(distutils.cmd.Command):
         assert self.dbname != "", "'--dbname=DBNAME' is a required option"
         assert self.dbuser != "", "'--dbuser=DBUSER' is a required option"
         assert self.dbpass != "", "'--dbpass=DBPASS' is a required option"
-        # super().finalize_options()
 
     def run(self):
         tmpldict = {
@@ -170,18 +168,6 @@ class BuildCommand(distutils.command.build.build):
         assert self.dbuser != "", "'--dbuser=DBUSER' is a required option"
         assert self.dbpass != "", "'--dbpass=DBPASS' is a required option"
         super().finalize_options()
-        # global config_options
-        # global config_opt_names
-        # for opt in config_opt_names:
-        #     if opt in config_options.keys():
-        #         setattr(self, opt, config_options[opt])
-        # for opt in config_opt_names:
-        #     if getattr(self, opt) != "":
-        #         config_options[opt] = getattr(self, opt)
-        # assert self.dbname != "", "'--dbname=DBNAME' is a required option"
-        # assert self.dbuser != "", "'--dbuser=DBUSER' is a required option"
-        # assert self.dbpass != "", "'--dbpass=DBPASS' is a required option"
-        # super().finalize_options()
 
     def run(self):
         self.run_command("configure")
@@ -215,15 +201,6 @@ class InstallCommand(setuptools.command.install.install):
         assert self.dbname != "", "'--dbname=DBNAME' is a required option"
         assert self.dbuser != "", "'--dbuser=DBUSER' is a required option"
         assert self.dbpass != "", "'--dbpass=DBPASS' is a required option"
-        super().finalize_options()
-        # global config_options
-        # global config_opt_names
-        # for opt in config_opt_names:
-        #     if getattr(self, opt) == "":
-        #         setattr(self, opt, config_options[opt])
-        # assert self.dbname != "", "'--dbname=DBNAME' is a required option"
-        # assert self.dbuser != "", "'--dbuser=DBUSER' is a required option"
-        # assert self.dbpass != "", "'--dbpass=DBPASS' is a required option"
         super().finalize_options()
 
     def run(self):
@@ -308,10 +285,7 @@ s = setuptools.setup(
     ],
 )
 
-try:
-    post_install()
-except Exception:
-    print("NO wsgi file written")
-
-
-
+# try:
+#     post_install()
+# except Exception:
+#     print("NO wsgi file written")

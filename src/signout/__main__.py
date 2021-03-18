@@ -13,6 +13,10 @@ Program to run the MSKCC intern signout page
 
 Run this as `> python3 -m signout`
 """
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from signout.app import application as app
 from signout.db import load_db_settings
