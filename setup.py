@@ -111,12 +111,16 @@ class ConfigureCommand(distutils.cmd.Command):
 
     def finalize_options(self):
         global config_options
-        for opt in ["dbname", "dbuser", "dbpass"]:
-            if opt in config_options.keys():
+        global config_opt_names
+        for opt in config_opt_names:
+            if getattr(self, opt) != "":
+                config_options[opt] = getattr(self, opt)
+            elif opt in config_options.keys() and config_options[opt] != "":
                 setattr(self, opt, config_options[opt])
         assert self.dbname != "", "'--dbname=DBNAME' is a required option"
         assert self.dbuser != "", "'--dbuser=DBUSER' is a required option"
         assert self.dbpass != "", "'--dbpass=DBPASS' is a required option"
+        # super().finalize_options()
 
     def run(self):
         tmpldict = {
@@ -157,15 +161,27 @@ class BuildCommand(distutils.command.build.build):
         global config_options
         global config_opt_names
         for opt in config_opt_names:
-            if opt in config_options.keys():
-                setattr(self, opt, config_options[opt])
-        for opt in config_opt_names:
             if getattr(self, opt) != "":
                 config_options[opt] = getattr(self, opt)
+            elif opt in config_options.keys() and config_options[opt] != "":
+                # elif config_options[opt] != "":
+                setattr(self, opt, config_options[opt])
         assert self.dbname != "", "'--dbname=DBNAME' is a required option"
         assert self.dbuser != "", "'--dbuser=DBUSER' is a required option"
         assert self.dbpass != "", "'--dbpass=DBPASS' is a required option"
         super().finalize_options()
+        # global config_options
+        # global config_opt_names
+        # for opt in config_opt_names:
+        #     if opt in config_options.keys():
+        #         setattr(self, opt, config_options[opt])
+        # for opt in config_opt_names:
+        #     if getattr(self, opt) != "":
+        #         config_options[opt] = getattr(self, opt)
+        # assert self.dbname != "", "'--dbname=DBNAME' is a required option"
+        # assert self.dbuser != "", "'--dbuser=DBUSER' is a required option"
+        # assert self.dbpass != "", "'--dbpass=DBPASS' is a required option"
+        # super().finalize_options()
 
     def run(self):
         self.run_command("configure")
@@ -186,18 +202,28 @@ class InstallCommand(setuptools.command.install.install):
         self.twilio_sid = ""
         self.twilio_auth_token = ""
         self.twilio_number = ""
-        atexit.register(post_install)
 
     def finalize_options(self):
         global config_options
         global config_opt_names
-        print(f"config_options='{config_options}'")
-        assert self.dbname != "", "'--dbname=DBNAME' is a required option"
-        assert self.dbuser != "", "'--dbuser=DBUSER' is a required option"
-        assert self.dbpass != "", "'--dbpass=DBPASS' is a required option"
         for opt in config_opt_names:
             if getattr(self, opt) != "":
                 config_options[opt] = getattr(self, opt)
+                # elif config_options[opt] != "":
+            elif opt in config_options.keys() and config_options[opt] != "":
+                setattr(self, opt, config_options[opt])
+        assert self.dbname != "", "'--dbname=DBNAME' is a required option"
+        assert self.dbuser != "", "'--dbuser=DBUSER' is a required option"
+        assert self.dbpass != "", "'--dbpass=DBPASS' is a required option"
+        super().finalize_options()
+        # global config_options
+        # global config_opt_names
+        # for opt in config_opt_names:
+        #     if getattr(self, opt) == "":
+        #         setattr(self, opt, config_options[opt])
+        # assert self.dbname != "", "'--dbname=DBNAME' is a required option"
+        # assert self.dbuser != "", "'--dbuser=DBUSER' is a required option"
+        # assert self.dbpass != "", "'--dbpass=DBPASS' is a required option"
         super().finalize_options()
 
     def run(self):
@@ -281,3 +307,11 @@ s = setuptools.setup(
         "wrapt==1.12.1",
     ],
 )
+
+try:
+    post_install()
+except Exception:
+    print("NO wsgi file written")
+
+
+
