@@ -10,6 +10,9 @@
 - Interface for modifying callback numbers
 - Split into separate python scripts
 - Calculate best-estimate of elapsed-time for signouts
+- From B.C.: - Notification messages after 7:15 not 7:30
+- From B.C.: ore predictable refresh (every 1 min?  save form data?  not within 30s of submit time? more freq for NF page?)
+- From B.C.: Don't notify on Gen med non-signouts. 
 
 # Post v0.4 upgrade
 
@@ -17,10 +20,10 @@
 - **COMPLETE** There is no Lymphoma #3. There is a Lymphoma green APP.
 - **COMPLETE** Add note to the 'add page' demonstrating the normal formatting of the list names (6ad8ec64dbf96291346596b80093fa3387622429)
 - ? Add ability for NF to 'add lists' to the person currently signing out
-- ? Web interface for changing configuration values
+- **WILL NOT DO: better to use the arcane curl syntax on the CLI** Web interface for changing configuration values
 - **COMPLETE** Fix for the insertContact not putting in the right email address on some pages (ex: submission, works fine on query) (aaa4519eaf660d1adfcf2c69a6afaeb34deac75c)
 - **COMPLETE** UI and logging cleanup (2acc089a9bca2156b55abfc572cb0e4ae3aac62c)
-- ? Web interface for interrogating server state
+- **COMPLETE WITH MODS: Uses curl on CLI*** Web interface for interrogating server state
 - **COMPLETE** Admin interface for changing service lists: (3a21e20102042741c27116403a3e0be60fa6f3b5)
 - **COMPLETE** Millisecond timing for system clock sync (75fb038334290b13b34d6a2963d07e5d76e6195e)
 
