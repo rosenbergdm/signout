@@ -11,8 +11,9 @@
 - Split into separate python scripts
 - Calculate best-estimate of elapsed-time for signouts
 - From B.C.: - Notification messages after 7:15 not 7:30
-- From B.C.: ore predictable refresh (every 1 min?  save form data?  not within 30s of submit time? more freq for NF page?)
+- From B.C.: More predictable refresh (every 1 min?  save form data?  not within 30s of submit time? more freq for NF page?)
 - From B.C.: Don't notify on Gen med non-signouts. 
+- From S.N.: Put gen med at the bottom of the signout form so that it isn't accidentally selected.
 
 # Post v0.4 upgrade
 
